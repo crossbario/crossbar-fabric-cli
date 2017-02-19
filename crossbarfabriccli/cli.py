@@ -9,7 +9,13 @@ import os
 from crossbarfabriccli import __version__
 from crossbarfabriccli.key import UserKey
 from crossbarfabriccli.config import Config
+from crossbarfabriccli.client import ClientSession
 from os.path import expanduser, join, exists
+
+import six
+import sys
+import argparse
+from autobahn.twisted.wamp import ApplicationRunner
 
 
 def pprint_json(value):
@@ -27,6 +33,10 @@ class CmdConfig(object):
     help="Set the profile to be used",
 )
 @click.option(
+    '--realm', envvar='CBF_REALM', default=None,
+    help="Set the realm to be used",
+)
+@click.option(
     '--debug', '-d', 'debug',
     flag_value=True,
     default=False,
@@ -38,9 +48,10 @@ class CmdConfig(object):
     help='Output in json instead of text',
 )
 @click.pass_context
-def main(ctx, profile, debug, json):
+def main(ctx, profile, realm, debug, json):
     cfg = CmdConfig()
     cfg.profile = profile
+    cfg.realm = realm
     cfg.debug = debug
     cfg.output = 'json' if json else 'text'
 
@@ -85,7 +96,28 @@ def _init_cbf_dir(dotdir=None, profile=None):
 @main.command()
 @click.pass_obj
 def login(cfg):
+    if cfg.debug:
+        txaio.start_logging(level='debug')
+    else:
+        txaio.start_logging(level='info')
+
     key, profile = _init_cbf_dir(profile=cfg.profile)
 
     click.echo('using profile: {}'.format(profile))
     click.echo('using key: {}'.format(key))
+
+    realm = cfg.realm or profile.realm or u'fabric'
+    authid = key.user_id
+
+    url = u'ws://localhost:8080/ws'
+
+    extra = {
+        u'authid': authid,
+        u'cfg': cfg,
+        u'key': key,
+        u'profile': profile
+    }
+    click.echo('connecting to {}: realm={}, authid={}'.format(url, realm, authid))
+
+    runner = ApplicationRunner(url=url, realm=realm, extra=extra)
+    runner.run(ClientSession)

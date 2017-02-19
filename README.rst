@@ -1,4 +1,18 @@
+
 # Fabric CLI
+
+
+pip install crossbarfabriccli
+
+cbf login
+
+cbf list nodes
+cbf check node
+cbf pair node
+
+cbf start worker ..
+cbf start realm ..
+
 
 ## cbf init
 

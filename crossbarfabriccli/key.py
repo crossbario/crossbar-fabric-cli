@@ -110,6 +110,9 @@ class UserKey(object):
         self._pubkey_path = pubkey
 
         self.key = None
+        self._creator = None
+        self._created_at = None
+        self.user_id = None
         self._privkey = None
         self._privkey_hex = None
         self._pubkey = None
@@ -130,6 +133,9 @@ class UserKey(object):
                 if tag not in priv_tags:
                     raise Exception("Corrupt user private key file {} - {} tag not found".format(privkey_path, tag))
 
+            creator = priv_tags[u'creator']
+            created_at = priv_tags[u'created-at']
+            user_id = priv_tags[u'user-id']
             privkey_hex = priv_tags[u'private-key-ed25519']
             privkey = SigningKey(privkey_hex, encoder=HexEncoder)
             pubkey = privkey.verify_key
@@ -171,6 +177,9 @@ class UserKey(object):
 
         else:
             # user private key does not yet exist: generate one
+            creator = _creator()
+            created_at = utcnow()
+            user_id = _user_id()
             privkey = SigningKey.generate()
             privkey_hex = privkey.encode(encoder=HexEncoder).decode('ascii')
             pubkey = privkey.verify_key
@@ -178,9 +187,9 @@ class UserKey(object):
 
             # first, write the public file
             tags = OrderedDict([
-                (u'creator', _creator()),
-                (u'created-at', utcnow()),
-                (u'user-id', _user_id()),
+                (u'creator', creator),
+                (u'created-at', created_at),
+                (u'user-id', user_id),
                 (u'public-key-ed25519', pubkey_hex),
             ])
             msg = u'Crossbar.io Fabric user public key\n\n'
@@ -204,6 +213,9 @@ class UserKey(object):
             self.log.info("File permissions on user private key fixed!")
 
         # load keys into object
+        self._creator = creator
+        self._created_at = created_at
+        self.user_id = user_id
         self._privkey = privkey
         self._privkey_hex = privkey_hex
         self._pubkey = pubkey
