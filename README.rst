@@ -1,3 +1,57 @@
+# Fabric CLI
+
+## cbf init
+
+Invoking
+
+```
+cbf init
+```
+
+initializes cbf:
+
+- if directory `$HOME/.cbf` does not exist, create it
+- if `$HOME/.cbf/config` does not exist, create a default one
+- if `$HOME/.cbf/userkey.priv|pub` exist, if not, generate them, asking for email in the course
+
+Then try login using email as `authid` and pubkey from `$HOME/.cbf/userkey.pub` as `authextra`.
+
+The userkey pair to use can be overidden using command line options.
+
+If no realm is specified on the command line, cbf will connect to the global realm.
+
+A user can specify a management realm to connect to, which will be necessary for all non top level actions like eg
+
+
+cbf --realm global info
+
+cbf --realm oberstet list nodes
+
+export CBF_REALM=oberstet
+
+cbf list nodes
+cbf list workers --node node7
+cbf list components --node node7 --container container6
+cbf list realms --node node7 --router router4
+
+cbf register node --node7 <PATH TO NODE PUBLIC KEYFILE>
+
+cbf check node --node node7
+cbf check worker --node node7 --worker router4
+
+cbf start worker --node node7 myworker.json
+cbf start component --node node2 --worker container6 mycomponent.json
+cbf start realm --node node3 --worker router4 myrealm.json
+cbf start role --node node4 --worker router4 myrole.json
+cbf start permission --node node3 --worker router4 --realm realm1 mypermission.json
+
+
+cbf start component "node=node2 container=container6 component=component4" mycomponent.json
+
+cbf start component --path "/node/node2/worker/container6/component/component4" mycomponent.json
+
+
+
 # CDC CLI
 
 * Overview
@@ -28,7 +82,7 @@
 
 `cdc` is a command line interface (CLI) for Crossbar.io DevOps Center (CDC).
 
-`cdc` can be used to manage and monitor a fleet of Crossbar.io nodes remotely. `cdc` connects to CDC issuing commmands, like listing all currently running Crossbar.io nodes or start a new worker on a Crossbar.io node. 
+`cdc` can be used to manage and monitor a fleet of Crossbar.io nodes remotely. `cdc` connects to CDC issuing commmands, like listing all currently running Crossbar.io nodes or start a new worker on a Crossbar.io node.
 
 'cdc' does not connect directly to Crossbar.io nodes, but works through a connection to a CDC instance:
 
@@ -153,7 +207,7 @@ cdc --profile=bob get time
 
 Many options that need to be provided are simple string or numeric values. However, some operations require JSON data structures as input parameters.
 
-These data structures can be given as a JSON-formatted commandline string, e.g. 
+These data structures can be given as a JSON-formatted commandline string, e.g.
 
 ```console
 cdc create transport \
@@ -174,7 +228,7 @@ or from a file.
 
 'cdc' enables the creation as well as the configuration of nodes, e.g. starting routers, modifying workers and setting permissions.
 
-Configurations are stored in the CDC database. Entries are created, modified and deleted via the respective commands (`create`, `modify`, `delete`). 
+Configurations are stored in the CDC database. Entries are created, modified and deleted via the respective commands (`create`, `modify`, `delete`).
 
 `create` accepts a full set of configuration data, while `modify` takes a change set. Data in the change set for existing entries results in a change of those entries, while new data results in the entry being added. It is possible to delete an entry by setting its value to `null` in a change set.
 
@@ -182,7 +236,7 @@ The configuration does not contain any configuration data for sub-entities, e.g.
 
 An entity in the CDC database can be run (by doing `start`), and the current configuration will apply (entities can only be run if their containing entity is running, e.g. a realm can only be started if the router worker it is on is already running). A cyle of `stop` and `start` restarts with the current settings (there's also `restart` which does this with a single command).
 
-Starting an entity as a default also starts all its sub-entities recursively, e.g. when starting a worker, realms and transports configured within this worker are also started, as are the roles within the realms. To start an entity without the contained sub-entities, e.g. when debugging to see what sub-entity causes problems, set the option `recursive='false'`. 
+Starting an entity as a default also starts all its sub-entities recursively, e.g. when starting a worker, realms and transports configured within this worker are also started, as are the roles within the realms. To start an entity without the contained sub-entities, e.g. when debugging to see what sub-entity causes problems, set the option `recursive='false'`.
 
 `delete`, when applied to a running entity, defaults to stopping the entity and then deleting it from the database. This default can be overriden with --dontstop, in which case trying to delete a running instance returns an exception.
 
@@ -233,7 +287,7 @@ A sample configuration is:
 
 #### Starting
 
-Nodes cannot be started by the CDC - since without a node there's no entity to receive a `start`command. 
+Nodes cannot be started by the CDC - since without a node there's no entity to receive a `start`command.
 
 When you start a node (manually, via script etc.), it can only connect to the CDC if its connection data establishes a transport to the CDC and it has the required authentication key.
 
@@ -272,7 +326,7 @@ The <change_set> is a JSON data structure, which can contain any subset of the c
 ```
 
 which would change the transport port from `9000` (as seen in the example configuration for `create`) to `8080`.
- 
+
 
 #### Deleting
 
@@ -282,7 +336,7 @@ To delete a node, do
 cdc delete node <node_id>
 ```
 
-Deleting a node erases the node configuration from the CDC database, and drops the connection to the node. 
+Deleting a node erases the node configuration from the CDC database, and drops the connection to the node.
 
 The `--stopnode` option stops the node before dropping the connection. Otherwise you're free to manage this on your own (if you want).
 
@@ -301,7 +355,7 @@ If you're in a terminal on the machine running the Crossbar.io node, in the dire
 cdc attach node <node_id>
 ```
 
-This creates a node in the CDC database, copies the connection data into the local configuration, and copies the local configuration into the database. 
+This creates a node in the CDC database, copies the connection data into the local configuration, and copies the local configuration into the database.
 
 <node_id> is optional - if omitted, the CDC just assigns an ID.
 
@@ -485,7 +539,7 @@ WAMP routing occurs within realms, i.e. messages are only routed between client 
    where the <change_set> is either a full realm configuration, a change in the name of the realm, or a set of roles which replaces the current set. If you want to add, remove or modify permissions or roles, use the more specific mechanisms described further below.
 
    * Reloading
-   
+
 ? is there a reloading? The realm is not something which runs, but which exists on the router. It is always possible to change this without a restart of the router. adding roles is always possible without affecting anything currently running, while removing roles would kill connections. The question here is not 'restart' but 'apply if this affects current connections' ???
 
 
@@ -507,7 +561,7 @@ WAMP routing occurs within realms, i.e. messages are only routed between client 
 Realms are what WAMP clients connect to logically, transports are how they connect technically. To fulfill its function, a router worker requires at least one transport. For the different types of transports and the available options see the Crossbar.io documentation.
 
    * Creating a Transport
-   
+
    To create a transport, do
 
    ```console
@@ -534,7 +588,7 @@ Realms are what WAMP clients connect to logically, transports are how they conne
 
    ```console
    cdc start transport <full_transport_path>
-   
+
    * Stopping a Transport
 
    To stop a transport do
@@ -550,7 +604,7 @@ Realms are what WAMP clients connect to logically, transports are how they conne
    cdc modify transport <full_transport_path> <change_set>
    ```
 
-   where the <change_set> is either a full transport configuration, a change in the name of the transport, or a set of the remaining configuration options which replaces the current set.    
+   where the <change_set> is either a full transport configuration, a change in the name of the transport, or a set of the remaining configuration options which replaces the current set.
 
    Modifying a transport modifies the entry in the CDC database, but these changes are not applied to a running transport.
 
@@ -561,7 +615,7 @@ Realms are what WAMP clients connect to logically, transports are how they conne
    ```console
    cdc reload transport <full_transport_path> --restart='true'
    ```
-   
+
    This checks whether the current modifications to the transport configuration can be applied without a restart of the transport. If this is the case, then the changes are applied.
 
    If the changes require a restart, then the outcome is determined by the `restart`argument. If this is set to `true`, the transport is restarted, if `false` then the changes in their entirety are not applied.
