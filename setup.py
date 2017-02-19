@@ -26,69 +26,55 @@
 
 from __future__ import absolute_import
 
-import sys
-import re
-import os
-import platform
 from setuptools import setup, find_packages
 
-# Get package version and docstring from cdc/__init__.py
-#
-PACKAGE_FILE = "crossbar-fabric-cli/__init__.py"
-initfile = open(PACKAGE_FILE, "rt").read()
+with open('crossbarfabriccli/_version.py') as f:
+    exec(f.read())  # defines __version__
 
-VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VSRE, initfile, re.M)
-if mo:
-    verstr = mo.group(1)
-else:
-    raise RuntimeError("Unable to find version string in {}.".format(PACKAGE_FILE))
-
-DSRE = r"__doc__ = \"\"\"(.*)\"\"\""
-mo = re.search(DSRE, initfile, re.DOTALL)
-if mo:
-    docstr = mo.group(1)
-else:
-    raise RuntimeError("Unable to find doc string in {}.".format(PACKAGE_FILE))
-
+with open('README.rst') as f:
+    docstr = f.read()
 
 setup(
-    name='crossbar-fabric-cli',
-    version=verstr,
+    name='crossbarfabriccli',
+    version=__version__,
     description='Crossbar.io Fabric command line interface (CLI).',
     long_description=docstr,
-    author='Tavendo GmbH',
-    author_email='autobahnws@googlegroups.com',
-    url='http://crossbar.io/',
+    author='Crossbar.io Technologies GmbH',
+    url='http://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'autobahn[asyncio]>=0.10.5',  # MIT license
-        'humanize>=0.5.1',            # MIT license
+        'twisted>=17.1.0',
+        'autobahn[twisted,accelerate,serialization,encryption]>=0.17.1',
+        'humanize>=0.5.1',
+        'click>=6.7',
     ],
     extras_require={
     },
     entry_points={
         'console_scripts': [
-            'cfb = crossbar-fabric-cli.main:cdc'
-        ]},
+            'cbf = crossbarfabriccli.cli:main'
+        ]
+    },
     packages=find_packages(),
     include_package_data=True,
-    data_files=[('.', ['LICENSE', 'README.md'])],
+    data_files=[
+        ('.', ['LICENSE', 'README.rst'])
+    ],
     zip_safe=False,
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    #
     classifiers=["License :: OSI Approved :: MIT License",
                  "Development Status :: 4 - Beta",
                  "Intended Audience :: Developers",
                  "Intended Audience :: System Administrators",
                  "Environment :: Console",
                  "Operating System :: OS Independent",
-                 "Programming Language :: Python :: 2.6",
                  "Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
                  "Programming Language :: Python :: 3.3",
                  "Programming Language :: Python :: 3.4",
+                 "Programming Language :: Python :: 3.5",
+                 "Programming Language :: Python :: 3.6",
                  "Programming Language :: Python :: Implementation :: CPython",
                  "Programming Language :: Python :: Implementation :: PyPy"],
-    keywords='crossbar.io crossbar'
+    keywords='crossbar.io crossbar wamp router cli administration management'
 )
