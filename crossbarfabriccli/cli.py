@@ -94,8 +94,12 @@ def _init_cbf_dir(dotdir=None, profile=None):
 
 
 @main.command()
+@click.option(
+    '--code', default=None,
+    help="Supply login/registration code",
+)
 @click.pass_obj
-def login(cfg):
+def login(cfg, code):
     if cfg.debug:
         txaio.start_logging(level='debug')
     else:
@@ -113,9 +117,11 @@ def login(cfg):
 
     extra = {
         u'authid': authid,
+        u'authrole': None,
         u'cfg': cfg,
         u'key': key,
-        u'profile': profile
+        u'profile': profile,
+        u'activation_code': code
     }
     click.echo('connecting to {}: realm={}, authid={}'.format(url, realm, authid))
 

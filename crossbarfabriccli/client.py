@@ -65,13 +65,18 @@ class ClientSession(ApplicationSession):
             # encoded 32 bytes random value.
             u'challenge': None,
 
-            u'channel_binding': u'tls-unique'
+            u'channel_binding': u'tls-unique',
         }
+
+        # used for user login/registration activation code
+        if u'activation_code' in self.config.extra and self.config.extra[u'activation_code']:
+            extra[u'activation_code'] = self.config.extra[u'activation_code']
 
         # now request to join ..
         self.join(self.config.realm,
                   authmethods=[u'cryptosign'],
-                  authid=self.config.extra[u'authid'],
+                  authid=self.config.extra.get(u'authid', None),
+                  authrole=self.config.extra.get(u'authrole', None),
                   authextra=extra)
 
     def onChallenge(self, challenge):
