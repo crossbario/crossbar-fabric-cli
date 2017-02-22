@@ -34,7 +34,11 @@ class CmdConfig(object):
 )
 @click.option(
     '--realm', envvar='CBF_REALM', default=None,
-    help="Set the realm to be used",
+    help="Override the realm to join",
+)
+@click.option(
+    '--role', envvar='CBF_ROLE', default=None,
+    help="Override the role requested on the realm to join",
 )
 @click.option(
     '--debug', '-d', 'debug',
@@ -48,10 +52,11 @@ class CmdConfig(object):
     help='Output in json instead of text',
 )
 @click.pass_context
-def main(ctx, profile, realm, debug, json):
+def main(ctx, profile, realm, role, debug, json):
     cfg = CmdConfig()
     cfg.profile = profile
     cfg.realm = realm
+    cfg.role = role
     cfg.debug = debug
     cfg.output = 'json' if json else 'text'
 
@@ -92,6 +97,21 @@ def _init_cbf_dir(dotdir=None, profile=None):
 
     return key, profile_obj
 
+from twisted.internet import reactor
+from twisted.internet.error import ReactorNotRunning
+from twisted.internet.defer import Deferred, inlineCallbacks, returnValue
+from twisted.internet.task import react
+
+def connect(reactor, on_success, on_error, url, realm, extra):
+    done = Deferred()
+    done.addCallbacks(on_success, on_error)
+    extra[u'done'] = done
+
+    runner = ApplicationRunner(url=url, realm=realm, extra=extra)
+    runner.run(ClientSession, start_reactor=False, auto_reconnect=False)
+
+    return done
+
 
 @main.command()
 @click.option(
@@ -99,31 +119,36 @@ def _init_cbf_dir(dotdir=None, profile=None):
     help="Supply login/registration code",
 )
 @click.pass_obj
+@inlineCallbacks
 def login(cfg, code):
-    if cfg.debug:
-        txaio.start_logging(level='debug')
-    else:
-        txaio.start_logging(level='info')
-
     key, profile = _init_cbf_dir(profile=cfg.profile)
 
-    click.echo('using profile: {}'.format(profile))
-    click.echo('using key: {}'.format(key))
+    #click.echo('using profile: {}'.format(profile))
+    #click.echo('using key: {}'.format(key))
 
     realm = cfg.realm or profile.realm or u'fabric'
+    authrole = cfg.role or profile.role or None
     authid = key.user_id
 
     url = u'ws://localhost:8080/ws'
 
     extra = {
         u'authid': authid,
-        u'authrole': None,
+        u'authrole': authrole,
         u'cfg': cfg,
         u'key': key,
         u'profile': profile,
-        u'activation_code': code
+        u'activation_code': code,
     }
-    click.echo('connecting to {}: realm={}, authid={}'.format(url, realm, authid))
+    #click.echo('connecting to {}: realm={}, authid={}'.format(url, realm, authid))
 
-    runner = ApplicationRunner(url=url, realm=realm, extra=extra)
-    runner.run(ClientSession)
+    if cfg.debug:
+        txaio.start_logging(level='debug')
+
+    def success(details):
+        print('login successful: realm={}, authid={}, authrole={}'.format(details.realm, details.authid, details.authrole))
+
+    def error(err):
+        print('login failed: {}'.format(err))
+
+    react(connect, (success, error, url, realm, extra))

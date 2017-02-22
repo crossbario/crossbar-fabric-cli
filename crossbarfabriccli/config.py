@@ -17,23 +17,25 @@ class Profile(object):
 
     log = make_logger()
 
-    def __init__(self, name=None, reconnect=None, debug=None, realm=None, pubkey=None, privkey=None):
+    def __init__(self, name=None, reconnect=None, debug=None, realm=None, role=None, pubkey=None, privkey=None):
         self.name = name
         self.reconnect = reconnect
         self.debug = debug
         self.realm = realm
+        self.role = role
         self.pubkey = pubkey
         self.privkey = privkey
 
     def __str__(self):
         name = u'u"{}"'.format(self.name) if self.name else u'None'
-        return u'Profile(name={}, reconnect={}, debug={}, realm={}, pubkey={}, privkey={})'.format(name, self.reconnect, self.debug, self.realm, self.pubkey, self.privkey)
+        return u'Profile(name={}, reconnect={}, debug={}, realm={}, role={}, pubkey={}, privkey={})'.format(name, self.reconnect, self.debug, self.realm, self.role, self.pubkey, self.privkey)
 
     @staticmethod
     def parse(name, items):
         reconnect = None
         debug = None
         realm = None
+        role = None
         pubkey = None
         privkey = None
         for k, v in items:
@@ -43,6 +45,8 @@ class Profile(object):
                 debug = bool(v)
             elif k == 'realm':
                 realm = str(v)
+            elif k == 'role':
+                role = str(v)
             elif k == 'pubkey':
                 pubkey = str(v)
             elif k == 'privkey':
@@ -51,10 +55,16 @@ class Profile(object):
                 # skip unknown attribute
                 self.log.warn('unprocessed config attribute "{}"'.format(k))
 
-        profile = Profile(name, reconnect, debug, realm, pubkey, privkey)
+        profile = Profile(name, reconnect, debug, realm, role, pubkey, privkey)
 
         return profile
 
+DEFAULT_CONFIG = """
+[default]
+
+privkey=default.priv
+pubkey=default.pub
+"""
 
 class Config(object):
 
@@ -68,7 +78,7 @@ class Config(object):
 
         if not os.path.isfile(config_path):
             with open(config_path, 'w') as f:
-                f.write('[test]')
+                f.write(DEFAULT_CONFIG)
 
         config = configparser.ConfigParser()
         config.read(config_path)

@@ -34,6 +34,8 @@ from twisted.internet.error import ReactorNotRunning
 from autobahn.twisted.wamp import ApplicationSession
 from autobahn.wamp import cryptosign
 
+from autobahn.wamp.exception import ApplicationError
+
 
 class ClientSession(ApplicationSession):
 
@@ -97,15 +99,29 @@ class ClientSession(ApplicationSession):
     def onJoin(self, details):
         self.log.info("session joined: {details}", details=details)
         self.log.info("*** Hooray! We've been successfully authenticated with WAMP-cryptosign using Ed25519! ***")
-        self.leave()
+
+        done = self.config.extra.get(u'done', None)
+        if done and not done.called:
+            done.callback(details)
+
+        #self.leave()
 
     def onLeave(self, details):
         self.log.info("session closed: {details}", details=details)
+
+        # reason=<wamp.error.authentication_failed>
+        if details.reason != u'wamp.close.normal':
+            done = self.config.extra.get(u'done', None)
+            if done and not done.called:
+                done.errback(ApplicationError(details.reason, details.message))
+
         self.disconnect()
 
     def onDisconnect(self):
         self.log.info("connection to router closed")
-        try:
-            reactor.stop()
-        except ReactorNotRunning:
-            pass
+
+#        try:
+#            reactor.stop()
+#        except ReactorNotRunning:
+#            pass
+
