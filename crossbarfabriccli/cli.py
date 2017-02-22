@@ -34,10 +34,13 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import prompt, prompt_async
 
 
-from crossbarfabriccli import repl
+from crossbarfabriccli import repl, command
+
+import asyncio
+from crossbarfabriccli import client
 
 
-class CmdGlobal(object):
+class Application(object):
 
     def __init__(self):
         self.current_resource_type = None
@@ -45,21 +48,87 @@ class CmdGlobal(object):
         self.session = None
 
     def __str__(self):
-        return u'CmdGlobal(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
+        return u'App(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
 
-global_cfg = CmdGlobal()
+_app = Application()
 
 
-class CmdConfig(object):
+class Config(object):
 
-    def __init__(self, global_cfg):
-        self.gcfg = global_cfg
+    def __init__(self, app):
+        self.app = app
         self.verbose = None
         self.resource_type = None
         self.resource = None
 
     def __str__(self):
-        return u'CmdConfig(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
+        return u'Config(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
+
+
+
+async def run_command(cmd, session):
+    result = await cmd.run(session)
+    click.echo(result)
+
+
+WELCOME = """
+Welcome to Crossbar.io Fabric Shell!
+
+Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
+Type "help" to get help. Try TAB for auto-completion.
+
+"""
+
+def run_context(ctx):
+    click.echo(WELCOME)
+    loop = asyncio.get_event_loop()
+
+    ctx.obj.app.session = client.run()
+
+    prompt_kwargs = {
+        'history': FileHistory('cbf-history'),
+    }
+    shell_task = loop.create_task(repl.repl(ctx, prompt_kwargs=prompt_kwargs))
+
+    loop.run_until_complete(shell_task)
+    loop.close()
+
+
+@click.group()
+@click.pass_context
+def cli(ctx):
+    ctx.obj = Config(_app)
+
+
+@cli.command(help='Run an interactive shell')
+@click.pass_context
+def run(ctx):
+    run_context(ctx)
+
+
+@cli.group(name='list', help='list resources')
+@click.option(
+    '--verbose',
+    help='include resource details',
+    is_flag=True,
+    default=False
+)
+@click.pass_obj
+def cmd_list(cfg, verbose):
+    cfg.verbose = verbose
+
+@cmd_list.command(name='nodes', help='list nodes')
+@click.pass_obj
+async def cmd_list_nodes(cfg):
+    cmd = command.CmdListNodes(verbose=cfg.verbose)
+    await run_command(cmd, cfg.app.session)
+
+@cmd_list.command(name='workers', help='list workers')
+@click.argument('node')
+@click.pass_obj
+async def cmd_list_workers(cfg, node):
+    cmd = command.CmdListWorkers(node, verbose=cfg.verbose)
+    await run_command(cmd, cfg.app.session)
 
 
 
@@ -71,17 +140,16 @@ class CmdConfig(object):
     default=False
 )
 @click.pass_context
-def cli(ctx, verbose):
+def _cli(ctx, verbose):
     #print("333", ctx)
-    cfg = CmdConfig(global_cfg)
+    cfg = Config(global_cfg)
     cfg.verbose = verbose
-
     ctx.obj = cfg
 
 
-@cli.command(help='Start in interactive shell mode')
+@_cli.command(help='Start in interactive shell mode')
 @click.pass_obj
-def shell(cfg):
+def _shell(cfg):
 
     import asyncio
     loop = asyncio.get_event_loop()
@@ -99,7 +167,7 @@ def shell(cfg):
     #loop.run_until_complete(session_task)
 
     #global_cfg.session = client.run()
-    cfg.gcfg.session = client.run()
+    cfg.app.session = client.run()
     #click.echo(global_cfg.session)
 
     #return
@@ -122,9 +190,9 @@ from autobahn.util import rtime
 )
 @click.pass_obj
 async def cmd_add2(cfg, x, y, bias):
-    if cfg.gcfg.session:
+    if cfg.app.session:
         started = rtime()
-        res = await cfg.gcfg.session.call(u'com.example.add2', x, y + bias)
+        res = await cfg.app.session.call(u'com.example.add2', x, y + bias)
         ended = rtime()
         duration = round(1000000. * (ended - started))
         click.echo('RPC took {}us'.format(duration))
@@ -299,7 +367,13 @@ def main():
     """
     Main entry point into CLI.
     """
+    click.clear()
+
+    ctx = {}
+
     cli()
+
+    #cli(ctx)
     return
 
     import asyncio

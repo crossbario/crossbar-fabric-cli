@@ -25,6 +25,21 @@
 #
 ###############################################################################
 
+
+from prompt_toolkit import prompt
+from prompt_toolkit.styles import style_from_dict
+from prompt_toolkit.token import Token
+
+def get_bottom_toolbar_tokens(cli):
+    return [(Token.Toolbar, ' This is a toolbar. ')]
+
+style = style_from_dict({
+    Token.Toolbar: '#ffffff bg:#333333',
+})
+
+
+###########
+
 from collections import defaultdict
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import InMemoryHistory
@@ -206,16 +221,22 @@ async def repl(
 
     if isatty:
         prompt_kwargs = prompt_kwargs or {}
-        prompt_kwargs.setdefault('message', u'> ')
+        prompt_kwargs.setdefault('message', u'>> ')
         history = prompt_kwargs.pop('history', None) \
             or InMemoryHistory()
         completer = prompt_kwargs.pop('completer', None) \
             or ClickCompleter(group)
 
+#text = prompt('> ', get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
+#              style=style)
+
+
         def get_command():
             return prompt_async(completer=completer,
                                 history=history,
                                 #patch_stdout=True,
+                                get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
+                                style=style,
                                 **prompt_kwargs)
     else:
         get_command = sys.stdin.readline
