@@ -48,10 +48,11 @@ test_get_stats:
 
 
 clean:
-	rm -rf build
-	rm -rf dist
-	rm -rf *.egg-info
-	find . -name "*.pyc" -exec rm -f {} \;
+	-rm -rf build
+	-rm -rf dist
+	-rm -rf *.egg-info
+	-rm -rf ./__pycache__
+	-find . -name "*.pyc" -exec rm -f {} \;
 
 # This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:
