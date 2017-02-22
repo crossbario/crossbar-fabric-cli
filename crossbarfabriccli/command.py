@@ -84,3 +84,60 @@ class CmdListWorkers(CmdList):
         else:
             raise Exception('not connected')
 
+
+class CmdShow(Cmd):
+
+    def __init__(self, verbose=False):
+        Cmd.__init__(self)
+        self.verbose = verbose
+
+
+class CmdShowFabric(CmdShow):
+
+    def __init__(self, verbose=False):
+        CmdShow.__init__(self, verbose)
+
+    async def run(self, session):
+        if session:
+            started = rtime()
+            result = await session.call(u'com.example.show_fabric', verbose=self.verbose)
+            ended = rtime()
+            duration = round(1000. * (ended - started), 1)
+            return CmdRunResult(result, duration)
+        else:
+            raise Exception('not connected')
+
+
+class CmdShowNode(CmdShow):
+
+    def __init__(self, node, verbose=False):
+        CmdShow.__init__(self, verbose)
+        self.node = node
+
+    async def run(self, session):
+        if session:
+            started = rtime()
+            result = await session.call(u'com.example.show_node', verbose=self.verbose)
+            ended = rtime()
+            duration = round(1000. * (ended - started), 1)
+            return CmdRunResult(result, duration)
+        else:
+            raise Exception('not connected')
+
+
+class CmdShowWorker(CmdShow):
+
+    def __init__(self, node, worker, verbose=False):
+        CmdShow.__init__(self, verbose)
+        self.node = node
+        self.worker = worker
+
+    async def run(self, session):
+        if session:
+            started = rtime()
+            result = await session.call(u'com.example.show_worker', self.node, verbose=self.verbose)
+            ended = rtime()
+            duration = round(1000. * (ended - started), 1)
+            return CmdRunResult(result, duration)
+        else:
+            raise Exception('not connected')
