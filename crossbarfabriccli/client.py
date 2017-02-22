@@ -8,7 +8,7 @@ from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 from autobahn.wamp.types import ComponentConfig
 
 
-class MyComponent(ApplicationSession):
+class ShellClient(ApplicationSession):
 
     async def onJoin(self, details):
 
@@ -25,7 +25,7 @@ class MyComponent(ApplicationSession):
 
 def run():
     cfg = ComponentConfig(u"realm1", {})
-    session = MyComponent(cfg)
+    session = ShellClient(cfg)
     runner = ApplicationRunner(u"ws://localhost:8080/ws", u"realm1")
     runner.run(session, start_loop=False)
     return session

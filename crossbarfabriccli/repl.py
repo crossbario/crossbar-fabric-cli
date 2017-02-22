@@ -25,32 +25,31 @@
 #
 ###############################################################################
 
-
-from prompt_toolkit import prompt
-from prompt_toolkit.styles import style_from_dict
-from prompt_toolkit.token import Token
-
-def get_bottom_toolbar_tokens(cli):
-    return [(Token.Toolbar, ' This is a toolbar. ')]
-
-style = style_from_dict({
-    Token.Toolbar: '#ffffff bg:#333333',
-})
-
-
-###########
-
-from collections import defaultdict
-from prompt_toolkit.completion import Completer, Completion
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.shortcuts import prompt, prompt_async
-import click
-import click._bashcomplete
-import click.parser
 import os
 import shlex
 import sys
 import six
+from collections import defaultdict
+
+import click
+import click._bashcomplete
+import click.parser
+
+from prompt_toolkit.completion import Completer, Completion
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.shortcuts import prompt, prompt_async
+from prompt_toolkit.styles import style_from_dict
+from prompt_toolkit.token import Token
+from prompt_toolkit import prompt
+
+
+def _get_bottom_toolbar_tokens(cli):
+    return [(Token.Toolbar, ' This is a toolbar. ')]
+
+
+_style = style_from_dict({
+    Token.Toolbar: '#ffffff bg:#333333',
+})
 
 
 class InternalCommandException(Exception):
@@ -113,16 +112,12 @@ _register_internal_command(['?', 'h', 'help'], _help_internal,
                            'displays general help information')
 
 
-NODES = ['node1', 'mynode7', 'foonode']
-
 class ClickCompleter(Completer):
     def __init__(self, cli):
         self.cli = cli
 
     def get_completions(self, document, complete_event=None):
         # Code analogous to click._bashcomplete.do_complete
-        #print(document)
-        #print(complete_event)
 
         try:
             args = shlex.split(document.text_before_cursor)
@@ -146,10 +141,6 @@ class ClickCompleter(Completer):
         if ctx is None:
             return
 
-        from pprint import pprint
-        #pprint(dir(ctx))
-        #print(ctx.command)
-        #print(ctx.command.__class__)
         cmds = []
         c = ctx
         while c:
@@ -194,7 +185,9 @@ async def repl(
         prompt_kwargs=None,
         allow_system_commands=True,
         allow_internal_commands=True,
-        once=False
+        once=False,
+        get_bottom_toolbar_tokens=_get_bottom_toolbar_tokens,
+        style=_style
 ):
     """
     Start an interactive shell. All subcommands are available in it.
@@ -226,10 +219,6 @@ async def repl(
             or InMemoryHistory()
         completer = prompt_kwargs.pop('completer', None) \
             or ClickCompleter(group)
-
-#text = prompt('> ', get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
-#              style=style)
-
 
         def get_command():
             return prompt_async(completer=completer,

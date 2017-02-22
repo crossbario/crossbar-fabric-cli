@@ -24,20 +24,22 @@
 #
 ###############################################################################
 
-
+import asyncio
 import click
-
-# https://github.com/click-contrib/click-repl
-#from click_repl import register_repl
-#import click_repl
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import prompt, prompt_async
+from prompt_toolkit.styles import style_from_dict
+from prompt_toolkit.token import Token
+from crossbarfabriccli import client, repl, command
 
 
-from crossbarfabriccli import repl, command
+WELCOME = """
+Welcome to Crossbar.io Fabric Shell!
 
-import asyncio
-from crossbarfabriccli import client
+Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
+Type "help" to get help. Try TAB for auto-completion.
+
+"""
 
 
 class Application(object):
@@ -47,8 +49,14 @@ class Application(object):
         self.current_resource = None
         self.session = None
 
+    def get_bottom_toolbar_tokens(self, cli):
+            return [(Token.Toolbar, 'current resource: {}'.format(self.format_cwd()))]
+
+    def format_cwd(self):
+        return u'{} -> {}.\n'.format(self.current_resource_type, self.current_resource)
+
     def print_cwd(self):
-        click.echo('{} -> {}.\n'.format(self.current_resource_type, self.current_resource))
+        click.echo(self.format_cwd())
 
     def cwd(self):
         return self.current_resource_type, self.current_resource
@@ -71,30 +79,28 @@ class Config(object):
         return u'Config(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
 
 
-
 async def run_command(cmd, session):
     result = await cmd.run(session)
     click.echo(result)
 
 
-WELCOME = """
-Welcome to Crossbar.io Fabric Shell!
-
-Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
-Type "help" to get help. Try TAB for auto-completion.
-
-"""
-
 def run_context(ctx):
     click.echo(WELCOME)
     loop = asyncio.get_event_loop()
 
-    ctx.obj.app.session = client.run()
+    app = ctx.obj.app
+
+    app.session = client.run()
 
     prompt_kwargs = {
         'history': FileHistory('cbf-history'),
     }
-    shell_task = loop.create_task(repl.repl(ctx, prompt_kwargs=prompt_kwargs))
+
+    shell_task = loop.create_task(
+        repl.repl(ctx,
+                  get_bottom_toolbar_tokens=app.get_bottom_toolbar_tokens,
+                  prompt_kwargs=prompt_kwargs)
+    )
 
     loop.run_until_complete(shell_task)
     loop.close()
@@ -106,11 +112,16 @@ def cli(ctx):
     ctx.obj = Config(_app)
 
 
-@cli.command(help='Run an interactive shell')
+@cli.command(help='run an interactive Crossbar.io Fabric shell')
 @click.pass_context
 def run(ctx):
     run_context(ctx)
 
+
+@cli.command(name='clear', help='clear screen')
+@click.pass_obj
+async def cmd_clear(cfg):
+    click.clear()
 
 @cli.group(name='list', help='list resources')
 @click.option(
@@ -172,25 +183,6 @@ async def cmd_show_worker(cfg, node):
     await run_command(cmd, cfg.app.session)
 
 
-
-
-#:@cmd_stop.command(name='transport', help='Stop a router transport.')
-#@click.argument('resource')
-#@click.option(
-#    '--mode',
-#    help=u'graceful: wait for all clients to disconnect before stopping\n\nimmediate: stop transport forcefully disconnecting all clients',
-#    type=click.Choice([u'graceful', u'immediate']),
-#    default=u'graceful'
-#)
-#@click.pass_obj
-#def cmd_stop_transport(cfg, resource, mode):
-#    cfg.resource_type = u'transport'
-#    cfg.resource = resource
-#    click.echo(cfg)
-#    click.echo(_app)
-
-
-
 @cli.command(name='pwd', help='print current resource')
 @click.pass_obj
 async def cmd_pwd(cfg):
@@ -207,9 +199,6 @@ def cmd_cd(cfg):
 @click.argument('resource')
 @click.pass_obj
 async def cmd_cd_node(cfg, resource):
-    """
-    Change current resource
-    """
     _app.current_resource_type = u'node'
     _app.current_resource = resource
     _app.print_cwd()
