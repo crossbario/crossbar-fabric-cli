@@ -41,6 +41,18 @@ Type "help" to get help. Try TAB for auto-completion.
 
 """
 
+USAGE = """
+Examples:
+To start the interactive shell, use the "shell" command:
+
+    cbf shell
+
+You can run the shell under different user profile
+using the "--profile" option:
+
+    cbf --profile mister-test1 shell
+"""
+
 
 class Application(object):
 
@@ -50,27 +62,28 @@ class Application(object):
         self.session = None
 
     def get_bottom_toolbar_tokens(self, cli):
-            return [(Token.Toolbar, 'current resource: {}'.format(self.format_cwd()))]
+            return [(Token.Toolbar, 'current resource: {}'.format(self.format_selected()))]
 
-    def format_cwd(self):
+    def format_selected(self):
         return u'{} -> {}.\n'.format(self.current_resource_type, self.current_resource)
 
-    def print_cwd(self):
-        click.echo(self.format_cwd())
+    def print_selected(self):
+        click.echo(self.format_selected())
 
-    def cwd(self):
+    def selected(self):
         return self.current_resource_type, self.current_resource
 
     def __str__(self):
-        return u'App(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
+        return u'Application(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
 
 _app = Application()
 
 
 class Config(object):
 
-    def __init__(self, app):
+    def __init__(self, app, profile):
         self.app = app
+        self.profile = profile
         self.verbose = None
         self.resource_type = None
         self.resource = None
@@ -105,23 +118,41 @@ def run_context(ctx):
     loop.run_until_complete(shell_task)
     loop.close()
 
-
+# @click.group(invoke_without_command=True)
 @click.group()
+@click.option(
+    '--profile',
+    help='profile to use',
+    default=u'default'
+)
 @click.pass_context
-def cli(ctx):
-    ctx.obj = Config(_app)
+def cli(ctx, profile):
+    ctx.obj = Config(_app, profile)
 
 
-@cli.command(help='run an interactive Crossbar.io Fabric shell')
+@cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
 @click.pass_context
-def run(ctx):
+async def cmd_login(ctx):
+    click.echo('authenticating profile "{}" ..'.format(ctx.obj.profile))
+
+
+@cli.command(name='shell', help='run an interactive Crossbar.io Fabric shell')
+@click.pass_context
+def cmd_shell(ctx):
     run_context(ctx)
 
 
 @cli.command(name='clear', help='clear screen')
-@click.pass_obj
-async def cmd_clear(cfg):
+async def cmd_clear():
     click.clear()
+
+
+@cli.command(name='help', help='general help')
+@click.pass_context
+async def cmd_help(ctx):
+    click.echo(ctx.parent.get_help())
+    click.echo(USAGE)
+
 
 @cli.group(name='list', help='list resources')
 @click.option(
@@ -140,6 +171,7 @@ def cmd_list(cfg, verbose):
 async def cmd_list_nodes(cfg):
     cmd = command.CmdListNodes(verbose=cfg.verbose)
     await run_command(cmd, cfg.app.session)
+
 
 @cmd_list.command(name='workers', help='list workers')
 @click.argument('node')
@@ -169,57 +201,89 @@ async def cmd_show_fabric(cfg):
 
 
 @cmd_show.command(name='node', help='show node')
+@click.argument('node')
 @click.pass_obj
-async def cmd_show_node(cfg):
-    cmd = command.CmdShowNode(verbose=cfg.verbose)
+async def cmd_show_node(cfg, node):
+    cmd = command.CmdShowNode(node, verbose=cfg.verbose)
     await run_command(cmd, cfg.app.session)
 
 
 @cmd_show.command(name='worker', help='show worker')
 @click.argument('node')
+@click.argument('worker')
 @click.pass_obj
-async def cmd_show_worker(cfg, node):
-    cmd = command.CmdShowWorker(node, verbose=cfg.verbose)
+async def cmd_show_worker(cfg, node, worker):
+    cmd = command.CmdShowWorker(node, worker, verbose=cfg.verbose)
     await run_command(cmd, cfg.app.session)
 
 
-@cli.command(name='pwd', help='print current resource')
+@cmd_show.command(name='transport', help='show transport (for router workers)')
+@click.argument('node')
+@click.argument('worker')
+@click.argument('transport')
 @click.pass_obj
-async def cmd_pwd(cfg):
-    _app.print_cwd()
+async def cmd_show_transport(cfg, node, worker, transport):
+    cmd = command.CmdShowTransport(node, worker, transport, verbose=cfg.verbose)
+    await run_command(cmd, cfg.app.session)
 
 
-@cli.group(name='cd', help='change current resource')
+@cmd_show.command(name='realm', help='show realm (for router workers)')
+@click.argument('node')
+@click.argument('worker')
+@click.argument('realm')
 @click.pass_obj
-def cmd_cd(cfg):
+async def cmd_show_realm(cfg, node, worker, realm):
+    cmd = command.CmdShowRealm(node, worker, realm, verbose=cfg.verbose)
+    await run_command(cmd, cfg.app.session)
+
+
+@cmd_show.command(name='component', help='show component (for container and router workers)')
+@click.argument('node')
+@click.argument('worker')
+@click.argument('component')
+@click.pass_obj
+async def cmd_show_component(cfg, node, worker, component):
+    cmd = command.CmdShowComponent(node, worker, component, verbose=cfg.verbose)
+    await run_command(cmd, cfg.app.session)
+
+
+@cli.command(name='current', help='currently selected resource')
+@click.pass_obj
+async def cmd_current(cfg):
+    _app.print_selected()
+
+
+@cli.group(name='select', help='change current resource')
+@click.pass_obj
+def cmd_select(cfg):
     pass
 
 
-@cmd_cd.command(name='node', help='change current node')
+@cmd_select.command(name='node', help='change current node')
 @click.argument('resource')
 @click.pass_obj
-async def cmd_cd_node(cfg, resource):
+async def cmd_select_node(cfg, resource):
     _app.current_resource_type = u'node'
     _app.current_resource = resource
-    _app.print_cwd()
+    _app.print_selected()
 
 
-@cmd_cd.command(name='worker', help='change current worker')
+@cmd_select.command(name='worker', help='change current worker')
 @click.argument('resource')
 @click.pass_obj
-async def cmd_cd_worker(cfg, resource):
+async def cmd_select_worker(cfg, resource):
     _app.current_resource_type = u'worker'
     _app.current_resource = resource
-    _app.print_cwd()
+    _app.print_selected()
 
 
-@cmd_cd.command(name='transport', help='change current transport')
+@cmd_select.command(name='transport', help='change current transport')
 @click.argument('resource')
 @click.pass_obj
-async def cmd_cd_transport(cfg, resource):
+async def cmd_select_transport(cfg, resource):
     _app.current_resource_type = u'transport'
     _app.current_resource = resource
-    _app.print_cwd()
+    _app.print_selected()
 
 
 def main():

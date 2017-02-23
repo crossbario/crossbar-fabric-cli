@@ -42,7 +42,20 @@ class CmdRunResult(object):
 
 
 class Cmd(object):
-    pass
+
+    def __init__(self):
+        self._started = None
+
+    def _pre(self, session):
+        if not session:
+            raise Exception('not connected')
+        self._started = rtime()
+
+    def _post(self, session, result):
+        duration = round(1000. * (rtime() - self._started), 1)
+        self._started = None
+        return CmdRunResult(result, duration)
+
 
 
 class CmdList(Cmd):
@@ -58,14 +71,9 @@ class CmdListNodes(CmdList):
         CmdList.__init__(self, verbose)
 
     async def run(self, session):
-        if session:
-            started = rtime()
-            result = await session.call(u'com.example.list_nodes', verbose=self.verbose)
-            ended = rtime()
-            duration = round(1000. * (ended - started), 1)
-            return CmdRunResult(result, duration)
-        else:
-            raise Exception('not connected')
+        self._pre(session)
+        result = await session.call(u'com.example.list_nodes', verbose=self.verbose)
+        return self._post(session, result)
 
 
 class CmdListWorkers(CmdList):
@@ -75,14 +83,9 @@ class CmdListWorkers(CmdList):
         self.node = node
 
     async def run(self, session):
-        if session:
-            started = rtime()
-            result = await session.call(u'com.example.list_workers', self.node, verbose=self.verbose)
-            ended = rtime()
-            duration = round(1000. * (ended - started), 1)
-            return CmdRunResult(result, duration)
-        else:
-            raise Exception('not connected')
+        self._pre(session)
+        result = await session.call(u'com.example.list_workers', self.node, verbose=self.verbose)
+        return self._post(session, result)
 
 
 class CmdShow(Cmd):
@@ -91,21 +94,15 @@ class CmdShow(Cmd):
         Cmd.__init__(self)
         self.verbose = verbose
 
-
 class CmdShowFabric(CmdShow):
 
     def __init__(self, verbose=False):
         CmdShow.__init__(self, verbose)
 
     async def run(self, session):
-        if session:
-            started = rtime()
-            result = await session.call(u'com.example.show_fabric', verbose=self.verbose)
-            ended = rtime()
-            duration = round(1000. * (ended - started), 1)
-            return CmdRunResult(result, duration)
-        else:
-            raise Exception('not connected')
+        self._pre(session)
+        result = await session.call(u'com.example.show_fabric', verbose=self.verbose)
+        return self._post(session, result)
 
 
 class CmdShowNode(CmdShow):
@@ -115,14 +112,9 @@ class CmdShowNode(CmdShow):
         self.node = node
 
     async def run(self, session):
-        if session:
-            started = rtime()
-            result = await session.call(u'com.example.show_node', verbose=self.verbose)
-            ended = rtime()
-            duration = round(1000. * (ended - started), 1)
-            return CmdRunResult(result, duration)
-        else:
-            raise Exception('not connected')
+        self._pre(session)
+        result = await session.call(u'com.example.show_node', self.node, verbose=self.verbose)
+        return self._post(session, result)
 
 
 class CmdShowWorker(CmdShow):
@@ -133,11 +125,48 @@ class CmdShowWorker(CmdShow):
         self.worker = worker
 
     async def run(self, session):
-        if session:
-            started = rtime()
-            result = await session.call(u'com.example.show_worker', self.node, verbose=self.verbose)
-            ended = rtime()
-            duration = round(1000. * (ended - started), 1)
-            return CmdRunResult(result, duration)
-        else:
-            raise Exception('not connected')
+        self._pre(session)
+        result = await session.call(u'com.example.show_worker', self.node, self.worker, verbose=self.verbose)
+        return self._post(session, result)
+
+
+class CmdShowTransport(CmdShow):
+
+    def __init__(self, node, worker, transport, verbose=False):
+        CmdShow.__init__(self, verbose)
+        self.node = node
+        self.worker = worker
+        self.transport = transport
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.example.show_transport', self.node, self.worker, self.transport, verbose=self.verbose)
+        return self._post(session, result)
+
+
+class CmdShowRealm(CmdShow):
+
+    def __init__(self, node, worker, realm, verbose=False):
+        CmdShow.__init__(self, verbose)
+        self.node = node
+        self.worker = worker
+        self.realm = realm
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.example.show_realm', self.node, self.worker, self.realm, verbose=self.verbose)
+        return self._post(session, result)
+
+
+class CmdShowComponent(CmdShow):
+
+    def __init__(self, node, worker, component, verbose=False):
+        CmdShow.__init__(self, verbose)
+        self.node = node
+        self.worker = worker
+        self.component = component
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.example.show_component', self.node, self.worker, self.component, verbose=self.verbose)
+        return self._post(session, result)
