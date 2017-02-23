@@ -79,11 +79,25 @@ def localnow():
 
 class Application(object):
 
-    OUTPUT_PLAIN = 'plain'
-    OUTPUT_JSON = 'json'
-    OUTPUT_JSON_COLORED = 'json-color'
-    OUTPUT_YAML = 'yaml'
-    OUTPUT_YAML_COLORED = 'yaml-colored'
+    OUTPUT_FORMAT_PLAIN = 'plain'
+    OUTPUT_FORMAT_JSON = 'json'
+    OUTPUT_FORMAT_JSON_COLORED = 'json-color'
+    OUTPUT_FORMAT_YAML = 'yaml'
+    OUTPUT_FORMAT_YAML_COLORED = 'yaml-color'
+
+    OUTPUT_FORMAT = [OUTPUT_FORMAT_PLAIN,
+                     OUTPUT_FORMAT_JSON,
+                     OUTPUT_FORMAT_JSON_COLORED,
+                     OUTPUT_FORMAT_YAML,
+                     OUTPUT_FORMAT_YAML_COLORED]
+
+    OUTPUT_VERBOSITY_SILENT = 'silent'
+    OUTPUT_VERBOSITY_RESULT_ONLY = 'result-only'
+    OUTPUT_VERBOSITY_NORMAL = 'normal'
+
+    OUTPUT_VERBOSITY = [OUTPUT_VERBOSITY_SILENT,
+                        OUTPUT_VERBOSITY_RESULT_ONLY,
+                        OUTPUT_VERBOSITY_NORMAL]
 
     WELCOME = """
     Welcome to {title}!
@@ -97,13 +111,9 @@ class Application(object):
         self.current_resource_type = None
         self.current_resource = None
         self.session = None
-
         self._history = FileHistory('.cbsh-history')
-
-        self._output = Application.OUTPUT_JSON_COLORED
-        self._output = Application.OUTPUT_YAML_COLORED
-
-        self._output_finished_verbose = False
+        self._output_format = Application.OUTPUT_FORMAT_JSON_COLORED
+        self._output_verbosity = Application.OUTPUT_VERBOSITY_NORMAL
 
         self._style = style_from_dict({
             Token.Toolbar: '#fce94f bg:#333333',
@@ -120,6 +130,21 @@ class Application(object):
             #Token.Path:     '#884444 underline',
         })
 
+    def set_output_format(self, output_format):
+        if output_format in Application.OUTPUT_FORMAT:
+            self._output_format = output_format
+        else:
+            raise Exception('invalid value {} for output_format (not in {})'.format(output_format, Application.OUTPUT_FORMAT))
+
+    def set_output_verbosity(self, output_verbosity):
+        if output_verbosity in Application.OUTPUT_VERBOSITY:
+            self._output_verbosity = output_verbosity
+        else:
+            raise Exception('invalid value {} for output_verbosity (not in {})'.format(output_verbosity, Application.OUTPUT_VERBOSITY))
+
+    def error(self, msg):
+        click.echo()
+
     def format_selected(self):
         return u'{} -> {}.\n'.format(self.current_resource_type, self.current_resource)
 
@@ -135,7 +160,7 @@ class Application(object):
     async def run_command(self, cmd):
         result = await cmd.run(self.session)
 
-        if self._output in [Application.OUTPUT_JSON, Application.OUTPUT_JSON_COLORED]:
+        if self._output_format in [Application.OUTPUT_FORMAT_JSON, Application.OUTPUT_FORMAT_JSON_COLORED]:
 
             json_str = json.dumps(result.result,
                                   separators=(', ', ': '),
@@ -143,37 +168,37 @@ class Application(object):
                                   indent=4,
                                   ensure_ascii=False)
 
-            if self._output == Application.OUTPUT_JSON_COLORED:
+            if self._output_format == Application.OUTPUT_FORMAT_JSON_COLORED:
                 console_str = highlight(json_str,
                                         lexers.JsonLexer(),
                                         formatters.TerminalFormatter())
             else:
                 console_str = json_str
 
-        elif self._output in [Application.OUTPUT_YAML, Application.OUTPUT_YAML_COLORED]:
+        elif self._output_format in [Application.OUTPUT_FORMAT_YAML, Application.OUTPUT_FORMAT_YAML_COLORED]:
 
             yaml_str = yaml.safe_dump(result.result)
 
-            if self._output == Application.OUTPUT_YAML_COLORED:
+            if self._output_format == Application.OUTPUT_FORMAT_YAML_COLORED:
                 console_str = highlight(yaml_str,
                                         lexers.YamlLexer(),
                                         formatters.TerminalFormatter())
             else:
                 console_str = yaml_str
 
-        elif self._output in [Application.OUTPUT_PLAIN]:
+        elif self._output_format in [Application.OUTPUT_FORMAT_PLAIN]:
 
             console_str = u'{}'.format(result.result)
 
         else:
             # should not arrive here
-            raise Exception('internal error: unprocessed value "{}" for output format'.format(self._output))
+            raise Exception('internal error: unprocessed value "{}" for output format'.format(self._output_format))
 
         # output result of command
         click.echo(console_str)
 
         # output command metadata (such as runtime)
-        if self._output_finished_verbose:
+        if self._output_verbosity:
             if result.duration:
                 click.echo(style_finished_line(u'Finished in {} ms on {}.'.format(result.duration, localnow())))
             else:

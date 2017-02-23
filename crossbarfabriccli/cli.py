@@ -25,6 +25,33 @@
 ###############################################################################
 
 import click
+
+_old_click_argument = click.argument
+
+import inspect
+from click import Argument
+from click.decorators import _param_memo
+
+def _new_click_argument(*param_decls, **attrs):
+    """Attaches an argument to the command.  All positional arguments are
+    passed as parameter declarations to :class:`Argument`; all keyword
+    arguments are forwarded unchanged (except ``cls``).
+    This is equivalent to creating an :class:`Argument` instance manually
+    and attaching it to the :attr:`Command.params` list.
+    :param cls: the argument class to instantiate.  This defaults to
+                :class:`Argument`.
+    """
+    def decorator(f):
+        if 'help' in attrs:
+            attrs['help'] = inspect.cleandoc(attrs['help'])
+        ArgumentClass = attrs.pop('cls', Argument)
+        _param_memo(f, ArgumentClass(param_decls, **attrs))
+        return f
+    return decorator
+
+click.argument = _new_click_argument
+
+
 from crossbarfabriccli import app, command
 
 
@@ -107,6 +134,72 @@ async def cmd_clear():
 def cmd_help(ctx):
     click.echo(ctx.parent.get_help())
     click.echo(USAGE)
+
+
+@cli.group(name='set', help='change shell settings')
+@click.pass_obj
+def cmd_set(cfg):
+    pass
+
+
+@cmd_set.group(name='output-verbosity', help='command output verbosity')
+@click.pass_obj
+def cmd_set_output_verbosity(cfg):
+    pass
+
+
+@cmd_set_output_verbosity.command(name='silent', help='swallow everything including result, but error messages')
+@click.pass_obj
+def cmd_set_output_verbosity_silent(cfg):
+    cfg.app.set_output_verbosity('silent')
+
+
+@cmd_set_output_verbosity.command(name='result-only', help='only output the plain command result')
+@click.pass_obj
+def cmd_set_output_verbosity_result_only(cfg):
+    cfg.app.set_output_verbosity('result-only')
+
+
+@cmd_set_output_verbosity.command(name='normal', help='output result and short run-time message')
+@click.pass_obj
+def cmd_set_output_verbosity_normal(cfg):
+    cfg.app.set_output_verbosity('normal')
+
+
+@cmd_set.group(name='output-format', help='command output format')
+@click.pass_obj
+def cmd_set_output_format(cfg):
+    pass
+
+
+@cmd_set_output_format.command(name='json', help='set JSON output format')
+@click.pass_obj
+def cmd_set_output_format_json(cfg):
+    cfg.app.set_output_format('json')
+
+
+@cmd_set_output_format.command(name='json-color', help='set JSON+color output format')
+@click.pass_obj
+def cmd_set_output_format_json_color(cfg):
+    cfg.app.set_output_format('json-color')
+
+
+@cmd_set_output_format.command(name='yaml', help='set YAML format')
+@click.pass_obj
+def cmd_set_output_format_yaml(cfg):
+    cfg.app.set_output_format('yaml')
+
+
+@cmd_set_output_format.command(name='yaml-color', help='set YAML+color output format')
+@click.pass_obj
+def cmd_set_output_format_yaml_color(cfg):
+    cfg.app.set_output_format('yaml-color')
+
+
+@cmd_set_output_format.command(name='plain', help='set plain output format')
+@click.pass_obj
+def cmd_set_output_format_plain(cfg):
+    cfg.app.set_output_format('plain')
 
 
 @cli.group(name='list', help='list resources')
