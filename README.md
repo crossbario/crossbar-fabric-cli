@@ -1,6 +1,18 @@
 # Fabric CLI
 
+## Global Resource Tree
+
+    REALM (Crossbar.io Fabric User Realm)
+      |
+      +-- USER
+            |
+            +-- KEY
+
 ## Resource Tree
+
+In normal use, you will connect to one of your **management realms** on Crossbar.io Fabric using your default user profile.
+
+When the Crossbar.io Fabric Shell has connected, you will have access to a unified resource tree making your whole network of Crossbar.io instances connected to that same management realm available:
 
     REALM (Crossbar.io Fabric Management Realm)
       |
@@ -18,7 +30,7 @@
                    |
                    +-- TRANSPORT
                    |
-                   +-- COMPONENT (Python only; danger zone)
+                   +-- COMPONENT (same Python only; danger zone)
             |
             +-- WORKER [SUBTYPE PROXY] (Crossbar.io Fabric only; scale up/out)
                    |
@@ -26,7 +38,7 @@
             |
             +-- WORKER [SUBTYPE CONTAINER]
                    |
-                   +-- COMPONENT (Python only)
+                   +-- COMPONENT (same Python only)
             |
             +-- WORKER [SUBTYPE GUEST] (arbitrary executable)
             |
@@ -35,6 +47,13 @@
       +-- HOST
       |
       +-- DEVICE
+
+Using the Crossbar.io Fabric Shell, you can then navigate the resource tree and perform actions like:
+
+* start and stop workers on specific nodes
+* start new realms on router workers
+* monitor usage and load statistics on nodes
+* ...
 
 ## Other CLIs
 
