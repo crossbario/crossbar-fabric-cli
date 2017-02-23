@@ -4,9 +4,13 @@
 
     REALM (Crossbar.io Fabric User Realm)
       |
-      +-- USER
+      +-- USER (most info below is private)
             |
             +-- KEY
+            |
+            +-- REALM (Crossbar.io Management Realm)
+                  |
+                  +-- ROLE (Owner, Admin, Operator, Developer, ..)
 
 ## Resource Tree
 
@@ -14,7 +18,7 @@ In normal use, you will connect to one of your **management realms** on Crossbar
 
 When the Crossbar.io Fabric Shell has connected, you will have access to a unified resource tree making your whole network of Crossbar.io instances connected to that same management realm available:
 
-    REALM (Crossbar.io Fabric Management Realm)
+    REALM (Crossbar.io Fabric Management Realm of User)
       |
       +-- NODE
             |
@@ -54,6 +58,9 @@ Using the Crossbar.io Fabric Shell, you can then navigate the resource tree and 
 * start new realms on router workers
 * monitor usage and load statistics on nodes
 * ...
+
+The permissions you have on specific resources within the resource tree of a management realm depends on your assigned role on the management realm.
+
 
 ## Other CLIs
 
