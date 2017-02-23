@@ -24,22 +24,9 @@
 #
 ###############################################################################
 
-import asyncio
 import click
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.shortcuts import prompt, prompt_async
-from prompt_toolkit.styles import style_from_dict
-from prompt_toolkit.token import Token
-from crossbarfabriccli import client, repl, command
+from crossbarfabriccli import app, command
 
-
-WELCOME = """
-Welcome to Crossbar.io Fabric Shell!
-
-Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
-Type "help" to get help. Try TAB for auto-completion.
-
-"""
 
 USAGE = """
 Examples:
@@ -54,32 +41,15 @@ using the "--profile" option:
 """
 
 
-class Application(object):
-
-    def __init__(self):
-        self.current_resource_type = None
-        self.current_resource = None
-        self.session = None
-
-    def get_bottom_toolbar_tokens(self, cli):
-            return [(Token.Toolbar, 'current resource: {}'.format(self.format_selected()))]
-
-    def format_selected(self):
-        return u'{} -> {}.\n'.format(self.current_resource_type, self.current_resource)
-
-    def print_selected(self):
-        click.echo(self.format_selected())
-
-    def selected(self):
-        return self.current_resource_type, self.current_resource
-
-    def __str__(self):
-        return u'Application(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
-
-_app = Application()
+# the global, singleton app object
+_app = app.Application()
 
 
 class Config(object):
+    """
+    Command configuration object where we collect all the parameters,
+    options etc for later processing.
+    """
 
     def __init__(self, app, profile):
         self.app = app
@@ -92,34 +62,7 @@ class Config(object):
         return u'Config(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
 
 
-async def run_command(cmd, session):
-    result = await cmd.run(session)
-    click.echo(result)
-
-
-def run_context(ctx):
-    click.echo(WELCOME)
-    loop = asyncio.get_event_loop()
-
-    app = ctx.obj.app
-
-    app.session = client.run()
-
-    prompt_kwargs = {
-        'history': FileHistory('cbf-history'),
-    }
-
-    shell_task = loop.create_task(
-        repl.repl(ctx,
-                  get_bottom_toolbar_tokens=app.get_bottom_toolbar_tokens,
-                  prompt_kwargs=prompt_kwargs)
-    )
-
-    loop.run_until_complete(shell_task)
-    loop.close()
-
-# @click.group(invoke_without_command=True)
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option(
     '--profile',
     help='profile to use',
@@ -128,6 +71,18 @@ def run_context(ctx):
 @click.pass_context
 def cli(ctx, profile):
     ctx.obj = Config(_app, profile)
+
+    # Allowing a command group to specifiy a default subcommand can be done using
+    # https://github.com/click-contrib/click-default-group
+    #
+    # However, this breaks the click-repl integration for prompt-toolkit:
+    #
+    # https://github.com/pallets/click/issues/430#issuecomment-282015177
+    #
+    # Hence, we are using a different (probably less clean) trick - this works.
+    #
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(cmd_shell)
 
 
 @cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
@@ -139,7 +94,7 @@ async def cmd_login(ctx):
 @cli.command(name='shell', help='run an interactive Crossbar.io Fabric shell')
 @click.pass_context
 def cmd_shell(ctx):
-    run_context(ctx)
+    ctx.obj.app.run_context(ctx)
 
 
 @cli.command(name='clear', help='clear screen')
@@ -170,7 +125,7 @@ def cmd_list(cfg, verbose):
 @click.pass_obj
 async def cmd_list_nodes(cfg):
     cmd = command.CmdListNodes(verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_list.command(name='workers', help='list workers')
@@ -178,7 +133,7 @@ async def cmd_list_nodes(cfg):
 @click.pass_obj
 async def cmd_list_workers(cfg, node):
     cmd = command.CmdListWorkers(node, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cli.group(name='show', help='show resources')
@@ -197,7 +152,7 @@ def cmd_show(cfg, verbose):
 @click.pass_obj
 async def cmd_show_fabric(cfg):
     cmd = command.CmdShowFabric(verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_show.command(name='node', help='show node')
@@ -205,7 +160,7 @@ async def cmd_show_fabric(cfg):
 @click.pass_obj
 async def cmd_show_node(cfg, node):
     cmd = command.CmdShowNode(node, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_show.command(name='worker', help='show worker')
@@ -214,7 +169,7 @@ async def cmd_show_node(cfg, node):
 @click.pass_obj
 async def cmd_show_worker(cfg, node, worker):
     cmd = command.CmdShowWorker(node, worker, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_show.command(name='transport', help='show transport (for router workers)')
@@ -224,7 +179,7 @@ async def cmd_show_worker(cfg, node, worker):
 @click.pass_obj
 async def cmd_show_transport(cfg, node, worker, transport):
     cmd = command.CmdShowTransport(node, worker, transport, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_show.command(name='realm', help='show realm (for router workers)')
@@ -234,7 +189,7 @@ async def cmd_show_transport(cfg, node, worker, transport):
 @click.pass_obj
 async def cmd_show_realm(cfg, node, worker, realm):
     cmd = command.CmdShowRealm(node, worker, realm, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_show.command(name='component', help='show component (for container and router workers)')
@@ -244,7 +199,7 @@ async def cmd_show_realm(cfg, node, worker, realm):
 @click.pass_obj
 async def cmd_show_component(cfg, node, worker, component):
     cmd = command.CmdShowComponent(node, worker, component, verbose=cfg.verbose)
-    await run_command(cmd, cfg.app.session)
+    await cfg.app.run_command(cmd)
 
 
 @cli.command(name='current', help='currently selected resource')

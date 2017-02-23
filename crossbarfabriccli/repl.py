@@ -187,6 +187,7 @@ async def repl(
         allow_internal_commands=True,
         once=False,
         get_bottom_toolbar_tokens=_get_bottom_toolbar_tokens,
+        get_prompt_tokens=None,
         style=_style
 ):
     """
@@ -214,7 +215,8 @@ async def repl(
 
     if isatty:
         prompt_kwargs = prompt_kwargs or {}
-        prompt_kwargs.setdefault('message', u'>> ')
+        if not get_prompt_tokens:
+            prompt_kwargs.setdefault('message', u'>> ')
         history = prompt_kwargs.pop('history', None) \
             or InMemoryHistory()
         completer = prompt_kwargs.pop('completer', None) \
@@ -225,6 +227,7 @@ async def repl(
                                 history=history,
                                 #patch_stdout=True,
                                 get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
+                                get_prompt_tokens=get_prompt_tokens,
                                 style=style,
                                 **prompt_kwargs)
     else:

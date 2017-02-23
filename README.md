@@ -3,7 +3,7 @@
 
 ## Other CLIs
 
-* Juniper JunOS CLI
+* [Juniper JunOS CLI](https://www.juniper.net/documentation/en_US/junos/information-products/pathway-pages/junos-cli/junos-cli.html)
 * [Microsoft PowerShell](https://en.wikipedia.org/wiki/PowerShell)
 * [Azure CLI 2.0](https://github.com/Azure/azure-cli)
 
@@ -14,14 +14,21 @@ uses stdlib asyncio (no Twisted needed)
 
 ## Libraries uses
 
-click
-prompt-toolkit
+Here is a [nice comparison](https://realpython.com/blog/python/comparing-python-command-line-parsing-libraries-argparse-docopt-click/) of three popular libraries (`argparse`, `docopt` and `click`) for command line parsing in Python.
+
+* [click](https://github.com/pallets/click)
+* [prompt-toolkit](https://github.com/jonathanslenders/python-prompt-toolkit)
 * [tabulate](https://bitbucket.org/astanin/python-tabulate)
 * [colorama](https://github.com/tartley/colorama)
 
+We _may_ use these libraries if needed:
 
-https://github.com/kislyuk/argcomplete
-https://github.com/jmespath/jmespath.py
+* [jmespath](https://github.com/jmespath/jmespath.py)
+* [argcomplete](https://github.com/kislyuk/argcomplete)
+
+
+https://github.com/davidhalter/jedi
+
 
 
 ## Basic Syntax

@@ -56,7 +56,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'cbf = crossbarfabriccli.cli:main'
+            'cbsh = crossbarfabriccli.cli:main'
         ]
     },
     packages=find_packages(),
