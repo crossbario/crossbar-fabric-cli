@@ -27,6 +27,7 @@
 import sys
 import time
 import locale
+import pprint
 import json
 import yaml
 import asyncio
@@ -94,10 +95,12 @@ class Application(object):
     OUTPUT_VERBOSITY_SILENT = 'silent'
     OUTPUT_VERBOSITY_RESULT_ONLY = 'result-only'
     OUTPUT_VERBOSITY_NORMAL = 'normal'
+    OUTPUT_VERBOSITY_EXTENDED = 'extended'
 
     OUTPUT_VERBOSITY = [OUTPUT_VERBOSITY_SILENT,
                         OUTPUT_VERBOSITY_RESULT_ONLY,
-                        OUTPUT_VERBOSITY_NORMAL]
+                        OUTPUT_VERBOSITY_NORMAL,
+                        OUTPUT_VERBOSITY_EXTENDED]
 
     WELCOME = """
     Welcome to {title}!
@@ -186,28 +189,37 @@ class Application(object):
             else:
                 console_str = yaml_str
 
-        elif self._output_format in [Application.OUTPUT_FORMAT_PLAIN]:
+        elif self._output_format == Application.OUTPUT_FORMAT_PLAIN:
 
-            console_str = u'{}'.format(result.result)
+            #console_str = u'{}'.format(pprint.pformat(result.result))
+            console_str = u'{}'.format(result)
 
         else:
             # should not arrive here
             raise Exception('internal error: unprocessed value "{}" for output format'.format(self._output_format))
 
-        # output result of command
-        click.echo(console_str)
-
         # output command metadata (such as runtime)
-        if self._output_verbosity:
-            if result.duration:
-                click.echo(style_finished_line(u'Finished in {} ms on {}.'.format(result.duration, localnow())))
-            else:
-                click.echo(style_finished_line(u'Finished successfully on {}.'.format(localnow())))
+        if self._output_verbosity == Application.OUTPUT_VERBOSITY_SILENT:
+            pass
         else:
-            if result.duration:
-                click.echo(style_finished_line(u'Finished in {} ms.'.format(result.duration)))
+            # output result of command
+            click.echo(console_str)
+
+            if self._output_verbosity == Application.OUTPUT_VERBOSITY_RESULT_ONLY or self._output_format == Application.OUTPUT_FORMAT_PLAIN:
+                pass
+            elif self._output_verbosity == Application.OUTPUT_VERBOSITY_NORMAL:
+                if result.duration:
+                    click.echo(style_finished_line(u'Finished in {} ms.'.format(result.duration)))
+                else:
+                    click.echo(style_finished_line(u'Finished successfully.'))
+            elif self._output_verbosity == Application.OUTPUT_VERBOSITY_EXTENDED:
+                if result.duration:
+                    click.echo(style_finished_line(u'Finished in {} ms on {}.'.format(result.duration, localnow())))
+                else:
+                    click.echo(style_finished_line(u'Finished successfully on {}.'.format(localnow())))
             else:
-                click.echo(style_finished_line(u'Finished successfully.'))
+                # should not arrive here
+                raise Exception('internal error')
 
     def _get_bottom_toolbar_tokens(self, cli):
         toolbar_str = ' Current resource path: {}'.format(self.format_selected())

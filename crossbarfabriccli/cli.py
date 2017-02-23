@@ -113,6 +113,10 @@ def cli(ctx, profile):
 
 
 @cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
+@click.option(
+    '--code', default=None,
+    help="Supply login/registration code",
+)
 @click.pass_context
 def cmd_login(ctx):
     click.echo('authenticating profile "{}" ..'.format(ctx.obj.profile))
@@ -164,6 +168,12 @@ def cmd_set_output_verbosity_result_only(cfg):
 @click.pass_obj
 def cmd_set_output_verbosity_normal(cfg):
     cfg.app.set_output_verbosity('normal')
+
+
+@cmd_set_output_verbosity.command(name='extended', help='output result and extended execution information.')
+@click.pass_obj
+def cmd_set_output_verbosity_extended(cfg):
+    cfg.app.set_output_verbosity('extended')
 
 
 @cmd_set.group(name='output-format', help='command output format')

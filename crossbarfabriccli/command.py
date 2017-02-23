@@ -35,10 +35,7 @@ class CmdRunResult(object):
         self.duration = duration
 
     def __str__(self):
-        if self.duration:
-            return u'{}\n\nFinished in {} ms.'.format(self.result, self.duration)
-        else:
-            return u'{}\n\nFinished successfully.'.format(self.result)
+        return u'CmdRunResult(result={}, duration={})'.format(self.result, self.duration)
 
 
 class Cmd(object):
