@@ -1,6 +1,50 @@
 
 # Fabric CLI
 
+## Other CLIs
+
+* Juniper JunOS CLI
+* [Microsoft PowerShell](https://en.wikipedia.org/wiki/PowerShell)
+* [Azure CLI 2.0](https://github.com/Azure/azure-cli)
+
+## Requirements
+
+Python 3.5 required
+uses stdlib asyncio (no Twisted needed)
+
+## Libraries uses
+
+click
+prompt-toolkit
+* [tabulate](https://bitbucket.org/astanin/python-tabulate)
+* [colorama](https://github.com/tartley/colorama)
+
+
+https://github.com/kislyuk/argcomplete
+https://github.com/jmespath/jmespath.py
+
+
+## Basic Syntax
+
+Our CLI syntax
+
+    >> COMMAND [RESOURCE-TYPE RESOURCE-PATH]* [OPTIONS]
+
+For example:
+
+```console
+>> show worker node1 worker1
+{'type': 'router'}
+
+Finished in 1.0 ms.
+```
+
+The new Azure CLI 2.0 syntax:
+
+    $ az [ group ] [ subgroup ] [ command ] {parameters}
+
+
+## SORTME
 
 pip install crossbarfabriccli
 

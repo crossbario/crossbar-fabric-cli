@@ -31,7 +31,7 @@ from setuptools import setup, find_packages
 with open('crossbarfabriccli/_version.py') as f:
     exec(f.read())  # defines __version__
 
-with open('README.rst') as f:
+with open('README.md') as f:
     docstr = f.read()
 
 setup(
@@ -43,14 +43,14 @@ setup(
     url='http://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'twisted>=17.1.0',
-        'autobahn[twisted,accelerate,serialization,encryption]>=0.17.1',
-        'humanize>=0.5.1',
-        'prompt_toolkit>=1.0.13',
+        'autobahn[asyncio,accelerate,serialization,encryption]>=0.17.2',
         'click>=6.7',
-        # https://github.com/click-contrib/click-repl
-        # https://pypi.python.org/pypi/click-repl/
-        'click-repl>=0.1.1'
+        'prompt_toolkit>=1.0.13',
+        'colorama>=0.3.7',
+        'pygments>=2.2.0',
+        'humanize>=0.5.1',
+        'tabulate>=0.7.7',
+        'pyyaml>=3.12'
     ],
     extras_require={
     },
@@ -62,7 +62,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     data_files=[
-        ('.', ['LICENSE', 'README.rst'])
+        ('.', ['LICENSE', 'README.md'])
     ],
     zip_safe=False,
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -72,10 +72,7 @@ setup(
                  "Intended Audience :: System Administrators",
                  "Environment :: Console",
                  "Operating System :: OS Independent",
-                 "Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
-                 "Programming Language :: Python :: 3.3",
-                 "Programming Language :: Python :: 3.4",
                  "Programming Language :: Python :: 3.5",
                  "Programming Language :: Python :: 3.6",
                  "Programming Language :: Python :: Implementation :: CPython",
