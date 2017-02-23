@@ -87,7 +87,7 @@ def cli(ctx, profile):
 
 @cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
 @click.pass_context
-async def cmd_login(ctx):
+def cmd_login(ctx):
     click.echo('authenticating profile "{}" ..'.format(ctx.obj.profile))
 
 
@@ -104,7 +104,7 @@ async def cmd_clear():
 
 @cli.command(name='help', help='general help')
 @click.pass_context
-async def cmd_help(ctx):
+def cmd_help(ctx):
     click.echo(ctx.parent.get_help())
     click.echo(USAGE)
 
@@ -245,7 +245,6 @@ def main():
     """
     Main entry point into CLI.
     """
-    click.clear()
     cli()
 
 

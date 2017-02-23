@@ -1,5 +1,32 @@
-
 # Fabric CLI
+
+## Resource Tree
+
+    REALM (Crossbar.io Fabric Management Realm)
+      |
+      +-- NODE [SUBTYPE EDGE]
+            |
+            +-- WORKER [SUBTYPE ROUTER]
+                   |
+                   +-- REALM (Crossbar.io Realm)
+                         |
+                         +-- ROLE
+                               |
+                               +-- PERMISSION
+                   |
+                   +-- TRANSPORT
+                   |
+                   +-- COMPONENT
+            |
+            +-- WORKER [SUBTYPE CONTAINER]
+                   |
+                   +-- COMPONENT
+            |
+            +-- WORKER [SUBTYPE GUEST]
+                   |
+                   +-- EXECUTABLE
+      |
+      +-- HOST
 
 ## Other CLIs
 

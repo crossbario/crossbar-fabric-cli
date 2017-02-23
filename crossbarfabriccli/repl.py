@@ -267,7 +267,9 @@ async def repl(
 
         try:
             with group.make_context(None, args, parent=group_ctx) as ctx:
-                await group.invoke(ctx)
+                f = group.invoke(ctx)
+                if f:
+                    await f
                 ctx.exit()
         except click.ClickException as e:
             e.show()

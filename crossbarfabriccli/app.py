@@ -28,6 +28,7 @@ import sys
 import time
 import locale
 import json
+import yaml
 import asyncio
 import click
 from pygments import highlight, lexers, formatters
@@ -81,6 +82,8 @@ class Application(object):
     OUTPUT_PLAIN = 'plain'
     OUTPUT_JSON = 'json'
     OUTPUT_JSON_COLORED = 'json-color'
+    OUTPUT_YAML = 'yaml'
+    OUTPUT_YAML_COLORED = 'yaml-colored'
 
     WELCOME = """
     Welcome to {title}!
@@ -98,6 +101,7 @@ class Application(object):
         self._history = FileHistory('.cbsh-history')
 
         self._output = Application.OUTPUT_JSON_COLORED
+        self._output = Application.OUTPUT_YAML_COLORED
 
         self._output_finished_verbose = False
 
@@ -146,7 +150,29 @@ class Application(object):
             else:
                 console_str = json_str
 
+        elif self._output in [Application.OUTPUT_YAML, Application.OUTPUT_YAML_COLORED]:
+
+            yaml_str = yaml.safe_dump(result.result)
+
+            if self._output == Application.OUTPUT_YAML_COLORED:
+                console_str = highlight(yaml_str,
+                                        lexers.YamlLexer(),
+                                        formatters.TerminalFormatter())
+            else:
+                console_str = yaml_str
+
+        elif self._output in [Application.OUTPUT_PLAIN]:
+
+            console_str = u'{}'.format(result.result)
+
+        else:
+            # should not arrive here
+            raise Exception('internal error: unprocessed value "{}" for output format'.format(self._output))
+
+        # output result of command
         click.echo(console_str)
+
+        # output command metadata (such as runtime)
         if self._output_finished_verbose:
             if result.duration:
                 click.echo(style_finished_line(u'Finished in {} ms on {}.'.format(result.duration, localnow())))
@@ -175,6 +201,7 @@ class Application(object):
         ]
 
     def run_context(self, ctx):
+        click.clear()
         click.echo(self.WELCOME)
         loop = asyncio.get_event_loop()
 
