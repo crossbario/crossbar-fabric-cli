@@ -4,7 +4,9 @@
 
     REALM (Crossbar.io Fabric Management Realm)
       |
-      +-- NODE [SUBTYPE EDGE]
+      +-- NODE
+            |
+            +-- CONTROLLER
             |
             +-- WORKER [SUBTYPE ROUTER]
                    |
@@ -16,17 +18,23 @@
                    |
                    +-- TRANSPORT
                    |
-                   +-- COMPONENT
+                   +-- COMPONENT (Python only; danger zone)
+            |
+            +-- WORKER [SUBTYPE PROXY] (Crossbar.io Fabric only; scale up/out)
+                   |
+                   +-- TRANSPORT
             |
             +-- WORKER [SUBTYPE CONTAINER]
                    |
-                   +-- COMPONENT
+                   +-- COMPONENT (Python only)
             |
-            +-- WORKER [SUBTYPE GUEST]
-                   |
-                   +-- EXECUTABLE
+            +-- WORKER [SUBTYPE GUEST] (arbitrary executable)
+            |
+            +-- WORKER [SUBTYPE DOCKER] (Crossbar.io Fabric only)
       |
       +-- HOST
+      |
+      +-- DEVICE
 
 ## Other CLIs
 
