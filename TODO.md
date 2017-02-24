@@ -1,3 +1,12 @@
+# Checks
+
+    cbsh login
+    cbsh login --code 5V39-YG4Y-JKUK
+
+    cbsh --profile oberstet login
+    cbsh --profile oberstet login --code 5V39-YG4Y-JKUK
+
+
 # CLI refreshing
 
 When we asynchronously receive eg a WAMP event, we want to trigger a refresh / rerender of the CLI (eg for the bottom toolbar.)
