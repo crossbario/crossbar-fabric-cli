@@ -32,6 +32,7 @@ import json
 import yaml
 import asyncio
 import click
+import pygments
 from pygments import highlight, lexers, formatters
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import prompt, prompt_async
@@ -102,6 +103,10 @@ class Application(object):
                         OUTPUT_VERBOSITY_NORMAL,
                         OUTPUT_VERBOSITY_EXTENDED]
 
+    # list of all available Pygments styles (including ones loaded from plugins)
+    # https://www.complang.tuwien.ac.at/doc/python-pygments/styles.html
+    OUTPUT_STYLE = list(pygments.styles.get_all_styles())
+
     WELCOME = """
     Welcome to {title}!
 
@@ -133,17 +138,43 @@ class Application(object):
             #Token.Path:     '#884444 underline',
         })
 
+        self._output_style = 'fruity'
+
     def set_output_format(self, output_format):
+        """
+        Set command output format.
+
+        :param output_format: The verbosity to use.
+        :type output_format: str
+        """
         if output_format in Application.OUTPUT_FORMAT:
             self._output_format = output_format
         else:
             raise Exception('invalid value {} for output_format (not in {})'.format(output_format, Application.OUTPUT_FORMAT))
 
     def set_output_verbosity(self, output_verbosity):
+        """
+        Set command output verbosity.
+
+        :param output_verbosity: The verbosity to use.
+        :type output_verbosity: str
+        """
         if output_verbosity in Application.OUTPUT_VERBOSITY:
             self._output_verbosity = output_verbosity
         else:
             raise Exception('invalid value {} for output_verbosity (not in {})'.format(output_verbosity, Application.OUTPUT_VERBOSITY))
+
+    def set_output_style(self, output_style):
+        """
+        Set pygments syntax highlighting style ("theme") to be used for command result output.
+
+        :param output_style: The style to use.
+        :type output_style: str
+        """
+        if output_style in Application.OUTPUT_STYLE:
+            self._output_style = output_style
+        else:
+            raise Exception('invalid value {} for output_style (not in {})'.format(output_style, Application.OUTPUT_STYLE))
 
     def error(self, msg):
         click.echo()
@@ -174,7 +205,7 @@ class Application(object):
             if self._output_format == Application.OUTPUT_FORMAT_JSON_COLORED:
                 console_str = highlight(json_str,
                                         lexers.JsonLexer(),
-                                        formatters.TerminalFormatter())
+                                        formatters.Terminal256Formatter(style=self._output_style))
             else:
                 console_str = json_str
 
@@ -185,7 +216,7 @@ class Application(object):
             if self._output_format == Application.OUTPUT_FORMAT_YAML_COLORED:
                 console_str = highlight(yaml_str,
                                         lexers.YamlLexer(),
-                                        formatters.TerminalFormatter())
+                                        formatters.Terminal256Formatter(style=self._output_style))
             else:
                 console_str = yaml_str
 

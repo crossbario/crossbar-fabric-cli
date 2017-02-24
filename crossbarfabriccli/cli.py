@@ -146,6 +146,9 @@ def cmd_set(cfg):
     pass
 
 
+#
+# set output-verbosity
+#
 @cmd_set.group(name='output-verbosity', help='command output verbosity')
 @click.pass_obj
 def cmd_set_output_verbosity(cfg):
@@ -176,40 +179,42 @@ def cmd_set_output_verbosity_extended(cfg):
     cfg.app.set_output_verbosity('extended')
 
 
+#
+# set output-format
+#
 @cmd_set.group(name='output-format', help='command output format')
 @click.pass_obj
 def cmd_set_output_format(cfg):
     pass
 
+def _make_set_output_format(output_format):
+    @cmd_set_output_format.command(name=output_format, help='set {} output format'.format(output_format.upper()))
+    @click.pass_obj
+    def f(cfg):
+        cfg.app.set_output_format(output_format)
+    return f
 
-@cmd_set_output_format.command(name='json', help='set JSON output format')
+for output_format in app.Application.OUTPUT_FORMAT:
+    _make_set_output_format(output_format)
+
+
+#
+# set output-style
+#
+@cmd_set.group(name='output-style', help='command output style')
 @click.pass_obj
-def cmd_set_output_format_json(cfg):
-    cfg.app.set_output_format('json')
+def cmd_set_output_style(cfg):
+    pass
 
+def _make_set_output_style(output_style):
+    @cmd_set_output_style.command(name=output_style, help='set {} output style'.format(output_style.upper()))
+    @click.pass_obj
+    def f(cfg):
+        cfg.app.set_output_style(output_style)
+    return f
 
-@cmd_set_output_format.command(name='json-color', help='set JSON+color output format')
-@click.pass_obj
-def cmd_set_output_format_json_color(cfg):
-    cfg.app.set_output_format('json-color')
-
-
-@cmd_set_output_format.command(name='yaml', help='set YAML format')
-@click.pass_obj
-def cmd_set_output_format_yaml(cfg):
-    cfg.app.set_output_format('yaml')
-
-
-@cmd_set_output_format.command(name='yaml-color', help='set YAML+color output format')
-@click.pass_obj
-def cmd_set_output_format_yaml_color(cfg):
-    cfg.app.set_output_format('yaml-color')
-
-
-@cmd_set_output_format.command(name='plain', help='set plain output format')
-@click.pass_obj
-def cmd_set_output_format_plain(cfg):
-    cfg.app.set_output_format('plain')
+for output_style in app.Application.OUTPUT_STYLE:
+    _make_set_output_style(output_style)
 
 
 @cli.group(name='list', help='list resources')
