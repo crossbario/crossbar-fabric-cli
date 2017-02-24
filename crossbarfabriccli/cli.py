@@ -125,11 +125,8 @@ def version(cfg):
 )
 @click.pass_context
 def cmd_login(ctx, code):
-    print(ctx.command.name)
-    print(ctx.command)
     cfg = ctx.obj
     cfg.code = code
-    click.echo('authenticating profile "{}" / code "{}" ..'.format(cfg.profile, cfg.code))
     ctx.obj.app.run_context(ctx)
 
 

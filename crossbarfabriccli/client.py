@@ -97,15 +97,15 @@ class ShellClient(ApplicationSession):
         self.log.info("session joined: {details}", details=details)
         self.log.info("*** Hooray! We've been successfully authenticated with WAMP-cryptosign using Ed25519! ***")
 
-        done = self.config.extra.get(u'done', None)
-        if done and not done.done():
-            done.set_result(details)
-
         self._ticks = 0
         def on_tick(tick):
             self._ticks += 1
 
         await self.subscribe(on_tick, u'com.example.tick')
+
+        done = self.config.extra.get(u'done', None)
+        if done and not done.done():
+            done.set_result(details)
 
     def onLeave(self, details):
         self.log.info("session closed: {details}", details=details)

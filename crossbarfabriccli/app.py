@@ -332,31 +332,29 @@ class Application(object):
 
         self.session = client.run(url, realm, extra)
 
-        prompt_kwargs = {
-            'history': self._history,
-        }
-
         if ctx.command.name == 'login':
             extra[u'activation_code'] = cfg.code
-            loop.run_until_complete(connected)
-
-        elif ctx.command.name == 'shell':
-            click.clear()
-            click.echo(self.WELCOME)
 
             loop.run_until_complete(connected)
 
             # autobahn.wamp.types.SessionDetails
             session_details = connected.result()
 
-            click.echo(self.CONNECTED.format(
-                url=url,
-                realm=style_crossbar(session_details.realm),
-                authmethod=session_details.authmethod,
-                authid=style_crossbar(session_details.authid),
-                authrole=style_crossbar(session_details.authrole),
-                session=session_details.session
-                ))
+            self._print_welcome(url, session_details)
+
+        elif ctx.command.name == 'shell':
+
+            loop.run_until_complete(connected)
+
+            # autobahn.wamp.types.SessionDetails
+            session_details = connected.result()
+
+            click.clear()
+            self._print_welcome(url, session_details)
+
+            prompt_kwargs = {
+                'history': self._history,
+            }
 
             shell_task = loop.create_task(
                 repl.repl(ctx,
@@ -372,3 +370,15 @@ class Application(object):
             raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
 
         loop.close()
+
+    def _print_welcome(self, url, session_details):
+        click.echo(self.WELCOME)
+        click.echo(self.CONNECTED.format(
+            url=url,
+            realm=style_crossbar(session_details.realm),
+            authmethod=session_details.authmethod,
+            authid=style_crossbar(session_details.authid),
+            authrole=style_crossbar(session_details.authrole),
+            session=session_details.session
+            ))
+
