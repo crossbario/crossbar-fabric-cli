@@ -26,33 +26,31 @@
 
 import click
 
-_old_click_argument = click.argument
+if False:
+    # try to monkey patch click to allow arguments to have help
+    # DOES NOT WORK!
 
-import inspect
-from click import Argument
-from click.decorators import _param_memo
+    _old_click_argument = click.argument
 
-def _new_click_argument(*param_decls, **attrs):
-    """Attaches an argument to the command.  All positional arguments are
-    passed as parameter declarations to :class:`Argument`; all keyword
-    arguments are forwarded unchanged (except ``cls``).
-    This is equivalent to creating an :class:`Argument` instance manually
-    and attaching it to the :attr:`Command.params` list.
-    :param cls: the argument class to instantiate.  This defaults to
-                :class:`Argument`.
-    """
-    def decorator(f):
-        if 'help' in attrs:
-            attrs['help'] = inspect.cleandoc(attrs['help'])
-        ArgumentClass = attrs.pop('cls', Argument)
-        _param_memo(f, ArgumentClass(param_decls, **attrs))
-        return f
-    return decorator
+    import inspect
+    from click import Argument
+    from click.decorators import _param_memo
 
-click.argument = _new_click_argument
+    def _new_click_argument(*param_decls, **attrs):
+
+        def decorator(f):
+            if 'help' in attrs:
+                attrs['help'] = inspect.cleandoc(attrs['help'])
+            ArgumentClass = attrs.pop('cls', Argument)
+            _param_memo(f, ArgumentClass(param_decls, **attrs))
+            return f
+        return decorator
+
+    click.argument = _new_click_argument
 
 
 from crossbarfabriccli import app, command
+from crossbarfabriccli import __version__
 
 
 USAGE = """
@@ -89,11 +87,12 @@ class Config(object):
         return u'Config(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
 
 
-@click.group(invoke_without_command=True)
+@click.group(help="Crossbar.io Fabric Command Line", invoke_without_command=True)
 @click.option(
     '--profile',
-    help='profile to use',
-    default=u'default'
+    envvar='CBF_PROFILE',
+    default=u'default',
+    help="Set the profile to be used",
 )
 @click.pass_context
 def cli(ctx, profile):
@@ -112,14 +111,26 @@ def cli(ctx, profile):
         ctx.invoke(cmd_shell)
 
 
+@cli.command()
+@click.pass_obj
+def version(cfg):
+    click.echo("Crossbar.io Fabric Shell {}".format(__version__))
+
+
 @cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
 @click.option(
-    '--code', default=None,
+    '--code',
+    default=None,
     help="Supply login/registration code",
 )
 @click.pass_context
-def cmd_login(ctx):
-    click.echo('authenticating profile "{}" ..'.format(ctx.obj.profile))
+def cmd_login(ctx, code):
+    print(ctx.command.name)
+    print(ctx.command)
+    cfg = ctx.obj
+    cfg.code = code
+    click.echo('authenticating profile "{}" / code "{}" ..'.format(cfg.profile, cfg.code))
+    ctx.obj.app.run_context(ctx)
 
 
 @cli.command(name='shell', help='run an interactive Crossbar.io Fabric shell')

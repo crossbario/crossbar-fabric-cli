@@ -25,6 +25,7 @@
 ###############################################################################
 
 import sys
+import os
 import time
 import locale
 import pprint
@@ -32,14 +33,17 @@ import json
 import yaml
 import asyncio
 import click
+
 import pygments
 from pygments import highlight, lexers, formatters
+
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.shortcuts import prompt, prompt_async
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
+
 from autobahn.util import utcnow
-from crossbarfabriccli import client, repl
+from crossbarfabriccli import client, repl, config, key, __version__
 
 
 _HAS_COLOR_TERM = False
@@ -108,12 +112,21 @@ class Application(object):
     OUTPUT_STYLE = list(pygments.styles.get_all_styles())
 
     WELCOME = """
-    Welcome to {title}!
+    Welcome to {title} v{version}
 
     Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
     Type "help" to get help. Try TAB for auto-completion.
+    """.format(title=style_crossbar('Crossbar.io Fabric Shell'), version=__version__)
 
-    """.format(title=style_crossbar('Crossbar.io Fabric Shell'))
+    CONNECTED = """    Connection:
+
+        url         : {url}
+        authmethod  : {authmethod}
+        realm       : {realm}
+        authid      : {authid}
+        authrole    : {authrole}
+        session     : {session}
+    """
 
     def __init__(self):
         self.current_resource_type = None
@@ -139,6 +152,28 @@ class Application(object):
         })
 
         self._output_style = 'fruity'
+
+    def _init_cbf_dir(self, dotdir=None, profile=None):
+
+        dotdir = dotdir or '~/.cbf'
+        profile = profile or 'default'
+
+        cbf_dir = os.path.expanduser(dotdir)
+        if not os.path.isdir(cbf_dir):
+            os.mkdir(cbf_dir)
+
+        config_path = os.path.join(cbf_dir, 'config')
+        config_obj = config.UserConfig(config_path)
+
+        profile_obj = config_obj.profiles.get(profile, None)
+        if not profile_obj:
+            raise click.ClickException('no such profile: "{}"'.format(profile))
+
+        privkey_path = os.path.join(cbf_dir, profile_obj.privkey or 'default.priv')
+        pubkey_path = os.path.join(cbf_dir, profile_obj.pubkey or 'default.pub')
+        key_obj = key.UserKey(privkey_path, pubkey_path)
+
+        return key_obj, profile_obj
 
     def set_output_format(self, output_format):
         """
@@ -269,23 +304,71 @@ class Application(object):
         ]
 
     def run_context(self, ctx):
-        click.clear()
-        click.echo(self.WELCOME)
+        cfg = ctx.obj
+
         loop = asyncio.get_event_loop()
 
-        self.session = client.run()
+        key, profile = self._init_cbf_dir(profile=cfg.profile)
+
+        #click.echo('using profile: {}'.format(profile))
+        #click.echo('using key: {}'.format(key))
+
+        url = profile.url or u'wss://fabric.crossbario.com'
+        url = u'ws://localhost:8080/ws'
+        realm = profile.realm or u'fabric'
+        authid = key.user_id
+        authrole = profile.role or None
+
+        connected = asyncio.Future()
+
+        extra = {
+            u'authid': authid,
+            u'authrole': authrole,
+            u'cfg': cfg,
+            u'key': key,
+            u'profile': profile,
+            u'done': connected
+        }
+
+        self.session = client.run(url, realm, extra)
 
         prompt_kwargs = {
             'history': self._history,
         }
 
-        shell_task = loop.create_task(
-            repl.repl(ctx,
-                      get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
-                      #get_prompt_tokens=self._get_prompt_tokens,
-                      style=self._style,
-                      prompt_kwargs=prompt_kwargs)
-        )
+        if ctx.command.name == 'login':
+            extra[u'activation_code'] = cfg.code
+            loop.run_until_complete(connected)
 
-        loop.run_until_complete(shell_task)
+        elif ctx.command.name == 'shell':
+            click.clear()
+            click.echo(self.WELCOME)
+
+            loop.run_until_complete(connected)
+
+            # autobahn.wamp.types.SessionDetails
+            session_details = connected.result()
+
+            click.echo(self.CONNECTED.format(
+                url=url,
+                realm=style_crossbar(session_details.realm),
+                authmethod=session_details.authmethod,
+                authid=style_crossbar(session_details.authid),
+                authrole=style_crossbar(session_details.authrole),
+                session=session_details.session
+                ))
+
+            shell_task = loop.create_task(
+                repl.repl(ctx,
+                          get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
+                          #get_prompt_tokens=self._get_prompt_tokens,
+                          style=self._style,
+                          prompt_kwargs=prompt_kwargs)
+            )
+
+            loop.run_until_complete(shell_task)
+
+        else:
+            raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
+
         loop.close()

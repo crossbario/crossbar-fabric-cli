@@ -43,8 +43,9 @@ class Profile(object):
 
     log = make_logger()
 
-    def __init__(self, name=None, reconnect=None, debug=None, realm=None, role=None, pubkey=None, privkey=None):
+    def __init__(self, name=None, url=None, reconnect=None, debug=None, realm=None, role=None, pubkey=None, privkey=None):
         self.name = name
+        self.url = url
         self.reconnect = reconnect
         self.debug = debug
         self.realm = realm
@@ -53,11 +54,11 @@ class Profile(object):
         self.privkey = privkey
 
     def __str__(self):
-        name = u'u"{}"'.format(self.name) if self.name else u'None'
-        return u'Profile(name={}, reconnect={}, debug={}, realm={}, role={}, pubkey={}, privkey={})'.format(name, self.reconnect, self.debug, self.realm, self.role, self.pubkey, self.privkey)
+        return u'Profile(name={}, url={}, reconnect={}, debug={}, realm={}, role={}, pubkey={}, privkey={})'.format(self.name, self.url, self.reconnect, self.debug, self.realm, self.role, self.pubkey, self.privkey)
 
     @staticmethod
     def parse(name, items):
+        url = None
         reconnect = None
         debug = None
         realm = None
@@ -65,7 +66,9 @@ class Profile(object):
         pubkey = None
         privkey = None
         for k, v in items:
-            if k == 'reconnect':
+            if k == 'url':
+                url = str(v)
+            elif k == 'reconnect':
                 reconnect = int(v)
             elif k == 'debug':
                 debug = bool(v)
@@ -81,7 +84,7 @@ class Profile(object):
                 # skip unknown attribute
                 self.log.warn('unprocessed config attribute "{}"'.format(k))
 
-        profile = Profile(name, reconnect, debug, realm, role, pubkey, privkey)
+        profile = Profile(name, url, reconnect, debug, realm, role, pubkey, privkey)
 
         return profile
 
@@ -92,7 +95,7 @@ privkey=default.priv
 pubkey=default.pub
 """
 
-class Config(object):
+class UserConfig(object):
 
     log = make_logger()
 
