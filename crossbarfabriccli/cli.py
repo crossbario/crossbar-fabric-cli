@@ -117,16 +117,23 @@ def version(cfg):
     click.echo("Crossbar.io Fabric Shell {}".format(__version__))
 
 
-@cli.command(name='login', help='authenticate user profile / key-pair with Crossbar.io Fabric')
+@cli.command(name='auth', help='authenticate user profile / key-pair with Crossbar.io Fabric')
 @click.option(
     '--code',
     default=None,
-    help="Supply login/registration code",
+    help="Supply authentication code (received by email)",
+)
+@click.option(
+    '--new-code',
+    is_flag=True,
+    default=False,
+    help="Request sending of a new authentication code (even though an old one is still pending)",
 )
 @click.pass_context
-def cmd_login(ctx, code):
+def cmd_auth(ctx, code, new_code):
     cfg = ctx.obj
     cfg.code = code
+    cfg.new_code = new_code
     ctx.obj.app.run_context(ctx)
 
 

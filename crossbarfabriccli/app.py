@@ -43,6 +43,11 @@ from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
 from autobahn.util import utcnow
+from autobahn.wamp.exception import ApplicationError
+from autobahn.wamp.types import ComponentConfig
+from autobahn.wamp.exception import ApplicationError
+from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
+
 from crossbarfabriccli import client, repl, config, key, __version__
 
 
@@ -78,6 +83,17 @@ def style_finished_line(text):
     else:
         return text
 
+def style_error(text):
+    if _HAS_COLOR_TERM:
+        return click.style(text, fg='red', bold=True)
+    else:
+        return text
+
+def style_ok(text):
+    if _HAS_COLOR_TERM:
+        return click.style(text, fg='green', bold=True)
+    else:
+        return text
 
 def localnow():
     return time.strftime(locale.nl_langinfo(locale.D_T_FMT), time.localtime())
@@ -315,32 +331,58 @@ class Application(object):
 
         url = profile.url or u'wss://fabric.crossbario.com'
         url = u'ws://localhost:8080/ws'
-        realm = profile.realm or u'fabric'
+        realm = profile.realm or None  # u'com.crossbario.fabric'
         authid = key.user_id
         authrole = profile.role or None
 
         connected = asyncio.Future()
 
         extra = {
+            # these are forward on the actual client connection
             u'authid': authid,
             u'authrole': authrole,
-            u'cfg': cfg,
+
+            # user provides authentication code to verify
+            u'activation_code': cfg.code,
+
+            # user requests sending of a new authentication code (while an old one is still pending)
+            u'request_new_activation_code': cfg.new_code,
+
+            # these are native Py object and only used client-side
             u'key': key,
-            u'profile': profile,
             u'done': connected
         }
 
-        self.session = client.run(url, realm, extra)
+        self.session = client.ShellClient(ComponentConfig(realm, extra))
 
-        if ctx.command.name == 'login':
-            extra[u'activation_code'] = cfg.code
+        runner = ApplicationRunner(url, realm)
+        runner.run(self.session, start_loop=False)
 
-            loop.run_until_complete(connected)
+        if ctx.command.name == u'auth':
+            try:
+                # autobahn.wamp.types.SessionDetails
+                session_details = loop.run_until_complete(connected)
 
-            # autobahn.wamp.types.SessionDetails
-            session_details = connected.result()
+            except ApplicationError as e:
 
-            self._print_welcome(url, session_details)
+                if e.error.startswith(u'fabric.auth-failed.'):
+                    error = e.error.split(u'.')[2]
+                    message = e.args[0]
+
+                    if error == u'new-user-auth-code-sent':
+                        click.echo('\nThanks for registering! {}'.format(message))
+                        click.echo(style_ok('Please check your inbox.\n'))
+
+                    elif error == u'registered-user-auth-code-sent':
+                        click.echo('\nWellcome back! {}'.format(message))
+                        click.echo(style_ok('Please check your inbox.\n'))
+
+                    else:
+                        click.echo(style_error('FIXME: unprocessed error type {}'.format(error)))
+                else:
+                    raise
+            else:
+                self._print_welcome(url, session_details)
 
         elif ctx.command.name == 'shell':
 

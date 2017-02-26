@@ -66,8 +66,9 @@ class ShellClient(ApplicationSession):
         }
 
         # used for user login/registration activation code
-        if u'activation_code' in self.config.extra and self.config.extra[u'activation_code']:
-            extra[u'activation_code'] = self.config.extra[u'activation_code']
+        for k in [u'activation_code', u'request_new_activation_code']:
+            if k in self.config.extra and self.config.extra[k]:
+                extra[k] = self.config.extra[k]
 
         # now request to join ..
         self.join(self.config.realm,
@@ -121,10 +122,3 @@ class ShellClient(ApplicationSession):
     def onDisconnect(self):
         loop = asyncio.get_event_loop()
         loop.stop()
-
-
-def run(url, realm, extra):
-    session = ShellClient(ComponentConfig(realm, extra))
-    runner = ApplicationRunner(url, realm)
-    runner.run(session, start_loop=False)
-    return session
