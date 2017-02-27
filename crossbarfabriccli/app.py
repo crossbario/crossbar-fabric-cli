@@ -342,16 +342,17 @@ class Application(object):
             u'authid': authid,
             u'authrole': authrole,
 
-            # user provides authentication code to verify
-            u'activation_code': cfg.code,
-
-            # user requests sending of a new authentication code (while an old one is still pending)
-            u'request_new_activation_code': cfg.new_code,
-
             # these are native Py object and only used client-side
             u'key': key,
             u'done': connected
         }
+
+        if ctx.command.name == u'auth':
+            # user provides authentication code to verify
+            extra[u'activation_code'] = cfg.code
+
+            # user requests sending of a new authentication code (while an old one is still pending)
+            extra[u'request_new_activation_code'] = cfg.new_code
 
         self.session = client.ShellClient(ComponentConfig(realm, extra))
 
