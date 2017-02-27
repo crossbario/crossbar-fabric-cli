@@ -232,6 +232,20 @@ for output_style in app.Application.OUTPUT_STYLE:
     _make_set_output_style(output_style)
 
 
+@cli.group(name='create', help='create resources')
+@click.pass_obj
+def cmd_create(cfg):
+    pass
+
+
+@cmd_create.command(name='management-realm', help='create a new management realm')
+@click.argument('realm')
+@click.pass_obj
+async def cmd_create_management_realm(cfg, realm):
+    cmd = command.CmdCreateManagementRealm(realm=realm)
+    await cfg.app.run_command(cmd)
+
+
 @cli.group(name='list', help='list resources')
 @click.option(
     '--verbose',
@@ -242,6 +256,13 @@ for output_style in app.Application.OUTPUT_STYLE:
 @click.pass_obj
 def cmd_list(cfg, verbose):
     cfg.verbose = verbose
+
+
+@cmd_list.command(name='management-realms', help='list management realms')
+@click.pass_obj
+async def cmd_list_management_realms(cfg):
+    cmd = command.CmdListManagementRealms(verbose=cfg.verbose)
+    await cfg.app.run_command(cmd)
 
 
 @cmd_list.command(name='nodes', help='list nodes')

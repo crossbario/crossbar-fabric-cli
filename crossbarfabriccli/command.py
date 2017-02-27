@@ -55,11 +55,40 @@ class Cmd(object):
 
 
 
+class CmdCreate(Cmd):
+
+    def __init__(self):
+        Cmd.__init__(self)
+
+
+class CmdCreateManagementRealm(CmdCreate):
+
+    def __init__(self, realm):
+        CmdCreate.__init__(self)
+        self.realm = realm
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.crossbario.fabric.create_management_realm', self.realm)
+        return self._post(session, result)
+
+
 class CmdList(Cmd):
 
     def __init__(self, verbose=False):
         Cmd.__init__(self)
         self.verbose = verbose
+
+
+class CmdListManagementRealms(CmdList):
+
+    def __init__(self, verbose=False):
+        CmdList.__init__(self, verbose)
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.crossbario.fabric.list_management_realms', verbose=self.verbose)
+        return self._post(session, result)
 
 
 class CmdListNodes(CmdList):
@@ -69,7 +98,7 @@ class CmdListNodes(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.list_nodes', verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.list_nodes', verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -81,7 +110,7 @@ class CmdListWorkers(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.list_workers', self.node, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.list_workers', self.node, verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -98,7 +127,7 @@ class CmdShowFabric(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_fabric', verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_fabric', verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -110,7 +139,7 @@ class CmdShowNode(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_node', self.node, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_node', self.node, verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -123,7 +152,7 @@ class CmdShowWorker(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_worker', self.node, self.worker, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_worker', self.node, self.worker, verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -137,7 +166,7 @@ class CmdShowTransport(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_transport', self.node, self.worker, self.transport, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_transport', self.node, self.worker, self.transport, verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -151,7 +180,7 @@ class CmdShowRealm(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_realm', self.node, self.worker, self.realm, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_realm', self.node, self.worker, self.realm, verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -165,5 +194,5 @@ class CmdShowComponent(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'com.example.show_component', self.node, self.worker, self.component, verbose=self.verbose)
+        result = await session.call(u'com.crossbario.fabric.show_component', self.node, self.worker, self.component, verbose=self.verbose)
         return self._post(session, result)

@@ -42,6 +42,10 @@ from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 from prompt_toolkit import prompt
 
+from autobahn.wamp.exception import ApplicationError
+
+from crossbarfabriccli.util import style_error
+
 
 def _get_bottom_toolbar_tokens(cli):
     return [(Token.Toolbar, ' This is a toolbar. ')]
@@ -271,8 +275,13 @@ async def repl(
                 if f:
                     await f
                 ctx.exit()
+
+        except ApplicationError as e:
+            click.echo(style_error(u'{} [{}]'.format(e.args[0], e.error)))
+
         except click.ClickException as e:
             e.show()
+
         except SystemExit:
             pass
 

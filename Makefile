@@ -1,3 +1,6 @@
+default:
+	@echo "targets: clean, install, flake8, upload"
+
 clean:
 	-rm -f ./.cbsh-history
 	-rm -rf build
@@ -8,6 +11,13 @@ clean:
 
 install:
 	pip install -e .
+
+# upload to our internal deployment system
+upload: clean
+	python setup.py bdist_wheel
+	aws s3 cp --acl public-read \
+		dist/crossbarfabriccli-*.whl \
+		s3://fabric-deploy/crossbarfabriccli/
 
 # This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:

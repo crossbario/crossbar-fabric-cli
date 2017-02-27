@@ -48,55 +48,8 @@ from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 
+from crossbarfabriccli.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
 from crossbarfabriccli import client, repl, config, key, __version__
-
-
-_HAS_COLOR_TERM = False
-try:
-    import colorama
-
-    # https://github.com/tartley/colorama/issues/48
-    term = None
-    if sys.platform == 'win32' and 'TERM' in os.environ:
-        term = os.environ.pop('TERM')
-
-    colorama.init()
-    _HAS_COLOR_TERM = True
-
-    if term:
-        os.environ['TERM'] = term
-
-except ImportError:
-    pass
-
-
-def style_crossbar(text):
-    if _HAS_COLOR_TERM:
-        return click.style(text, fg='yellow', bold=True)
-    else:
-        return text
-
-
-def style_finished_line(text):
-    if _HAS_COLOR_TERM:
-        return click.style(text, fg='yellow')
-    else:
-        return text
-
-def style_error(text):
-    if _HAS_COLOR_TERM:
-        return click.style(text, fg='red', bold=True)
-    else:
-        return text
-
-def style_ok(text):
-    if _HAS_COLOR_TERM:
-        return click.style(text, fg='green', bold=True)
-    else:
-        return text
-
-def localnow():
-    return time.strftime(locale.nl_langinfo(locale.D_T_FMT), time.localtime())
 
 
 class Application(object):
@@ -330,7 +283,6 @@ class Application(object):
         #click.echo('using key: {}'.format(key))
 
         url = profile.url or u'wss://fabric.crossbario.com'
-        url = u'ws://localhost:8080/ws'
         realm = profile.realm or None  # u'com.crossbario.fabric'
         authid = key.user_id
         authrole = profile.role or None

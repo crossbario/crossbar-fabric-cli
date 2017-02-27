@@ -102,7 +102,7 @@ class ShellClient(ApplicationSession):
         def on_tick(tick):
             self._ticks += 1
 
-        await self.subscribe(on_tick, u'com.example.tick')
+        await self.subscribe(on_tick, u'com.crossbario.fabric.tick')
 
         done = self.config.extra.get(u'done', None)
         if done and not done.done():

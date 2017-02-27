@@ -43,7 +43,7 @@ setup(
     url='http://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'autobahn[asyncio,accelerate,serialization,encryption]>=0.17.2',
+        'autobahn[asyncio,serialization,encryption]>=0.17.2',
         'click>=6.7',
         'prompt_toolkit>=1.0.13',
         'colorama>=0.3.7',
@@ -64,7 +64,7 @@ setup(
     data_files=[
         ('.', ['LICENSE', 'README.md'])
     ],
-    zip_safe=False,
+    zip_safe=True,
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=["License :: OSI Approved :: MIT License",
                  "Development Status :: 4 - Beta",
