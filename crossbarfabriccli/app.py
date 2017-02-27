@@ -359,6 +359,8 @@ class Application(object):
         runner = ApplicationRunner(url, realm)
         runner.run(self.session, start_loop=False)
 
+        exit_code = 0
+
         if ctx.command.name == u'auth':
             try:
                 # autobahn.wamp.types.SessionDetails
@@ -375,12 +377,46 @@ class Application(object):
                         click.echo(style_ok('Please check your inbox.\n'))
 
                     elif error == u'registered-user-auth-code-sent':
-                        click.echo('\nWellcome back! {}'.format(message))
+                        click.echo('\nWelcome back! {}'.format(message))
                         click.echo(style_ok('Please check your inbox.\n'))
 
+                    elif error == u'pending-activation':
+
+                        click.echo()
+                        click.echo(style_ok(message))
+                        click.echo()
+                        click.echo('Tip: you can request sending of a new code with "cbsh auth --new-code"')
+                        click.echo()
+
+                    elif error == u'no-pending-activation':
+
+                        exit_code = 1
+                        click.echo()
+                        click.echo(style_error('{} [{}]'.format(message, e.error)))
+                        click.echo()
+
+                    elif error == u'email-failure':
+
+                        exit_code = 1
+                        click.echo()
+                        click.echo(style_error('{} [{}]'.format(message, e.error)))
+                        click.echo()
+
+                    elif error == u'invalid-activation-code':
+
+                        exit_code = 1
+                        click.echo()
+                        click.echo(style_error('{} [{}]'.format(message, e.error)))
+                        click.echo()
+
                     else:
-                        click.echo(style_error('FIXME: unprocessed error type {}'.format(error)))
+
+                        exit_code = 1
+                        click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
+                        click.echo(style_error(message))
                 else:
+
+                    exit_code = 1
                     raise
             else:
                 self._print_welcome(url, session_details)
@@ -413,6 +449,8 @@ class Application(object):
             raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
 
         loop.close()
+
+        sys.exit(exit_code)
 
     def _print_welcome(self, url, session_details):
         click.echo(self.WELCOME)
