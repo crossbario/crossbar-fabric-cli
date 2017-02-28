@@ -55,6 +55,26 @@ class Cmd(object):
 
 
 
+class CmdPair(Cmd):
+
+    def __init__(self):
+        Cmd.__init__(self)
+
+
+class CmdPairNode(CmdPair):
+
+    def __init__(self, realm, pubkey, node_id):
+        CmdPair.__init__(self)
+        self.realm = realm
+        self.pubkey = pubkey
+        self.node_id = node_id
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.crossbario.fabric.pair_node', self.realm, self.pubkey, self.node_id)
+        return self._post(session, result)
+
+
 class CmdCreate(Cmd):
 
     def __init__(self):

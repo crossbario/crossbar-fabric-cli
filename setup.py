@@ -43,14 +43,14 @@ setup(
     url='http://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'autobahn[asyncio,serialization,encryption]>=0.17.2',
-        'click>=6.7',
-        'prompt_toolkit>=1.0.13',
-        'colorama>=0.3.7',
-        'pygments>=2.2.0',
-        'humanize>=0.5.1',
-        'tabulate>=0.7.7',
-        'pyyaml>=3.12'
+        'autobahn[asyncio,serialization,encryption]>=0.17.2',   # MIT
+        'click>=6.7',               # BSD
+        'prompt_toolkit>=1.0.13',   # BSD
+        'colorama>=0.3.7',          # BSD
+        'pygments>=2.2.0',          # BSD
+        'humanize>=0.5.1',          # MIT
+        'tabulate>=0.7.7',          # MIT
+        'pyyaml>=3.12'              # MIT
     ],
     extras_require={
     },

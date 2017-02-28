@@ -251,6 +251,22 @@ async def cmd_create_management_realm(cfg, realm):
     await cfg.app.run_command(cmd)
 
 
+@cli.group(name='pair', help='pair nodes and devices')
+@click.pass_obj
+def cmd_pair(cfg):
+    pass
+
+
+@cmd_pair.command(name='node', help='pair a node')
+@click.argument('realm')
+@click.argument('pubkey')
+@click.argument('node_id')
+@click.pass_obj
+async def cmd_pair_node(cfg, realm, pubkey, node_id):
+    cmd = command.CmdPairNode(realm=realm, pubkey=pubkey, node_id=node_id)
+    await cfg.app.run_command(cmd)
+
+
 @cli.group(name='list', help='list resources')
 @click.option(
     '--verbose',

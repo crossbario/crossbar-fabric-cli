@@ -1,5 +1,13 @@
 # Fabric CLI
 
+## Examples
+
+Pair a node:
+
+```console
+pair node oberstet d19f6b9bd35858e31a386cdfe4c33e616e46b28c2d3a96add4591642d425cdd6 node7
+```
+
 ## Global Resource Tree
 
     REALM (Crossbar.io Fabric User Realm)
