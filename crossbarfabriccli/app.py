@@ -27,12 +27,17 @@
 import sys
 import os
 import time
+import socket
 import locale
 import pprint
 import json
 import yaml
 import asyncio
 import click
+
+import txaio
+import sys
+txaio.use_asyncio()
 
 import pygments
 from pygments import highlight, lexers, formatters
@@ -50,6 +55,13 @@ from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 
 from crossbarfabriccli.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
 from crossbarfabriccli import client, repl, config, key, __version__
+
+# default configuration stored in $HOME/.cbf/config.ini
+_DEFAULT_CONFIG = """[default]
+
+privkey=default.priv
+pubkey=default.pub
+"""
 
 
 class Application(object):
@@ -122,24 +134,32 @@ class Application(object):
 
         self._output_style = 'fruity'
 
-    def _init_cbf_dir(self, dotdir=None, profile=None):
+    def _load_profile(self, dotdir=None, profile=None):
 
-        dotdir = dotdir or '~/.cbf'
-        profile = profile or 'default'
+        dotdir = dotdir or u'~/.cbf'
+        profile = profile or u'default'
 
         cbf_dir = os.path.expanduser(dotdir)
         if not os.path.isdir(cbf_dir):
             os.mkdir(cbf_dir)
+            click.echo(u'Created new local user directory: {}'.format(style_ok(cbf_dir)))
 
-        config_path = os.path.join(cbf_dir, 'config')
+        config_path = os.path.join(cbf_dir, 'config.ini')
+        if not os.path.isfile(config_path):
+            with open(config_path, 'w') as f:
+                f.write(_DEFAULT_CONFIG)
+            click.echo(u'Created new local user configuration: {}'.format(style_ok(config_path)))
+
         config_obj = config.UserConfig(config_path)
 
         profile_obj = config_obj.profiles.get(profile, None)
         if not profile_obj:
             raise click.ClickException('no such profile: "{}"'.format(profile))
+        else:
+            click.echo('Active user profile: {}'.format(style_ok(profile)))
 
-        privkey_path = os.path.join(cbf_dir, profile_obj.privkey or 'default.priv')
-        pubkey_path = os.path.join(cbf_dir, profile_obj.pubkey or 'default.pub')
+        privkey_path = os.path.join(cbf_dir, profile_obj.privkey or u'{}.priv'.format(profile))
+        pubkey_path = os.path.join(cbf_dir, profile_obj.pubkey or u'default.pub')
         key_obj = key.UserKey(privkey_path, pubkey_path)
 
         return key_obj, profile_obj
@@ -275,18 +295,22 @@ class Application(object):
     def run_context(self, ctx):
         cfg = ctx.obj
 
-        loop = asyncio.get_event_loop()
+        if False:
+            txaio.start_logging(level='info', out=sys.stdout)
 
-        key, profile = self._init_cbf_dir(profile=cfg.profile)
+        click.echo('Crossbar.io Fabric Shell: {}'.format(style_ok('v{}'.format(__version__))))
 
-        #click.echo('using profile: {}'.format(profile))
-        #click.echo('using key: {}'.format(key))
+        # load user profile and key for given profile name
+        key, profile = self._load_profile(profile=cfg.profile)
 
         url = profile.url or u'wss://fabric.crossbario.com'
         realm = profile.realm or None  # u'com.crossbario.fabric'
         authid = key.user_id
         authrole = profile.role or None
 
+        # this will be fired when the ShellClient below actually has joined
+        # the respective realm on Crossbar.io Fabric (either the global users
+        # realm, or a management realm the user has a role on)
         connected = asyncio.Future()
 
         extra = {
@@ -306,103 +330,111 @@ class Application(object):
             # user requests sending of a new authentication code (while an old one is still pending)
             extra[u'request_new_activation_code'] = cfg.new_code
 
+        # this is the WAMP ApplicationSession that connects the CLI to Crossbar.io Fabric
         self.session = client.ShellClient(ComponentConfig(realm, extra))
 
+        loop = asyncio.get_event_loop()
         runner = ApplicationRunner(url, realm)
-        runner.run(self.session, start_loop=False)
+
+        try:
+            runner.run(self.session, start_loop=False)
+        except socket.gaierror as e:
+            click.echo(style_error('Could not connect to {}: {}'.format(url, e)))
+            loop.close()
+            sys.exit(1)
 
         exit_code = 0
+        try:
+            # autobahn.wamp.types.SessionDetails
+            session_details = loop.run_until_complete(connected)
 
-        if ctx.command.name == u'auth':
-            try:
-                # autobahn.wamp.types.SessionDetails
-                session_details = loop.run_until_complete(connected)
+        except ApplicationError as e:
 
-            except ApplicationError as e:
+            if e.error.startswith(u'fabric.auth-failed.'):
+                error = e.error.split(u'.')[2]
+                message = e.args[0]
 
-                if e.error.startswith(u'fabric.auth-failed.'):
-                    error = e.error.split(u'.')[2]
-                    message = e.args[0]
+                if error == u'new-user-auth-code-sent':
 
-                    if error == u'new-user-auth-code-sent':
-                        click.echo('\nThanks for registering! {}'.format(message))
-                        click.echo(style_ok('Please check your inbox.\n'))
+                    click.echo('\nThanks for registering! {}'.format(message))
+                    click.echo(style_ok('Please check your inbox.\n'))
 
-                    elif error == u'registered-user-auth-code-sent':
-                        click.echo('\nWelcome back! {}'.format(message))
-                        click.echo(style_ok('Please check your inbox.\n'))
+                elif error == u'registered-user-auth-code-sent':
 
-                    elif error == u'pending-activation':
+                    click.echo('\nWelcome back! {}'.format(message))
+                    click.echo(style_ok('Please check your inbox.\n'))
 
-                        click.echo()
-                        click.echo(style_ok(message))
-                        click.echo()
-                        click.echo('Tip: you can request sending of a new code with "cbsh auth --new-code"')
-                        click.echo()
+                elif error == u'pending-activation':
 
-                    elif error == u'no-pending-activation':
+                    click.echo()
+                    click.echo(style_ok(message))
+                    click.echo()
+                    click.echo('Tip: to activate, run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>"')
+                    click.echo('Tip: you can request sending a new code with "cbsh auth --new-code"')
+                    click.echo()
 
-                        exit_code = 1
-                        click.echo()
-                        click.echo(style_error('{} [{}]'.format(message, e.error)))
-                        click.echo()
+                elif error == u'no-pending-activation':
 
-                    elif error == u'email-failure':
+                    exit_code = 1
+                    click.echo()
+                    click.echo(style_error('{} [{}]'.format(message, e.error)))
+                    click.echo()
 
-                        exit_code = 1
-                        click.echo()
-                        click.echo(style_error('{} [{}]'.format(message, e.error)))
-                        click.echo()
+                elif error == u'email-failure':
 
-                    elif error == u'invalid-activation-code':
+                    exit_code = 1
+                    click.echo()
+                    click.echo(style_error('{} [{}]'.format(message, e.error)))
+                    click.echo()
 
-                        exit_code = 1
-                        click.echo()
-                        click.echo(style_error('{} [{}]'.format(message, e.error)))
-                        click.echo()
+                elif error == u'invalid-activation-code':
 
-                    else:
+                    exit_code = 1
+                    click.echo()
+                    click.echo(style_error('{} [{}]'.format(message, e.error)))
+                    click.echo()
 
-                        exit_code = 1
-                        click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
-                        click.echo(style_error(message))
                 else:
 
                     exit_code = 1
-                    raise
+                    click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
+                    click.echo(style_error(message))
             else:
-                self._print_welcome(url, session_details)
 
-        elif ctx.command.name == 'shell':
-
-            loop.run_until_complete(connected)
-
-            # autobahn.wamp.types.SessionDetails
-            session_details = connected.result()
-
-            click.clear()
-            self._print_welcome(url, session_details)
-
-            prompt_kwargs = {
-                'history': self._history,
-            }
-
-            shell_task = loop.create_task(
-                repl.repl(ctx,
-                          get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
-                          #get_prompt_tokens=self._get_prompt_tokens,
-                          style=self._style,
-                          prompt_kwargs=prompt_kwargs)
-            )
-
-            loop.run_until_complete(shell_task)
+                exit_code = 1
+                raise
 
         else:
-            raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
 
-        loop.close()
+            if ctx.command.name == u'auth':
 
-        sys.exit(exit_code)
+                self._print_welcome(url, session_details)
+
+            elif ctx.command.name == 'shell':
+
+                click.clear()
+                self._print_welcome(url, session_details)
+
+                prompt_kwargs = {
+                    'history': self._history,
+                }
+
+                shell_task = loop.create_task(
+                    repl.repl(ctx,
+                              get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
+                              #get_prompt_tokens=self._get_prompt_tokens,
+                              style=self._style,
+                              prompt_kwargs=prompt_kwargs)
+                )
+
+                loop.run_until_complete(shell_task)
+
+            else:
+                raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
+
+        finally:
+            loop.close()
+            sys.exit(exit_code)
 
     def _print_welcome(self, url, session_details):
         click.echo(self.WELCOME)

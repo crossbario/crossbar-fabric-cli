@@ -88,12 +88,6 @@ class Profile(object):
 
         return profile
 
-DEFAULT_CONFIG = """
-[default]
-
-privkey=default.priv
-pubkey=default.pub
-"""
 
 class UserConfig(object):
 
@@ -101,13 +95,6 @@ class UserConfig(object):
 
     def __init__(self, config_path):
         self._config_path = os.path.abspath(config_path)
-        self._load_and_maybe_generate(self._config_path)
-
-    def _load_and_maybe_generate(self, config_path):
-
-        if not os.path.isfile(config_path):
-            with open(config_path, 'w') as f:
-                f.write(DEFAULT_CONFIG)
 
         config = configparser.ConfigParser()
         config.read(config_path)

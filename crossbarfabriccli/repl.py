@@ -229,7 +229,7 @@ async def repl(
         def get_command():
             return prompt_async(completer=completer,
                                 history=history,
-                                #patch_stdout=True,
+                                patch_stdout=False,
                                 get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
                                 get_prompt_tokens=get_prompt_tokens,
                                 style=style,
@@ -277,7 +277,7 @@ async def repl(
                 ctx.exit()
 
         except ApplicationError as e:
-            click.echo(style_error(u'{} [{}]'.format(e.args[0], e.error)))
+            click.echo(style_error(u'[{}] {}'.format(e.error, e.args[0])))
 
         except click.ClickException as e:
             e.show()

@@ -41,8 +41,13 @@ from autobahn.util import utcnow
 import click
 import re
 
+from crossbarfabriccli.util import style_ok, style_error
+
 
 class EmailAddress(click.ParamType):
+    """
+    Email address validator.
+    """
 
     name = 'Email address'
 
@@ -53,14 +58,14 @@ class EmailAddress(click.ParamType):
         if re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
                     value):
             return value
-        self.fail('invalid email address')
+        self.fail('invalid email address {}'.format(style_error(value)))
 
 
 
 def _user_id():
     while True:
         value = click.prompt('Please enter your email address', type=EmailAddress())
-        if click.confirm('We will send an activation code to this address "{}", right?'.format(value)):
+        if click.confirm('We will send an activation code to {}, ok?'.format(style_ok(value))):
             break
 
     return value
@@ -126,6 +131,10 @@ def _parse_keyfile(key_path, private=True):
     return tags
 
 
+import click
+from crossbarfabriccli.util import style_ok, style_error
+
+
 class UserKey(object):
 
     log = make_logger()
@@ -185,11 +194,7 @@ class UserKey(object):
                          " correspond to private-key-ed25519").format(pubkey_path)
                     )
             else:
-                self.log.info(
-                    "User public key file {pub_path} not found - re-creating from user private key file {priv_path}",
-                    pub_path=pubkey_path,
-                    priv_path=privkey_path,
-                )
+                # public key is missing! recreate it
                 pub_tags = OrderedDict([
                     (u'creator', priv_tags[u'creator']),
                     (u'created-at', priv_tags[u'created-at']),
@@ -199,7 +204,10 @@ class UserKey(object):
                 msg = u'Crossbar.io user public key\n\n'
                 _write_node_key(pubkey_path, pub_tags, msg)
 
-            self.log.debug("User key already exists (public key: {hex})", hex=pubkey_hex)
+                click.echo('Re-created user public key from private key: {}'.format(style_ok(pub_path)))
+
+            click.echo('User public key loaded: {}'.format(style_ok(pubkey_path)))
+            click.echo('User private key loaded: {}'.format(style_ok(privkey_path)))
 
         else:
             # user private key does not yet exist: generate one
@@ -220,23 +228,26 @@ class UserKey(object):
             ])
             msg = u'Crossbar.io Fabric user public key\n\n'
             _write_node_key(pubkey_path, tags, msg)
+            os.chmod(pubkey_path, 420)
 
             # now, add the private key and write the private file
             tags[u'private-key-ed25519'] = privkey_hex
             msg = u'Crossbar.io Fabric user private key - KEEP THIS SAFE!\n\n'
             _write_node_key(privkey_path, tags, msg)
+            os.chmod(privkey_path, 384)
 
-            self.log.info("New user key pair generated!")
+            click.echo('New user public key generated: {}'.format(style_ok(pubkey_path)))
+            click.echo('New user private key generated ({}): {}'.format(style_error('keep this safe!'), style_ok(privkey_path)))
 
         # fix file permissions on node public/private key files
         # note: we use decimals instead of octals as octal literals have changed between Py2/3
         if os.stat(pubkey_path).st_mode & 511 != 420:  # 420 (decimal) == 0644 (octal)
             os.chmod(pubkey_path, 420)
-            self.log.info("File permissions on user public key fixed!")
+            click.echo(style_error('File permissions on user public key fixed!'))
 
         if os.stat(privkey_path).st_mode & 511 != 384:  # 384 (decimal) == 0600 (octal)
             os.chmod(privkey_path, 384)
-            self.log.info("File permissions on user private key fixed!")
+            click.echo(style_error('File permissions on user private key fixed!'))
 
         # load keys into object
         self._creator = creator
