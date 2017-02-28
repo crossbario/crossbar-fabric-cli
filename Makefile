@@ -31,3 +31,20 @@ pep8_show_e231:
 
 autopep8:
 	autopep8 -ri --aggressive --ignore=E501 .
+
+# build a statically linked executable using Pyinstaller
+build_linux_exe: clean
+	python setup.py sdist
+	sudo docker build -t cbsh -f Dockerfile .
+	sudo docker create --name cbsh-build cbsh
+	sudo docker cp cbsh-build:/build/dist/cbsh ./dist/
+	sudo docker rm --force cbsh-build
+	sudo docker rmi cbsh
+
+upload_linux_exe:
+	aws s3 cp --acl public-read \
+		dist/cbsh \
+		s3://fabric-deploy/crossbarfabriccli/linux/
+
+build:
+	python setup.py sdist bdist_wheel

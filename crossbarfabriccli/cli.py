@@ -26,6 +26,11 @@
 
 import click
 
+# this is for pyinstaller! otherwise it fails to find this dep.
+# see: http://cffi.readthedocs.io/en/latest/cdef.html
+import _cffi_backend
+
+
 if False:
     # try to monkey patch click to allow arguments to have help
     # DOES NOT WORK!
