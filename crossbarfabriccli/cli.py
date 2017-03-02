@@ -281,6 +281,25 @@ async def cmd_pair_node(cfg, realm, pubkey, node_id):
     await cfg.app.run_command(cmd)
 
 
+@cli.group(name='start', help='start workers, components, ..')
+@click.pass_obj
+def cmd_start(cfg):
+    pass
+
+
+@cmd_start.command(name='worker', help='start a worker')
+@click.argument('node')
+@click.argument('worker')
+@click.argument('worker-type')
+@click.option('--options', help='worker options', default=None)
+@click.pass_obj
+async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
+    print(node, worker, worker_type, options)
+    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
+    print(cmd)
+    await cfg.app.run_command(cmd)
+
+
 @cli.group(name='list', help='list resources')
 @click.option(
     '--verbose',

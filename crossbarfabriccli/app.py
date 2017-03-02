@@ -216,7 +216,10 @@ class Application(object):
         return u'Application(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
 
     async def run_command(self, cmd):
-        result = await cmd.run(self.session)
+        try:
+            result = await cmd.run(self.session)
+        except Exception as e:
+            print(e)
 
         if self._output_format in [Application.OUTPUT_FORMAT_JSON, Application.OUTPUT_FORMAT_JSON_COLORED]:
 
@@ -294,8 +297,8 @@ class Application(object):
 
     def run_context(self, ctx):
 
-        if False:
-            txaio.start_logging(level='info', out=sys.stdout)
+        if True:
+            txaio.start_logging(level='debug', out=sys.stdout)
 
         # cfg contains the command lines options and arguments that
         # click collected for us
@@ -425,8 +428,27 @@ class Application(object):
                     exit_code = 1
                     click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
                     click.echo(style_error(message))
+
+            elif e.error.startswith(u'crossbar.error.'):
+
+                error = e.error.split(u'.')[2]
+                message = e.args[0]
+
+                if error == u'invalid_configuration':
+
+                    click.echo()
+                    click.echo(style_error('{} [{}]'.format(message, e.error)))
+                    click.echo()
+                else:
+
+                    # we should not arrive here! otherwise, add a new clause above and handle the situation
+                    exit_code = 1
+                    click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
+                    click.echo(style_error(message))
+
             else:
 
+                click.echo(style_error('{}'.format(e)))
                 exit_code = 1
                 raise
 

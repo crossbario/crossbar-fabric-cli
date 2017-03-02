@@ -216,3 +216,27 @@ class CmdShowComponent(CmdShow):
         self._pre(session)
         result = await session.call(u'com.crossbario.fabric.show_component', self.node, self.worker, self.component, verbose=self.verbose)
         return self._post(session, result)
+
+
+class CmdStart(Cmd):
+
+    def __init__(self):
+        Cmd.__init__(self)
+
+class CmdStartWorker(CmdStart):
+
+    def __init__(self, node_id, worker_id, worker_type, worker_options=None):
+        CmdStart.__init__(self)
+        self.node_id = node_id
+        self.worker_id = worker_id
+        self.worker_type = worker_type
+        self.worker_options = worker_options
+
+    async def run(self, session):
+        self._pre(session)
+        result = await session.call(u'com.crossbario.fabric.start_worker',
+                                    node_id=self.node_id,
+                                    worker_id=self.worker_id,
+                                    worker_type=self.worker_type,
+                                    worker_options=self.worker_options)
+        return self._post(session, result)
