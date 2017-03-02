@@ -81,9 +81,11 @@ class Config(object):
     options etc for later processing.
     """
 
-    def __init__(self, app, profile):
+    def __init__(self, app, profile, realm, role):
         self.app = app
         self.profile = profile
+        self.realm = realm
+        self.role = role
         self.verbose = None
         self.resource_type = None
         self.resource = None
@@ -99,9 +101,21 @@ class Config(object):
     default=u'default',
     help="Set the profile to be used",
 )
+@click.option(
+    '--realm',
+    envvar='CBF_REALM',
+    default=None,
+    help="Set the realm to join",
+)
+@click.option(
+    '--role',
+    envvar='CBF_ROLE',
+    default=None,
+    help="Set the role requested to authenticate as",
+)
 @click.pass_context
-def cli(ctx, profile):
-    ctx.obj = Config(_app, profile)
+def cli(ctx, profile, realm, role):
+    ctx.obj = Config(_app, profile, realm, role)
 
     # Allowing a command group to specifiy a default subcommand can be done using
     # https://github.com/click-contrib/click-default-group
@@ -116,9 +130,9 @@ def cli(ctx, profile):
         ctx.invoke(cmd_shell)
 
 
-@cli.command()
+@cli.command(name='version', help='print version information')
 @click.pass_obj
-def version(cfg):
+def cmd_version(cfg):
     click.echo("Crossbar.io Fabric Shell {}".format(__version__))
 
 

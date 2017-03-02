@@ -293,20 +293,39 @@ class Application(object):
         ]
 
     def run_context(self, ctx):
-        cfg = ctx.obj
 
         if False:
             txaio.start_logging(level='info', out=sys.stdout)
+
+        # cfg contains the command lines options and arguments that
+        # click collected for us
+        cfg = ctx.obj
+
+        cmd = ctx.command.name
+        if cmd not in [u'auth', u'shell']:
+            raise click.ClickException('"{}" command can only be run in shell'.format(cmd))
 
         click.echo('Crossbar.io Fabric Shell: {}'.format(style_ok('v{}'.format(__version__))))
 
         # load user profile and key for given profile name
         key, profile = self._load_profile(profile=cfg.profile)
 
+        # set the Fabric URL to connect to from the profile or default
         url = profile.url or u'wss://fabric.crossbario.com'
-        realm = profile.realm or None  # u'com.crossbario.fabric'
+
+        # users always authenticate with the user_id from the key, which
+        # filled from the email the user provided
         authid = key.user_id
-        authrole = profile.role or None
+
+        # the realm can be set from command line, env var, the profile
+        # or can be None, which means the user will be joined to the global
+        # Crossbar.io Fabric users realm (u'com.crossbario.fabric')
+        realm = cfg.realm or profile.realm or None
+
+        # the authrole can be set from command line, env var, the profile
+        # or can be None, in which case the role is chosen automatically
+        # from the list of roles the user us authorized for
+        authrole = cfg.role or profile.role or None
 
         # this will be fired when the ShellClient below actually has joined
         # the respective realm on Crossbar.io Fabric (either the global users
@@ -318,11 +337,12 @@ class Application(object):
             u'authid': authid,
             u'authrole': authrole,
 
-            # these are native Py object and only used client-side
+            # these are native Python object and only used client-side
             u'key': key,
             u'done': connected
         }
 
+        # for the "auth" command, forward additional command line options
         if ctx.command.name == u'auth':
             # user provides authentication code to verify
             extra[u'activation_code'] = cfg.code
@@ -336,6 +356,7 @@ class Application(object):
         loop = asyncio.get_event_loop()
         runner = ApplicationRunner(url, realm)
 
+        # this might fail eg when the transport connection cannot be established
         try:
             runner.run(self.session, start_loop=False)
         except socket.gaierror as e:
@@ -345,10 +366,14 @@ class Application(object):
 
         exit_code = 0
         try:
-            # autobahn.wamp.types.SessionDetails
+            # "connected" will complete when the WAMP session to Fabric
+            # has been established and is ready
             session_details = loop.run_until_complete(connected)
 
         except ApplicationError as e:
+
+            # some ApplicationErrors are actually signaling progress
+            # in the authentication flow, some are real errors
 
             if e.error.startswith(u'fabric.auth-failed.'):
                 error = e.error.split(u'.')[2]
@@ -357,12 +382,12 @@ class Application(object):
                 if error == u'new-user-auth-code-sent':
 
                     click.echo('\nThanks for registering! {}'.format(message))
-                    click.echo(style_ok('Please check your inbox.\n'))
+                    click.echo(style_ok('Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'))
 
                 elif error == u'registered-user-auth-code-sent':
 
                     click.echo('\nWelcome back! {}'.format(message))
-                    click.echo(style_ok('Please check your inbox.\n'))
+                    click.echo(style_ok('Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'))
 
                 elif error == u'pending-activation':
 
@@ -396,6 +421,7 @@ class Application(object):
 
                 else:
 
+                    # we should not arrive here! otherwise, add a new clause above and handle the situation
                     exit_code = 1
                     click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
                     click.echo(style_error(message))
@@ -406,11 +432,11 @@ class Application(object):
 
         else:
 
-            if ctx.command.name == u'auth':
+            if cmd == u'auth':
 
                 self._print_welcome(url, session_details)
 
-            elif ctx.command.name == 'shell':
+            elif cmd == 'shell':
 
                 click.clear()
                 self._print_welcome(url, session_details)
@@ -430,7 +456,8 @@ class Application(object):
                 loop.run_until_complete(shell_task)
 
             else:
-                raise Exception('dunno how to start for command "{}"'.format(ctx.command.name))
+                # should not arrive here, as we checked cmd in the beginning
+                raise Exception('logic error')
 
         finally:
             loop.close()
