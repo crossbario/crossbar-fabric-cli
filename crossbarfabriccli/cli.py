@@ -294,9 +294,7 @@ def cmd_start(cfg):
 @click.option('--options', help='worker options', default=None)
 @click.pass_obj
 async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
-    print(node, worker, worker_type, options)
     cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
-    print(cmd)
     await cfg.app.run_command(cmd)
 
 
