@@ -297,7 +297,7 @@ class Application(object):
 
     def run_context(self, ctx):
 
-        if True:
+        if False:
             txaio.start_logging(level='debug', out=sys.stdout)
 
         # cfg contains the command lines options and arguments that
