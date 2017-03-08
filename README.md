@@ -28,9 +28,9 @@ When the Crossbar.io Fabric Shell has connected, you will have access to a unifi
 
     REALM (Crossbar.io Fabric Management Realm of User)
       |
-      +-- NODE
+      +-- NODE (Crossbar.io Fabric node paired to management realm)
             |
-            +-- CONTROLLER
+            +-- CONTROLLER (this singleton process always runs)
             |
             +-- WORKER [SUBTYPE ROUTER]
                    |
@@ -41,6 +41,8 @@ When the Crossbar.io Fabric Shell has connected, you will have access to a unifi
                                +-- PERMISSION
                    |
                    +-- TRANSPORT
+                         |
+                         +-- RESOURCE (only for Web Transports)
                    |
                    +-- COMPONENT (same Python only; danger zone)
             |
