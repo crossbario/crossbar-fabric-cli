@@ -57,7 +57,9 @@ resource
 
 ## Workers
 
-### Starting a guest worker
+### Guest Workers
+
+#### Starting Guest Workers
 
 Guest workers are worker processes with an arbitrary, user-specified executable started and supervised by the Crossbar.io node controller process.
 
@@ -115,6 +117,24 @@ Here is the shell command that does the same:
     --argument "backend_complete.js" \
     --options-workdir "../backend" \
     --options-watch-directory "../backend" \
-    --options-watch-action restart
+    --options-watch-action restart \
 node1 guest1
 ```
+
+**Reference**
+
+* `--type`: must be `guest` for a guest worker
+* `--executable`: absolute path to executable (or only executable, if it can be resolved)
+* `--argument`: command line argument to executable
+* `--options-workdir`: working directory (absolute path or relative to Crossbar.io node directory)
+* `--options-env-inherit`: true or false
+* `--options-env-inherit`: environment variable to inherit
+* `--options-env-var`: environment variable setting `"X=y"`
+* `--options-stdin`: one of `close`
+* `--options-stdin-type`: one of `json`, `yaml`
+* `--options-stdin-value`: a JSON (or YAML) serialized string
+* `--options-stdin-close`: true or false
+* `--options-stdout`: one of `close`, `log`, `drop`
+* `--options-stderr`: one of `close`, `log`, `drop`
+* `--options-watch-directory`: directory to be watched
+* `--options-watch-action`: one of `restart`
