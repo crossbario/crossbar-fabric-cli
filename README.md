@@ -941,4 +941,184 @@ cdc log worker mynode.myworker --tail=100
 cdc log worker mynode.myworker --
 ```
 
+------------------------------------
 
+# CLI Overview
+
+The following notes are presently meant to provide a feel for how the current approach to CLI command structure feels - and works across the range of necessary actions for fully configuring Crossbar.io.
+
+It should serve as the basis for future documentation.
+
+
+## Management Realms
+
+When initially started, the CLI works in the global management context.
+
+For any actions on Crossbar.io nodes, it is first necessary to either specify the management realm in which commands should be perfomed, or to create such a realm.
+
+```
+join management-realm oberstet
+```
+
+The above joins the existing realm `oberstet`. After joining, all commands apply within this mangement realm, until the realm is left.
+
+```
+create management-realm goeddea
+```
+
+This creates a new management realm 'goeddea'. The management realm needs to be joined afterwards.
+
+```
+leave management-realm
+```
+
+This leaves a currently joined management realm. (No extra argument is needed here since the context is clear from within the management realm. There are no cross-realm commands).
+
+To destroy an existing management realm, do
+
+```
+destroy management-realm goeddea
+```
+
+and then affirm the confirmation request.
+
+
+## Node pairing
+
+A management realm allows operations on any Crossbar.io nodes connected to it.
+
+Once you have joined a realm, you can list the nodes currently paired to the realm by doing
+
+```
+pair node --pubkey XXX node1
+```
+
+The node is identified by its public key ("XXX"), which is created at startup, and "node1" could be replaced by any node ID which is unqiue within the present management realm. (Node IDs need to be a string with permitted characters YYYY).
+
+To unpair a node, do
+
+```
+unpair node node1
+```
+
+## CLI Command Basics
+
+CLI commands which operate on node resources (i.e. everything you do in the CLI except for the above commands) have the structure
+
+```
+<action> <resource-type> [options] <resource-path>
+```
+
+An action is selected, a resource type to perform this action on or with and the options for this are given, and the final argument is the path to the resource which is either created or, for existing resources, to which the action is applied.
+
+Examples:
+
+```
+start worker --type router node1 router1
+```
+
+> Question: Since "stop" is listed as a command verb, would the above start the worker "router1" is this was existent and stopped, and create the worker if it did not exist? Or does "start" really mean "create & run", and stop "stop & destroy"?
+
+```
+list worker node1
+```
+
+lists all workers on `node1`.
+
+> Question: Do we keep the singular "worker", "permission" etc. here, so that each resource type is always referred to by the same identifier, or do we use the grammatically correct "workers", "permissions" etc.? "list permission" feels wrong.
+
+
+## Node commands
+
+Nodes can be created, started, stopped and destroyed, e.g.
+
+```
+create node node1
+start node node1
+```
+
+```
+stop node node34
+destroy node node34
+```
+
+After a node has been created, resources on the node can be created (see below).
+
+To get a list of nodes which are paired with the current management realm, do
+
+```
+list nodes
+```
+> Question: Again the issue of singular vs. plural comes up.
+
+To get information about a particular node, do
+
+```
+show node node1
+```
+
+
+## Resource structure within node
+
+The resource structure is that which is also the basis for the Crossbar.io configuration file, i.e.
+
+    +-- CONTROLLER (this singleton process always runs)
+    |
+    +-- WORKER [SUBTYPE ROUTER]
+         |
+         +-- REALM (Crossbar.io Realm)
+               |
+               +-- ROLE
+                     |
+                     +-- PERMISSION
+         |
+         +-- TRANSPORT
+               |
+               +-- RESOURCE (only for Web Transports)
+         |
+         +-- COMPONENT (same Python only; danger zone)
+    |
+    +-- WORKER [SUBTYPE PROXY] (Crossbar.io Fabric only; scale up/out)
+         |
+         +-- TRANSPORT
+    |
+    +-- WORKER [SUBTYPE CONTAINER]
+         |
+         +-- COMPONENT (same Python only)
+    |
+    +-- WORKER [SUBTYPE GUEST] (arbitrary executable)
+    |
+    +-- WORKER [SUBTYPE DOCKER] (Crossbar.io Fabric only)
+
+In the following, we will go over each of the resources and its subresources in turn.
+
+### Controller
+
+The contoller is started automatically as a necessary part of the node. It keeps the connection with Crossbar.io Fabric and executes instructions from there.
+
+No configuration or other actions are required regarding the controller.
+
+### Router Worker
+
+When started up via the CLI, a Crossbar.io node only contains the controller. In order to do any WAMP routing for applications, you need to start up at least one worker of type `router`. Application components connect to a router worker
+
+    start worker --type router node1 router1
+
+Here we see the resource path for the first time, in this case `node1 router1`. The router worker is started on `node1`.
+
+#### Realms
+
+
+
+##### Roles
+
+###### Permissions
+
+
+#### Transports
+
+##### WebSocket Transport
+
+##### Web Transport
+
+#####
