@@ -100,15 +100,60 @@ resource
 
 Guest workers are worker processes with an arbitrary, user-specified executable started and supervised by the Crossbar.io node controller process.
 
-Here is how to start a guest worker `guest1` on `node1` starting the executable `/usr/bin/nodejs` with a single argument `../client.js` (used when starting the executable):
+For example, you might have an backend application component written in JavaScript using AutobahnJS. Here is how to start a guest worker `guest1` on `node1` starting the executable `/usr/bin/nodejs` with a single argument `../client.js`:
 
 ```console
->> start worker --type guest --executable /usr/bin/nodejs --arguments "../client.js" node1 guest1
+>> start worker --type guest --executable "/usr/bin/nodejs" --argument "../client.js" node1 guest1
 ```
 
+> Note: `--argument` can be repeated multiple times to provide multiple command line argument to the executable started. The argument will be provided to the executable in the same order as the `--argument` option.
 
+When using a local node configuration (eg `config.json`), above command would correspond to the following snippet:
 
+```json
+{
+    "id": "guest1",
+    "type": "guest",
+    "executable": "/usr/bin/nodejs",
+    "arguments": ["../client.js"]
+}
+```
 
+> Note: As usual, by default, the working directory of a guest worker is the node directory (where the `config.json` resides). So, `../client.js` goes one dir up from `.crossbar` and looks for a `client.js` to run under NodeJS.
 
+Again, everything that can be done via a local node configuration file is supported from Crossbar.io Fabric shell too.
 
+For example, take this more complex example of a guest worker (this is from our live demos instance):
 
+```json
+{
+    "id": "guest1",
+    "type": "guest",
+    "executable": "/usr/bin/nodejs",
+    "arguments": [
+        "backend_complete.js"
+    ],
+    "options": {
+        "workdir": "../backend",
+        "watch": {
+            "directories": [
+                "../backend"
+            ],
+            "action": "restart"
+        }
+    }
+}
+```
+
+Here is the shell command that does the same:
+
+```console
+>> start worker \
+    --type guest \
+    --executable "/usr/bin/nodejs" \
+    --argument "backend_complete.js" \
+    --options-workdir "../backend" \
+    --options-watch-directory "../backend" \
+    --options-watch-action restart
+node1 guest1
+```
