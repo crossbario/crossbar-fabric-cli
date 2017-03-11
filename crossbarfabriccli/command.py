@@ -223,6 +223,7 @@ class CmdStart(Cmd):
     def __init__(self):
         Cmd.__init__(self)
 
+
 class CmdStartWorker(CmdStart):
 
     def __init__(self, node_id, worker_id, worker_type, worker_options=None):
@@ -239,4 +240,81 @@ class CmdStartWorker(CmdStart):
                                     worker_id=self.worker_id,
                                     worker_type=self.worker_type,
                                     worker_options=self.worker_options)
+        return self._post(session, result)
+
+
+class CmdStartContainerWorker(CmdStart):
+
+    def __init__(self, node_id, worker_id, process_title=None):
+        CmdStart.__init__(self)
+        self.node_id = node_id
+        self.worker_id = worker_id
+        self.process_title = process_title
+
+    async def run(self, session):
+        self._pre(session)
+
+        options = {}
+        if self.process_title:
+            options[u'title'] = self.process_title
+
+        result = await session.call(u'com.crossbario.fabric.start_worker',
+                                    node_id=self.node_id,
+                                    worker_id=self.worker_id,
+                                    worker_type=u'container',
+                                    worker_options=options)
+        return self._post(session, result)
+
+
+class CmdStartContainerComponent(CmdStart):
+
+    def __init__(self, node_id, worker_id, component_id,
+                 classname,
+                 realm,
+                 transport_type,
+                 transport_ws_url,
+                 transport_endpoint_type,
+                 transport_tcp_host,
+                 transport_tcp_port):
+        CmdStart.__init__(self)
+        self.node_id = node_id
+        self.worker_id = worker_id
+        self.component_id = component_id
+        self.classname = classname
+        self.realm = realm
+        self.transport_type = transport_type
+        self.transport_ws_url = transport_ws_url
+        self.transport_endpoint_type = transport_endpoint_type
+        self.transport_tcp_host = transport_tcp_host
+        self.transport_tcp_port = transport_tcp_port
+
+    async def run(self, session):
+        self._pre(session)
+
+        config = {
+            u'type': u'class',
+            u'transport': {
+                u'type': self.transport_type,
+                u'endpoint': {
+                    u'type': self.transport_endpoint_type
+                }
+            }
+        }
+        if self.classname:
+            config[u'classname'] = self.classname
+        if self.realm:
+            config[u'realm'] = self.realm
+
+        if self.transport_type == u'websocket':
+            config[u'transport'][u'url'] = self.transport_ws_url
+
+        if self.transport_endpoint_type == u'tcp':
+            config[u'transport'][u'endpoint'][u'host'] = self.transport_tcp_host
+            config[u'transport'][u'endpoint'][u'port'] = self.transport_tcp_port
+
+        result = await session.call(u'com.crossbario.fabric.start_container_component',
+                                    node_id=self.node_id,
+                                    worker_id=self.worker_id,
+                                    component_id=self.component_id,
+                                    config=config)
         return self._post(session, result)

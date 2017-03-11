@@ -287,14 +287,57 @@ def cmd_start(cfg):
     pass
 
 
-@cmd_start.command(name='worker', help='start a worker')
+#@cmd_start.command(name='worker', help='start a worker')
+#@click.argument('node')
+#@click.argument('worker')
+#@click.argument('worker-type')
+#@click.option('--options', help='worker options', default=None)
+#@click.pass_obj
+#async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
+#    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
+#    await cfg.app.run_command(cmd)
+
+from crossbarfabriccli.command import CmdStartContainerWorker, CmdStartContainerComponent
+
+@cmd_start.command(name='container-worker', help='start a container worker')
+@click.option('--process-title', help='worker process title (at OS level)', default=None)
 @click.argument('node')
 @click.argument('worker')
-@click.argument('worker-type')
-@click.option('--options', help='worker options', default=None)
 @click.pass_obj
-async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
-    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
+async def cmd_start_container_worker(cfg, node, worker, process_title=None):
+    cmd = command.CmdStartContainerWorker(node, worker, process_title=process_title)
+    await cfg.app.run_command(cmd)
+
+
+@cmd_start.command(name='container-component', help='start a container component')
+@click.option('--classname', help='fully qualified Python class name', required=True)
+@click.option('--realm', help='realm to join this component on', required=True)
+@click.option('--transport-type', help='connecting transport type', required=True, type=click.Choice(['websocket', 'rawsocket']))
+@click.option('--transport-ws-url', help='WebSocket transport connecting URL (eg wss://example.com:9000/ws', type=str)
+@click.option('--transport-endpoint-type', help='connecting transport endpoint type', required=True, type=click.Choice(['tcp', 'unix']))
+@click.option('--transport-tcp-host', help='connecting TCP transport host', type=str)
+@click.option('--transport-tcp-port', help='connecting TCP transport port', type=int)
+@click.argument('node')
+@click.argument('worker')
+@click.argument('component')
+@click.pass_obj
+async def cmd_start_container_component(cfg, node, worker, component,
+                                        classname=None,
+                                        realm=None,
+                                        transport_type=None,
+                                        transport_ws_url=None,
+                                        transport_endpoint_type=None,
+                                        transport_tcp_host=None,
+                                        transport_tcp_port=None,
+                                        ):
+    cmd = command.CmdStartContainerComponent(node, worker, component,
+                                             classname=classname,
+                                             realm=realm,
+                                             transport_type=transport_type,
+                                             transport_ws_url=transport_ws_url,
+                                             transport_endpoint_type=transport_endpoint_type,
+                                             transport_tcp_host=transport_tcp_host,
+                                             transport_tcp_port=transport_tcp_port)
     await cfg.app.run_command(cmd)
 
 

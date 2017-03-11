@@ -184,6 +184,18 @@ class ClickCompleter(Completer):
                 yield item
 
 
+
+from prompt_toolkit.token import Token
+
+
+def continuation_tokens(cli, width):
+    " The continuation: display dots before all the following lines. "
+
+    # (make sure that the width of the continuation does not exceed the given
+    # width. -- It is the prompt that decides the width of the left margin.)
+    return [(Token, '.' * (width - 1) + ' ')]
+
+
 async def repl(
         old_ctx,
         prompt_kwargs=None,
@@ -230,6 +242,9 @@ async def repl(
             return prompt_async(completer=completer,
                                 history=history,
                                 patch_stdout=False,
+                                # https://github.com/jonathanslenders/python-prompt-toolkit/blob/master/examples/get-multiline-input.py
+                                #multiline=True,
+                                #get_continuation_tokens=continuation_tokens,
                                 get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
                                 get_prompt_tokens=get_prompt_tokens,
                                 style=style,
