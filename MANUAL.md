@@ -57,6 +57,39 @@ resource
 
 ## Workers
 
+### Router Workers
+
+#### Web Resources
+
+##### Static Web Resources
+
+To start a new Static Web Resource on a Web transport:
+
+```console
+>> start web-resource --url "/static" --type static --directory "../web/static" node1 router1 transport3 resource1
+```
+
+**Reference**
+
+* `--type`
+* `--directory`
+* `--package`
+* `--resource`
+* `--options-enable_directory_listing`
+* `--options-mime_types`
+* `--options-cache_timeout`
+
+##### WSGI Web Resources
+
+**Reference**
+
+* `--type`
+* `--module`
+* `--object`
+* `--minthreads`
+* `--maxthreads`
+
+
 ### Guest Workers
 
 #### Starting Guest Workers
