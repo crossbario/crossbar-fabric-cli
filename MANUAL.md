@@ -171,3 +171,21 @@ node1 guest1
 * `--options-stderr`: one of `close`, `log`, `drop`
 * `--options-watch-directory`: directory to be watched
 * `--options-watch-action`: one of `restart`
+
+
+
+
+start container-worker node3 container1
+
+start container-component
+    --classname backend.Backend
+    --realm realm1
+    --transport-type websocket
+    --transport-ws-url ws://localhost:9000/ws
+    --transport-endpoint-type tcp
+    --transport-tcp-host localhost
+    --transport-tcp-port 9000
+node3 container1 component2
+
+
+start container-component --classname backend.Backend --realm realm1 --transport-type websocket --transport-ws-url ws://localhost:9000/ws --transport-endpoint-type tcp --transport-tcp-host localhost --transport-tcp-port 9000 node3 container1 component2
