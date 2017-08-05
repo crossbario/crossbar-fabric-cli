@@ -298,6 +298,7 @@ class Application(object):
     def run_context(self, ctx):
 
         if False:
+            click.echo('Logging started ..')
             txaio.start_logging(level='debug', out=sys.stdout)
 
         # cfg contains the command lines options and arguments that
@@ -333,7 +334,7 @@ class Application(object):
         # this will be fired when the ShellClient below actually has joined
         # the respective realm on Crossbar.io Fabric (either the global users
         # realm, or a management realm the user has a role on)
-        connected = asyncio.Future()
+        ready = asyncio.Future()
 
         extra = {
             # these are forward on the actual client connection
@@ -342,7 +343,7 @@ class Application(object):
 
             # these are native Python object and only used client-side
             u'key': key,
-            u'done': connected
+            u'done': ready
         }
 
         # for the "auth" command, forward additional command line options
@@ -361,7 +362,8 @@ class Application(object):
 
         # this might fail eg when the transport connection cannot be established
         try:
-            runner.run(self.session, start_loop=False)
+            click.echo('Connecting to {} ..'.format(url))
+            _res = runner.run(self.session, start_loop=False)
         except socket.gaierror as e:
             click.echo(style_error('Could not connect to {}: {}'.format(url, e)))
             loop.close()
@@ -371,7 +373,12 @@ class Application(object):
         try:
             # "connected" will complete when the WAMP session to Fabric
             # has been established and is ready
-            session_details = loop.run_until_complete(connected)
+            click.echo('Entering event loop ..')
+            transport, protocol = loop.run_until_complete(_res)
+            #click.echo('transport, protocol: {} {}'.format(transport, protocol))
+            #loop.run_forever()
+            session_details = loop.run_until_complete(ready)
+            #click.echo('SessionDetails: {}'.format(session_details))
 
         except ApplicationError as e:
 
@@ -461,7 +468,10 @@ class Application(object):
             elif cmd == 'shell':
 
                 click.clear()
-                self._print_welcome(url, session_details)
+                try:
+                    self._print_welcome(url, session_details)
+                except Exception as e:
+                    click.echo('err: {}'.format(e))
 
                 prompt_kwargs = {
                     'history': self._history,
@@ -489,10 +499,10 @@ class Application(object):
         click.echo(self.WELCOME)
         click.echo(self.CONNECTED.format(
             url=url,
-            realm=style_crossbar(session_details.realm),
-            authmethod=session_details.authmethod,
-            authid=style_crossbar(session_details.authid),
-            authrole=style_crossbar(session_details.authrole),
-            session=session_details.session
+            realm=style_crossbar(session_details.realm) if session_details else None,
+            authmethod=session_details.authmethod if session_details else None,
+            authid=style_crossbar(session_details.authid) if session_details else None,
+            authrole=style_crossbar(session_details.authrole) if session_details else None,
+            session=session_details.session if session_details else None
             ))
 

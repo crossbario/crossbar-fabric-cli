@@ -108,6 +108,8 @@ class ShellClient(ApplicationSession):
         if done and not done.done():
             done.set_result(details)
 
+        self.log.info("session ready!")
+
     def onLeave(self, details):
         self.log.info("session closed: {details}", details=details)
 
