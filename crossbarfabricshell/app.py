@@ -53,8 +53,8 @@ from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 
-from crossbarfabriccli.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
-from crossbarfabriccli import client, repl, config, key, __version__
+from crossbarfabricshell.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
+from crossbarfabricshell import client, repl, config, key, __version__
 
 # default configuration stored in $HOME/.cbf/config.ini
 _DEFAULT_CONFIG = """[default]

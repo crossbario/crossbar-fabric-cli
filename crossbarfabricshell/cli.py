@@ -54,8 +54,8 @@ if False:
     click.argument = _new_click_argument
 
 
-from crossbarfabriccli import app, command
-from crossbarfabriccli import __version__
+from crossbarfabricshell import app, command
+from crossbarfabricshell import __version__
 
 
 USAGE = """
@@ -297,7 +297,7 @@ def cmd_start(cfg):
 #    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
 #    await cfg.app.run_command(cmd)
 
-from crossbarfabriccli.command import CmdStartContainerWorker, CmdStartContainerComponent
+from crossbarfabricshell.command import CmdStartContainerWorker, CmdStartContainerComponent
 
 @cmd_start.command(name='container-worker', help='start a container worker')
 @click.option('--process-title', help='worker process title (at OS level)', default=None)

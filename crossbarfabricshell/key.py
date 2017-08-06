@@ -41,7 +41,7 @@ from autobahn.util import utcnow
 import click
 import re
 
-from crossbarfabriccli.util import style_ok, style_error
+from crossbarfabricshell.util import style_ok, style_error
 
 
 class EmailAddress(click.ParamType):
@@ -132,7 +132,7 @@ def _parse_keyfile(key_path, private=True):
 
 
 import click
-from crossbarfabriccli.util import style_ok, style_error
+from crossbarfabricshell.util import style_ok, style_error
 
 
 class UserKey(object):

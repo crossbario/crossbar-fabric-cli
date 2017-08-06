@@ -44,7 +44,7 @@ from prompt_toolkit import prompt
 
 from autobahn.wamp.exception import ApplicationError
 
-from crossbarfabriccli.util import style_error
+from crossbarfabricshell.util import style_error
 
 
 def _get_bottom_toolbar_tokens(cli):
