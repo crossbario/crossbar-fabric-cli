@@ -34,10 +34,11 @@ with open('crossbarfabricshell/_version.py') as f:
 with open('README.md') as f:
     docstr = f.read()
 
+
 setup(
     name='crossbarfabricshell',
     version=__version__,
-    description='Crossbar.io Fabric command line interface (CLI).',
+    description='Interactive shell to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from the command line.',
     long_description=docstr,
     author='Crossbar.io Technologies GmbH',
     url='http://crossbario.com',

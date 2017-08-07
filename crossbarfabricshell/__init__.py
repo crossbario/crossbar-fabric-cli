@@ -24,8 +24,8 @@
 #
 ###############################################################################
 
-__doc__ = """Command line tool to access your fleet of Crossbar.io network from
-the Crossbar.io DevOps Center. Run your commands. Run your scripts.
-"""
+from __future__ import absolute_import
 
-__version__ = "0.1.0"
+from autobahn._version import __version__
+
+version = __version__
