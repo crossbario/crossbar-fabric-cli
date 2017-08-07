@@ -35,11 +35,11 @@ autopep8:
 # build a statically linked executable using Pyinstaller
 build_linux_exe: clean
 	python setup.py sdist
-	sudo docker build -t cbsh -f Dockerfile .
-	sudo docker create --name cbsh-build cbsh
-	sudo docker cp cbsh-build:/build/dist/cbsh ./dist/
-	sudo docker rm --force cbsh-build
-	sudo docker rmi cbsh
+	docker build -t cbsh -f docker/Dockerfile .
+	docker create --name cbsh-build cbsh
+	docker cp cbsh-build:/build/dist/cbsh ./dist/
+	docker rm --force cbsh-build
+	docker rmi cbsh
 
 upload_linux_exe:
 	aws s3 cp --acl public-read \
@@ -48,3 +48,8 @@ upload_linux_exe:
 
 build:
 	python setup.py sdist bdist_wheel
+
+
+publish: clean
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
