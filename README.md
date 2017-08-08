@@ -23,6 +23,8 @@ Crossbar.io Fabric Shell 17.7.1
 
 ## Usage
 
+Write me.
+
 
 ### Authentication
 
