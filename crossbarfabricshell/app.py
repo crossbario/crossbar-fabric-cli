@@ -48,6 +48,7 @@ from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
 from autobahn.util import utcnow
+from autobahn.websocket.util import parse_url
 from autobahn.wamp.exception import ApplicationError
 from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
@@ -56,9 +57,40 @@ from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 from crossbarfabricshell.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
 from crossbarfabricshell import client, repl, config, key, __version__
 
+
+_DEFAULT_CFC_URL = u'wss://fabric.crossbario.com'
+
+
+class WebSocketURL(click.ParamType):
+    """
+    WebSocket URL validator.
+    """
+
+    name = 'WebSocket URL'
+
+    def __init__(self):
+        click.ParamType.__init__(self)
+
+    def convert(self, value, param, ctx):
+        try:
+            parse_url(value)
+        except Exception as e:
+            self.fail(style_error(str(e)))
+        else:
+            return value
+
+def _prompt_for_url():
+    """
+    Prompt user for CFC URL to create a new ~/.cbf/config.ini file
+    """
+    value = click.prompt('Crossbar.io Fabric Center URL', type=WebSocketURL(), default=_DEFAULT_CFC_URL)
+    return value
+
+
 # default configuration stored in $HOME/.cbf/config.ini
 _DEFAULT_CONFIG = """[default]
 
+url={url}
 privkey=default.priv
 pubkey=default.pub
 """
@@ -147,7 +179,8 @@ class Application(object):
         config_path = os.path.join(cbf_dir, 'config.ini')
         if not os.path.isfile(config_path):
             with open(config_path, 'w') as f:
-                f.write(_DEFAULT_CONFIG)
+                url = _prompt_for_url()
+                f.write(_DEFAULT_CONFIG.format(url=url))
             click.echo(u'Created new local user configuration: {}'.format(style_ok(config_path)))
 
         config_obj = config.UserConfig(config_path)

@@ -58,14 +58,13 @@ class EmailAddress(click.ParamType):
         if re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
                     value):
             return value
-        self.fail('invalid email address {}'.format(style_error(value)))
-
+        self.fail(style_error('invalid email address "{}"'.format(value)))
 
 
 def _user_id():
     while True:
         value = click.prompt('Please enter your email address', type=EmailAddress())
-        if click.confirm('We will send an activation code to {}, ok?'.format(style_ok(value))):
+        if click.confirm('We will send an activation code to {}, ok?'.format(style_ok(value)), default=True):
             break
 
     return value

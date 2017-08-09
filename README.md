@@ -137,11 +137,53 @@ privkey=default.priv
 pubkey=default.pub
 ```
 
-Hence, before running `cbsh` the very first time, manually create a directory and config file with above content:
+You can specify a custom CFC URL during the first run of `cbsh`:
+
+```console
+Crossbar.io Fabric Shell: v17.7.1
+Created new local user directory: /home/oberstet/.cbf
+Crossbar.io Fabric Center URL [wss://fabric.crossbario.com]: ws://localhost:9000/ws
+Created new local user configuration: /home/oberstet/.cbf/config.ini
+Active user profile: default
+Please enter your email address: tobias.oberstein@gmail.com
+We will send an activation code to tobias.oberstein@gmail.com, ok? [Y/n]:
+New user public key generated: /home/oberstet/.cbf/default.pub
+New user private key generated (keep this safe!): /home/oberstet/.cbf/default.priv
+Connecting to ws://localhost:9000/ws ..
+Entering event loop ..
+
+Thanks for registering! We have sent an authentication code to tobias.oberstein@gmail.com.
+Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.
+```
+
+When the OEM CFC was configured including Mailgun connection, you will receive an email with an activation code.
+
+When the OEM CFC lacks Mailgun configuration, the authentication code will instead be printed in the CFC log.
+
+In both cases, activation then works like this:
+
+
+```console
+(cpy361_10) oberstet@thinkpad-t430s:$ cbsh auth --code GSNH-TX3H-SVUR
+Crossbar.io Fabric Shell: v17.7.1
+Active user profile: default
+User public key loaded: /home/oberstet/.cbf/default.pub
+User private key loaded: /home/oberstet/.cbf/default.priv
+Connecting to ws://localhost:9000/ws ..
+Entering event loop ..
+
+    Welcome to Crossbar.io Fabric Shell v17.7.1
+
+    Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
+    Type "help" to get help. Try TAB for auto-completion.
+
+    Connection:
+
+        url         : ws://localhost:9000/ws
+        authmethod  : cryptosign
+        realm       : com.crossbario.fabric
+        authid      : tobias.oberstein@gmail.com
+        authrole    : user
+        session     : 7988562296859153
 
 ```
-mkdir ~/.cbf
-vim ~/.cbf/config.ini
-```
-
-and then follow above recipe for authentication.
