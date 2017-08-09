@@ -158,13 +158,17 @@ Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.
 
 When the OEM CFC was configured including Mailgun connection, you will receive an email with an activation code.
 
-When the OEM CFC lacks Mailgun configuration, the authentication code will instead be printed in the CFC log.
+When the OEM CFC lacks Mailgun configuration, the authentication code will instead be printed in the CFC log:
+
+```
+cfc1_1   | 2017-08-09T14:50:35+0000 [Router         18] Mailgun not configured! This is the mail that would have been sent: {"from": "Crossbar.io <no-reply@mailing.crossbar.io>", "to": ["tobias.oberstein@gmail.com"], "subject": "Crossbar.io Fabric: your REGISTRATION code", "text": "We have received a registration request for your account. Please use this activation code: 7M46-7XWT-GA9P"}
+```
 
 In both cases, activation then works like this:
 
 
 ```console
-(cpy361_10) oberstet@thinkpad-t430s:$ cbsh auth --code GSNH-TX3H-SVUR
+(cpy361_10) oberstet@thinkpad-t430s:$ cbsh auth --code 7M46-7XWT-GA9P
 Crossbar.io Fabric Shell: v17.7.1
 Active user profile: default
 User public key loaded: /home/oberstet/.cbf/default.pub
