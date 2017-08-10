@@ -221,6 +221,7 @@ def cmd_set_output_verbosity_extended(cfg):
 def cmd_set_output_format(cfg):
     pass
 
+
 def _make_set_output_format(output_format):
     @cmd_set_output_format.command(name=output_format, help='set {} output format'.format(output_format.upper()))
     @click.pass_obj
@@ -239,6 +240,7 @@ for output_format in app.Application.OUTPUT_FORMAT:
 @click.pass_obj
 def cmd_set_output_style(cfg):
     pass
+
 
 def _make_set_output_style(output_style):
     @cmd_set_output_style.command(name=output_style, help='set {} output style'.format(output_style.upper()))
@@ -298,6 +300,7 @@ def cmd_start(cfg):
 #    await cfg.app.run_command(cmd)
 
 from crossbarfabricshell.command import CmdStartContainerWorker, CmdStartContainerComponent
+
 
 @cmd_start.command(name='container-worker', help='start a container worker')
 @click.option('--process-title', help='worker process title (at OS level)', default=None)
