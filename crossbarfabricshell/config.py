@@ -26,7 +26,6 @@
 
 import os
 from six.moves import configparser
-import click
 
 # pair a node from a node public key from a local file:
 #
@@ -54,7 +53,9 @@ class Profile(object):
         self.privkey = privkey
 
     def __str__(self):
-        return u'Profile(name={}, url={}, reconnect={}, debug={}, realm={}, role={}, pubkey={}, privkey={})'.format(self.name, self.url, self.reconnect, self.debug, self.realm, self.role, self.pubkey, self.privkey)
+        return u'Profile(name={}, url={}, reconnect={}, debug={}, realm={}, role={}, pubkey={},' \
+               u'privkey={})'.format(self.name, self.url, self.reconnect, self.debug, self.realm,
+                                     self.role, self.pubkey, self.privkey)
 
     @staticmethod
     def parse(name, items):
@@ -82,11 +83,9 @@ class Profile(object):
                 privkey = str(v)
             else:
                 # skip unknown attribute
-                self.log.warn('unprocessed config attribute "{}"'.format(k))
+                Profile.log.warn('unprocessed config attribute "{}"'.format(k))
 
-        profile = Profile(name, url, reconnect, debug, realm, role, pubkey, privkey)
-
-        return profile
+        return Profile(name, url, reconnect, debug, realm, role, pubkey, privkey)
 
 
 class UserConfig(object):

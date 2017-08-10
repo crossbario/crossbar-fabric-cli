@@ -24,18 +24,12 @@
 #
 ###############################################################################
 
-from prompt_toolkit import prompt_async
-from prompt_toolkit.validation import Validator, ValidationError
-from prompt_toolkit import prompt
-
 import txaio
 txaio.use_asyncio()
 
 import asyncio
-from autobahn.wamp import cryptosign
-from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
-from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
+from autobahn.asyncio.wamp import ApplicationSession
 
 
 class ShellClient(ApplicationSession):

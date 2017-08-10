@@ -24,12 +24,8 @@
 #
 ###############################################################################
 
-import sys
 import os
-import time
 import socket
-import locale
-import pprint
 import json
 import yaml
 import asyncio
@@ -43,18 +39,21 @@ import pygments
 from pygments import highlight, lexers, formatters
 
 from prompt_toolkit.history import FileHistory
-from prompt_toolkit.shortcuts import prompt, prompt_async
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
-from autobahn.util import utcnow
 from autobahn.websocket.util import parse_url
-from autobahn.wamp.exception import ApplicationError
 from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
-from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
+from autobahn.asyncio.wamp import ApplicationRunner
 
-from crossbarfabricshell.util import style_crossbar, style_finished_line, style_error, style_ok, localnow
+from crossbarfabricshell.util import (
+    style_crossbar,
+    style_finished_line,
+    style_error,
+    style_ok,
+    localnow
+)
 from crossbarfabricshell import client, repl, config, key, __version__
 
 
@@ -78,6 +77,7 @@ class WebSocketURL(click.ParamType):
             self.fail(style_error(str(e)))
         else:
             return value
+
 
 def _prompt_for_url():
     """
@@ -538,4 +538,3 @@ class Application(object):
             authrole=style_crossbar(session_details.authrole) if session_details else None,
             session=session_details.session if session_details else None
             ))
-
