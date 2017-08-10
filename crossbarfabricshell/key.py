@@ -41,8 +41,6 @@ from autobahn.util import utcnow
 import click
 import re
 
-from crossbarfabricshell.util import style_ok, style_error
-
 
 class EmailAddress(click.ParamType):
     """

@@ -37,10 +37,9 @@ import click.parser
 
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.shortcuts import prompt, prompt_async
+from prompt_toolkit.shortcuts import prompt_async
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
-from prompt_toolkit import prompt
 
 from autobahn.wamp.exception import ApplicationError
 
@@ -182,7 +181,6 @@ class ClickCompleter(Completer):
         for item in choices:
             if item.text.startswith(incomplete):
                 yield item
-
 
 
 from prompt_toolkit.token import Token

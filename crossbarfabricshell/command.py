@@ -24,7 +24,6 @@
 #
 ###############################################################################
 
-import pprint
 from autobahn.util import rtime
 
 
@@ -52,7 +51,6 @@ class Cmd(object):
         duration = round(1000. * (rtime() - self._started), 1)
         self._started = None
         return CmdRunResult(result, duration)
-
 
 
 class CmdPair(Cmd):
@@ -139,6 +137,7 @@ class CmdShow(Cmd):
     def __init__(self, verbose=False):
         Cmd.__init__(self)
         self.verbose = verbose
+
 
 class CmdShowFabric(CmdShow):
 
