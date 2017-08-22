@@ -77,9 +77,6 @@ class BaseClientSession(ApplicationSession):
         # sign and send back the challenge with our private key.
         return self._key.sign_challenge(self, challenge)
 
-    def onLeave(self, details):
-        self.disconnect()
-
     def onDisconnect(self):
         asyncio.get_event_loop().stop()
 
@@ -120,7 +117,7 @@ class ShellClient(BaseClientSession):
             if done and not done.done():
                 done.set_exception(ApplicationError(details.reason, details.message))
 
-        super().onLeave(details)
+        self.disconnect()
 
 
 class ManagementClientSession(BaseClientSession):
@@ -150,4 +147,4 @@ class ManagementClientSession(BaseClientSession):
 
     def onLeave(self, details):
         self.log.info("CFC session closed: {details}", details=details)
-        super().onLeave(details)
+        self.disconnect()
