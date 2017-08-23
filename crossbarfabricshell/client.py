@@ -32,18 +32,20 @@ from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationSession
 
 
-class ShellClient(ApplicationSession):
+class BaseClientSession(ApplicationSession):
+    def __init__(self, config=None):
+        super().__init__(config)
+        self._key = self.config.extra[u'key']
 
     def onConnect(self):
         self.log.info("connected to router")
 
         # authentication extra information for wamp-cryptosign
         #
-        key = self.config.extra[u'key'].key
         extra = {
             # forward the client pubkey: this allows us to omit authid as
             # the router can identify us with the pubkey already
-            u'pubkey': key.public_key(),
+            u'pubkey': self._key.public_key(),
 
             # not yet implemented. a public key the router should provide
             # a trustchain for it's public key. the trustroot can eg be
@@ -72,27 +74,29 @@ class ShellClient(ApplicationSession):
                   authextra=extra)
 
     def onChallenge(self, challenge):
-        self.log.info("authentication challenge received: {challenge}", challenge=challenge)
-        # alright, we've got a challenge from the router.
+        # sign and send back the challenge with our private key.
+        return self._key.sign_challenge(self, challenge)
 
+    def onDisconnect(self):
+        asyncio.get_event_loop().stop()
+
+
+class ShellClient(BaseClientSession):
+
+    def onChallenge(self, challenge):
+        self.log.info("authentication challenge received: {challenge}", challenge=challenge)
         # not yet implemented. check the trustchain the router provided against
         # our trustroot, and check the signature provided by the
         # router for our previous challenge. if both are ok, everything
         # is fine - the router is authentic wrt our trustroot.
-
-        # sign the challenge with our private key.
-        key = self.config.extra[u'key'].key
-        signed_challenge = key.sign_challenge(self, challenge)
-
-        # send back the signed challenge for verification
-        return signed_challenge
+        return super().onChallenge(challenge)
 
     async def onJoin(self, details):
-
         self.log.info("session joined: {details}", details=details)
         self.log.info("*** Hooray! We've been successfully authenticated with WAMP-cryptosign using Ed25519! ***")
 
         self._ticks = 0
+
         def on_tick(tick):
             self._ticks += 1
 
@@ -115,6 +119,32 @@ class ShellClient(ApplicationSession):
 
         self.disconnect()
 
-    def onDisconnect(self):
-        loop = asyncio.get_event_loop()
-        loop.stop()
+
+class ManagementClientSession(BaseClientSession):
+
+    async def onJoin(self, details):
+        self.log.info("CFC session joined: {details}", details=details)
+        main = self.config.extra.get(u'main', None)
+        if main:
+            self.log.info('running main() ...')
+            return_code = 0
+            try:
+                return_code = await main(self)
+            except Exception:
+                # something bad happened: investigate your side or pls file an issue;)
+                return_code = -1
+                self.log.failure()
+            finally:
+                # in any case, shutdown orderly
+                if return_code:
+                    self.config.extra[u'return_code'] = return_code
+                # in any case, shutdown orderly
+                if not self._goodbye_sent:
+                    self.leave()
+        else:
+            self.log.info('no main() configured!')
+            self.leave()
+
+    def onLeave(self, details):
+        self.log.info("CFC session closed: {details}", details=details)
+        self.disconnect()
