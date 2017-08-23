@@ -130,7 +130,7 @@ class ManagementClientSession(BaseClientSession):
             return_code = 0
             try:
                 return_code = await main(self)
-            except:
+            except Exception:
                 # something bad happened: investigate your side or pls file an issue;)
                 return_code = -1
                 self.log.failure()
