@@ -60,6 +60,9 @@ class CmdPair(Cmd):
 
 
 class CmdPairNode(CmdPair):
+    """
+    ACCOUNTS COMMAND: Pair a node to a management realm.
+    """
 
     def __init__(self, realm, pubkey, node_id):
         CmdPair.__init__(self)
@@ -80,6 +83,9 @@ class CmdCreate(Cmd):
 
 
 class CmdCreateManagementRealm(CmdCreate):
+    """
+    ACCOUNTS COMMAND: Create a new management realm.
+    """
 
     def __init__(self, realm):
         CmdCreate.__init__(self)
@@ -99,24 +105,30 @@ class CmdList(Cmd):
 
 
 class CmdListManagementRealms(CmdList):
+    """
+    ACCOUNTS COMMAND: Get list of management realms.
+    """
 
     def __init__(self, verbose=False):
         CmdList.__init__(self, verbose)
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.list_management_realms', verbose=self.verbose)
+        result = await session.call(u'crossbarfabriccenter.get_management_realms', verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdListNodes(CmdList):
+    """
+    ACCOUNTS COMMAND: Get list of nodes in management realms.
+    """
 
     def __init__(self, verbose=False):
         CmdList.__init__(self, verbose)
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.list_nodes', verbose=self.verbose)
+        result = await session.call(u'crossbarfabriccenter.get_nodes', verbose=self.verbose)
         return self._post(session, result)
 
 
