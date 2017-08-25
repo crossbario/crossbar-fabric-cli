@@ -49,12 +49,11 @@ __all__ = (
 
 
 class BaseClientSession(ApplicationSession):
-    def __init__(self, config=None):
-        super().__init__(config)
-        self._key = self.config.extra[u'key']
 
     def onConnect(self):
-        self.log.info("connected to router")
+        self.log.debug("BaseClientSession connected to router")
+
+        self._key = self.config.extra[u'key']
 
         # authentication extra information for wamp-cryptosign
         #
@@ -99,17 +98,10 @@ class BaseClientSession(ApplicationSession):
 
 class ShellClient(BaseClientSession):
 
-    def onChallenge(self, challenge):
-        self.log.info("authentication challenge received: {challenge}", challenge=challenge)
-        # not yet implemented. check the trustchain the router provided against
-        # our trustroot, and check the signature provided by the
-        # router for our previous challenge. if both are ok, everything
-        # is fine - the router is authentic wrt our trustroot.
-        return super().onChallenge(challenge)
+    log = make_logger()
 
     async def onJoin(self, details):
-        self.log.info("session joined: {details}", details=details)
-        self.log.info("*** Hooray! We've been successfully authenticated with WAMP-cryptosign using Ed25519! ***")
+        self.log.debug("ShellClient session joined: {details}", details=details)
 
         self._ticks = 0
 
@@ -122,10 +114,10 @@ class ShellClient(BaseClientSession):
         if done and not done.done():
             done.set_result(details)
 
-        self.log.info("session ready!")
+        self.log.debug("session ready!")
 
     def onLeave(self, details):
-        self.log.info("session closed: {details}", details=details)
+        self.log.debug("session closed: {details}", details=details)
 
         # reason=<wamp.error.authentication_failed>
         if details.reason != u'wamp.close.normal':
@@ -141,10 +133,11 @@ class ManagementClientSession(BaseClientSession):
     log = make_logger()
 
     async def onJoin(self, details):
-        self.log.info("CFC session joined: {details}", details=details)
+        self.log.debug("ManagementClientSession joined: {details}", details=details)
+
         main = self.config.extra.get(u'main', None)
         if main:
-            self.log.info('running main() ...')
+            self.log.debug('Running main() ...')
             return_code = 0
             try:
                 return_code = await main(self)
@@ -160,11 +153,11 @@ class ManagementClientSession(BaseClientSession):
                 if not self._goodbye_sent:
                     self.leave()
         else:
-            self.log.info('no main() configured!')
+            self.log.warn('no main() configured!')
             self.leave()
 
     def onLeave(self, details):
-        self.log.info("CFC session closed: {details}", details=details)
+        self.log.debug("CFC session closed: {details}", details=details)
         self.disconnect()
 
 

@@ -61,18 +61,19 @@ class CmdPair(Cmd):
 
 class CmdPairNode(CmdPair):
     """
-    ACCOUNTS COMMAND: Pair a node to a management realm.
+    GLOBAL REALM: Pair a node to a management realm.
     """
 
-    def __init__(self, realm, pubkey, node_id):
+    def __init__(self, realm, pubkey, node_id, authextra=None):
         CmdPair.__init__(self)
         self.realm = realm
         self.pubkey = pubkey
         self.node_id = node_id
+        self.authextra = authextra
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.pair_node', self.realm, self.pubkey, self.node_id)
+        result = await session.call(u'crossbarfabriccenter.mrealm.pair_node', self.pubkey, self.realm, self.node_id, self.authextra)
         return self._post(session, result)
 
 
@@ -84,7 +85,7 @@ class CmdCreate(Cmd):
 
 class CmdCreateManagementRealm(CmdCreate):
     """
-    ACCOUNTS COMMAND: Create a new management realm.
+    GLOBAL REALM: Create a new management realm.
     """
 
     def __init__(self, realm):
@@ -93,34 +94,33 @@ class CmdCreateManagementRealm(CmdCreate):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.create_management_realm', self.realm)
+        result = await session.call(u'crossbarfabriccenter.mrealm.create_realm', self.realm)
         return self._post(session, result)
 
 
 class CmdList(Cmd):
 
-    def __init__(self, verbose=False):
+    def __init__(self):
         Cmd.__init__(self)
-        self.verbose = verbose
 
 
 class CmdListManagementRealms(CmdList):
     """
-    ACCOUNTS COMMAND: Get list of management realms.
+    GLOBAL REALM: Get list of management realms.
     """
 
-    def __init__(self, verbose=False):
-        CmdList.__init__(self, verbose)
+    def __init__(self):
+        CmdList.__init__(self)
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.get_management_realms', verbose=self.verbose)
+        result = await session.call(u'crossbarfabriccenter.mrealm.get_realms')
         return self._post(session, result)
 
 
 class CmdListNodes(CmdList):
     """
-    ACCOUNTS COMMAND: Get list of nodes in management realms.
+    GLOBAL REALM: Get list of nodes in management realms.
     """
 
     def __init__(self, verbose=False):
@@ -128,11 +128,14 @@ class CmdListNodes(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.get_nodes', verbose=self.verbose)
+        result = await session.call(u'crossbarfabriccenter.mrealm.get_nodes', verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdListWorkers(CmdList):
+    """
+    MREALM: Get list of workers on a node.
+    """
 
     def __init__(self, node, verbose=False):
         CmdList.__init__(self, verbose)

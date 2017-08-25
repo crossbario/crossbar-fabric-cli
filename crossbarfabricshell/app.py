@@ -375,7 +375,7 @@ class Application(object):
             u'authrole': authrole,
 
             # these are native Python object and only used client-side
-            u'key': key,
+            u'key': key.key,
             u'done': ready
         }
 

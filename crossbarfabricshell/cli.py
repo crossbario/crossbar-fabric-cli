@@ -274,12 +274,12 @@ def cmd_pair(cfg):
 
 
 @cmd_pair.command(name='node', help='pair a node')
-@click.argument('realm')
 @click.argument('pubkey')
+@click.argument('realm')
 @click.argument('node_id')
 @click.pass_obj
-async def cmd_pair_node(cfg, realm, pubkey, node_id):
-    cmd = command.CmdPairNode(realm=realm, pubkey=pubkey, node_id=node_id)
+async def cmd_pair_node(cfg, pubkey, realm, node_id):
+    cmd = command.CmdPairNode(pubkey=pubkey, realm=realm, node_id=node_id)
     await cfg.app.run_command(cmd)
 
 
@@ -359,14 +359,14 @@ def cmd_list(cfg, verbose):
 @cmd_list.command(name='management-realms', help='list management realms')
 @click.pass_obj
 async def cmd_list_management_realms(cfg):
-    cmd = command.CmdListManagementRealms(verbose=cfg.verbose)
+    cmd = command.CmdListManagementRealms()
     await cfg.app.run_command(cmd)
 
 
 @cmd_list.command(name='nodes', help='list nodes')
 @click.pass_obj
 async def cmd_list_nodes(cfg):
-    cmd = command.CmdListNodes(verbose=cfg.verbose)
+    cmd = command.CmdListNodes()
     await cfg.app.run_command(cmd)
 
 
@@ -374,7 +374,7 @@ async def cmd_list_nodes(cfg):
 @click.argument('node')
 @click.pass_obj
 async def cmd_list_workers(cfg, node):
-    cmd = command.CmdListWorkers(node, verbose=cfg.verbose)
+    cmd = command.CmdListWorkers(node)
     await cfg.app.run_command(cmd)
 
 
