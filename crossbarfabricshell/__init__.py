@@ -26,6 +26,6 @@
 
 from __future__ import absolute_import
 
-from autobahn._version import __version__
+from crossbarfabricshell._version import __version__
 
 version = __version__
