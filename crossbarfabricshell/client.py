@@ -73,7 +73,9 @@ class BaseClientSession(ApplicationSession):
             # encoded 32 bytes random value.
             u'challenge': None,
 
-            u'channel_binding': u'tls-unique',
+            # this is only implemented on Twisted, and does NOT
+            # work currently on asyncio !
+            # u'channel_binding': u'tls-unique',
         }
 
         # used for user login/registration activation code

@@ -57,7 +57,7 @@ from crossbarfabricshell.util import (
 from crossbarfabricshell import client, repl, config, key, __version__
 
 
-_DEFAULT_CFC_URL = u'wss://fabric.crossbario.com'
+_DEFAULT_CFC_URL = u'wss://fabric.crossbario.com/ws'
 
 
 class WebSocketURL(click.ParamType):
