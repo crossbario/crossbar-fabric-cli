@@ -14,9 +14,16 @@ source venv/bin/activate
 pip install crossbarfabricshell
 ```
 
-To test the installation:
+A straigforward way to install into a shared directory outside your personal user HOME is installing into `/opt/cbsh` by creating a virtualenv:
 
 ```console
+sudo virtualenv -p /usr/bin/python3 /opt/cbsh
+sudo /opt/cbsh/bin/pip3 install crossbarfabricshell
+```
+
+To test the installation:
+
+```consoleb
 (cpy361_12) oberstet@thinkpad-t430s:~$ cbsh version
 Crossbar.io Fabric Shell 17.7.1
 ```
