@@ -37,16 +37,19 @@ cbsh auth
 If you haven't run this before, you will be asked for your email address:
 
 ```console
-(cpy361_12) oberstet@thinkpad-t430s:~$ cbsh auth
-Crossbar.io Fabric Shell: v17.7.1
+(cpy362_3) oberstet@thinkpad-t430s:~$ cbsh version
+Crossbar.io Fabric Shell 17.9.1
+(cpy362_3) oberstet@thinkpad-t430s:~$ cbsh
+Crossbar.io Fabric Shell: v17.9.1
 Created new local user directory: /home/oberstet/.cbf
+Crossbar.io Fabric Center URL [wss://fabric.crossbario.com/ws]:
 Created new local user configuration: /home/oberstet/.cbf/config.ini
 Active user profile: default
 Please enter your email address: tobias.oberstein@gmail.com
-We will send an activation code to tobias.oberstein@gmail.com, ok? [y/N]: y
+We will send an activation code to tobias.oberstein@gmail.com, ok? [Y/n]:
 New user public key generated: /home/oberstet/.cbf/default.pub
 New user private key generated (keep this safe!): /home/oberstet/.cbf/default.priv
-Connecting to wss://fabric.crossbario.com ..
+Connecting to wss://fabric.crossbario.com/ws ..
 Entering event loop ..
 
 Thanks for registering! We have sent an authentication code to tobias.oberstein@gmail.com.
@@ -63,27 +66,28 @@ When activation was successful, as short notice with your session details will b
 
 
 ```console
-(cpy361_12) oberstet@thinkpad-t430s:~$ cbsh auth --code RESF-MQPJ-WPYQ
-Crossbar.io Fabric Shell: v17.7.1
+(cpy362_3) oberstet@thinkpad-t430s:~$ cbsh auth --code RESF-MQPJ-WPYQ
+Crossbar.io Fabric Shell: v17.9.1
 Active user profile: default
 User public key loaded: /home/oberstet/.cbf/default.pub
 User private key loaded: /home/oberstet/.cbf/default.priv
-Connecting to ws://localhost:9000/ws ..
+Connecting to wss://fabric.crossbario.com/ws ..
 Entering event loop ..
 
-    Welcome to Crossbar.io Fabric Shell v17.7.1
+    Welcome to Crossbar.io Fabric Shell v17.9.1
 
     Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
     Type "help" to get help. Try TAB for auto-completion.
 
     Connection:
 
-        url         : ws://localhost:9000/ws
+        url         : wss://fabric.crossbario.com/ws
         authmethod  : cryptosign
         realm       : com.crossbario.fabric
         authid      : tobias.oberstein@gmail.com
         authrole    : user
-        session     : 188733230325443
+        session     : 6186592563885360
+
 ```
 
 Your client is now all setup. A public/private key pair as well as a configuration file for CBSH was generated:
@@ -107,19 +111,20 @@ cbsh
 CBSH will connect and present an interactive REPL loop:
 
 ```
-    Welcome to Crossbar.io Fabric Shell v17.7.1
+
+    Welcome to Crossbar.io Fabric Shell v17.9.1
 
     Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
     Type "help" to get help. Try TAB for auto-completion.
 
     Connection:
 
-        url         : ws://localhost:9000/ws
+        url         : wss://fabric.crossbario.com/ws
         authmethod  : cryptosign
         realm       : com.crossbario.fabric
         authid      : tobias.oberstein@gmail.com
         authrole    : user
-        session     : 5482054348558533
+        session     : 5159216761637739
 
 >>
 ```
