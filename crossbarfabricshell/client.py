@@ -41,17 +41,17 @@ from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 from autobahn.wamp import cryptosign
 
 __all__ = (
-    'BaseClientSession',
+    'BaseCryptosignClientSession',
     'ShellClient',
     'ManagementClientSession',
     'run',
 )
 
 
-class BaseClientSession(ApplicationSession):
+class BaseCryptosignClientSession(ApplicationSession):
 
     def onConnect(self):
-        self.log.debug("BaseClientSession connected to router")
+        self.log.debug("BaseCryptosignClientSession connected to router")
 
         self._key = self.config.extra[u'key']
 
@@ -98,7 +98,21 @@ class BaseClientSession(ApplicationSession):
         asyncio.get_event_loop().stop()
 
 
-class ShellClient(BaseClientSession):
+class BaseAnonymousClientSession(ApplicationSession):
+
+    def onConnect(self):
+        self.log.debug("BaseAnonymousClientSession connected to router")
+
+        # now request to join ..
+        self.join(self.config.realm,
+                  authmethods=[u'anonymous'],
+                  authextra=self.config.extra.get(u'authextra', None))
+
+    def onDisconnect(self):
+        asyncio.get_event_loop().stop()
+
+
+class _ShellClient(object):
 
     log = make_logger()
 
@@ -130,7 +144,14 @@ class ShellClient(BaseClientSession):
         self.disconnect()
 
 
-class ManagementClientSession(BaseClientSession):
+class ShellClient(_ShellClient, BaseCryptosignClientSession):
+    pass
+
+class ShellAnonymousClient(_ShellClient, BaseAnonymousClientSession):
+    pass
+
+
+class _ManagementClientSession(object):
 
     log = make_logger()
 
@@ -163,6 +184,13 @@ class ManagementClientSession(BaseClientSession):
         self.disconnect()
 
 
+class ManagementClientSession(_ManagementClientSession, BaseCryptosignClientSession):
+    pass
+
+class ManagementAnonymousClientSession(_ManagementClientSession, BaseAnonymousClientSession):
+    pass
+
+
 def run(main=None):
     # parse command line arguments
     parser = argparse.ArgumentParser()
@@ -175,6 +203,8 @@ def run(main=None):
                         help='The management realm to join on CFC')
     parser.add_argument('--keyfile', dest='keyfile', type=str, default=u'~/.cbf/default.priv',
                         help='The private client key file to use for authentication.')
+    parser.add_argument('--authmethod', dest='authmethod', type=str, default=u'cryptosign',
+                        help='Authentication method: cryptosign or anonymous')
     args = parser.parse_args()
 
     if args.debug:
@@ -182,40 +212,60 @@ def run(main=None):
     else:
         txaio.start_logging(level='info')
 
-    # for authenticating the management client, we need a Ed25519 public/private key pair
-    # here, we are reusing the user key - so this needs to exist before
-    privkey_file = os.path.expanduser(args.keyfile)
-    privkey_hex = None
-    user_id = None
+    extra = None
+    if args.authmethod == u'cryptosign':
 
-    if not os.path.exists(privkey_file):
-        raise Exception('private key file {} does not exist'.format(privkey_file))
+        # for authenticating the management client, we need a Ed25519 public/private key pair
+        # here, we are reusing the user key - so this needs to exist before
+        privkey_file = os.path.expanduser(args.keyfile)
+        privkey_hex = None
+        user_id = None
+
+        if not os.path.exists(privkey_file):
+            raise Exception('private key file {} does not exist'.format(privkey_file))
+        else:
+            with open(privkey_file, 'r') as f:
+                data = f.read()
+                for line in data.splitlines():
+                    if line.startswith('private-key-ed25519'):
+                        privkey_hex = line.split(':')[1].strip()
+                    if line.startswith('user-id'):
+                        user_id = line.split(':')[1].strip()
+
+        if privkey_hex is None:
+            raise Exception('no private key found in keyfile!')
+
+        if user_id is None:
+            raise Exception('no user ID found in keyfile!')
+
+        key = cryptosign.SigningKey.from_key_bytes(binascii.a2b_hex(privkey_hex))
+
+        extra = {
+            u'key': key,
+            u'authid': user_id,
+            u'main': main,
+            u'return_code': None
+        }
+
+    elif args.authmethod == u'anonymous':
+
+        extra = {
+            u'main': main,
+            u'return_code': None
+        }
+
     else:
-        with open(privkey_file, 'r') as f:
-            data = f.read()
-            for line in data.splitlines():
-                if line.startswith('private-key-ed25519'):
-                    privkey_hex = line.split(':')[1].strip()
-                if line.startswith('user-id'):
-                    user_id = line.split(':')[1].strip()
+        raise Exception('logic error')
 
-    if privkey_hex is None:
-        raise Exception('no private key found in keyfile!')
-
-    if user_id is None:
-        raise Exception('no user ID found in keyfile!')
-
-    key = cryptosign.SigningKey.from_key_bytes(binascii.a2b_hex(privkey_hex))
-
-    extra = {
-        u'key': key,
-        u'authid': user_id,
-        u'main': main,
-        u'return_code': None
-    }
-
+    print(extra)
     runner = ApplicationRunner(url=args.url, realm=args.realm, extra=extra)
-    runner.run(ManagementClientSession)
+
+    if args.authmethod == u'cryptosign':
+        runner.run(ManagementClientSession)
+    elif args.authmethod == u'anonymous':
+        runner.run(ManagementAnonymousClientSession)
+    else:
+        raise Exception('logic error')
 
     return_code = extra[u'return_code']
     if isinstance(return_code, int) and return_code != 0:
