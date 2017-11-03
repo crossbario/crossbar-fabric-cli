@@ -191,9 +191,9 @@ class ManagementAnonymousClientSession(_ManagementClientSession, BaseAnonymousCl
     pass
 
 
-def run(main=None):
+def run(main=None, parser=None):
     # parse command line arguments
-    parser = argparse.ArgumentParser()
+    parser = parser or argparse.ArgumentParser()
     parser.add_argument('--debug', dest='debug', action='store_true', default=False,
                         help='Enable logging at level "debug".')
     parser.add_argument('--url', dest='url', type=str, default=u'wss://fabric.crossbario.com',
@@ -241,6 +241,7 @@ def run(main=None):
         key = cryptosign.SigningKey.from_key_bytes(binascii.a2b_hex(privkey_hex))
 
         extra = {
+            u'args': args,
             u'key': key,
             u'authid': user_id,
             u'main': main,
@@ -250,6 +251,7 @@ def run(main=None):
     elif args.authmethod == u'anonymous':
 
         extra = {
+            u'args': args,
             u'main': main,
             u'return_code': None
         }
@@ -257,7 +259,6 @@ def run(main=None):
     else:
         raise Exception('logic error')
 
-    print(extra)
     runner = ApplicationRunner(url=args.url, realm=args.realm, extra=extra)
 
     if args.authmethod == u'cryptosign':
