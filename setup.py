@@ -44,7 +44,7 @@ setup(
     url='http://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'autobahn[asyncio,serialization,encryption]>=17.7.1',   # MIT
+        'autobahn[asyncio,serialization,encryption]>=18.3.1',   # MIT
         'click>=6.7',               # BSD
         'prompt_toolkit>=1.0.13',   # BSD
         'colorama>=0.3.7',          # BSD
