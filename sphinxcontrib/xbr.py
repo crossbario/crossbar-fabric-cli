@@ -35,10 +35,10 @@ import re
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from six import iteritems
-
 from sphinx import addnodes, locale
+from sphinx.builders import Builder
 from sphinx.directives import ObjectDescription
-from sphinx.domains import Domain, ObjType, Index
+from sphinx.domains import Domain, Index, ObjType
 from sphinx.locale import _, __
 from sphinx.roles import XRefRole
 from sphinx.util import logging
@@ -955,9 +955,6 @@ class XBRDomain(Domain):
         else:
             return '.'.join(filter(None, [nsname, ifcname, target]))
 
-
-
-from sphinx.builders import Builder
 
 class XBRBuilder(Builder):
     name = "xbr"

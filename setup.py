@@ -5,7 +5,7 @@
 # Copyright (c) Crossbar.io Technologies GmbH
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
+# of this software and associated documentation files (the 'Software'), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
@@ -14,7 +14,7 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", fWITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# THE SOFTWARE IS PROVIDED 'AS IS', fWITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open('cbsh/_version.py') as f:
     exec(f.read())  # defines __version__
@@ -73,17 +73,23 @@ setup(
         ('.', ['LICENSE', 'README.rst'])
     ],
     zip_safe=False,
+    license='MIT License',
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    classifiers=["License :: OSI Approved :: MIT License",
-                 "Development Status :: 4 - Beta",
-                 "Intended Audience :: Developers",
-                 "Intended Audience :: System Administrators",
-                 "Environment :: Console",
-                 "Operating System :: OS Independent",
-                 "Programming Language :: Python :: 3",
-                 "Programming Language :: Python :: 3.5",
-                 "Programming Language :: Python :: 3.6",
-                 "Programming Language :: Python :: Implementation :: CPython",
-                 "Programming Language :: Python :: Implementation :: PyPy"],
+    classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Development Status :: 4 - Beta',
+        'Framework :: Sphinx :: Extension',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Environment :: Console',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Topic :: Documentation :: Sphinx',
+        'Topic :: Software Development :: Documentation',
+    ],
     keywords='crossbar.io xbr crossbar autobahn wamp idl router cli administration management'
 )

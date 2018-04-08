@@ -16,6 +16,7 @@ docs:
 	sphinx-build -b html ./docs ./docs/_build
 
 install:
+	pip install -r test-requirements.txt
 	pip install -e .
 
 # upload to our internal deployment system
