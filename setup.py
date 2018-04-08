@@ -31,14 +31,14 @@ from setuptools import setup, find_packages
 with open('cbsh/_version.py') as f:
     exec(f.read())  # defines __version__
 
-with open('README.md') as f:
+with open('README.rst') as f:
     docstr = f.read()
 
 
 setup(
     name='cbsh',
     version=__version__,
-    description='Interactive shell to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from the command line.',
+    description='Crossbar.io Fabric Shell (cbsh) is a tool belt for Crossbar.io',
     long_description=docstr,
     author='Crossbar.io Technologies GmbH',
     url='http://crossbario.com',
@@ -53,6 +53,8 @@ setup(
         'tabulate>=0.7.7',          # MIT
         'pyyaml>=3.12',             # MIT
         'cookiecutter>=1.6.0',      # BSD
+        'sphinx>=1.7.2',            # BSD
+        'sphinx_rtd_theme>=0.3.0',  # MIT
     ],
     extras_require={
     },
@@ -64,7 +66,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     data_files=[
-        ('.', ['LICENSE', 'README.md'])
+        ('.', ['LICENSE', 'README.rst'])
     ],
     zip_safe=True,
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers

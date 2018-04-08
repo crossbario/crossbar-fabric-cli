@@ -9,8 +9,6 @@ RUN pip install pyinstaller
 RUN mkdir /build
 WORKDIR /build
 
-#RUN pip install https://s3-eu-west-1.amazonaws.com/fabric-deploy/autobahn/autobahn-0.17.2-py2.py3-none-any.whl
-
 COPY ./dist/cbsh-*.tar.gz /build
 RUN pip install cbsh-*.tar.gz
 
