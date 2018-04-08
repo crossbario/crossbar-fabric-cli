@@ -14,6 +14,8 @@ Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 
     <a href="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB" target="_blank"><img src="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB.png" /></a>
 
+--------------
+
 Please refer to the `documentation <https://cbsh.readthedocs.io/en/latest/>`_ for description and usage **cbsh**.
 
 .. |Version| image:: https://img.shields.io/pypi/v/cbsh.svg
