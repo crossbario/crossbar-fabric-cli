@@ -28,7 +28,7 @@ from __future__ import absolute_import
 
 from setuptools import setup, find_packages
 
-with open('crossbarfabricshell/_version.py') as f:
+with open('cbsh/_version.py') as f:
     exec(f.read())  # defines __version__
 
 with open('README.md') as f:
@@ -36,7 +36,7 @@ with open('README.md') as f:
 
 
 setup(
-    name='crossbarfabricshell',
+    name='cbsh',
     version=__version__,
     description='Interactive shell to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from the command line.',
     long_description=docstr,
@@ -58,7 +58,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'cbsh = crossbarfabricshell.cli:main'
+            'cbsh = cbsh.cli:main'
         ]
     },
     packages=find_packages(),

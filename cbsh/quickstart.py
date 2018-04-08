@@ -72,8 +72,8 @@ start:
 
 _cookiecutters = [
     # Crossbar.io
-    #('gh:crossbario/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
-    ('/home/oberstet/scm/crossbario/cookiecutter-crossbar/', 'Add a Crossbar.io OSS router'),
+    ('gh:crossbario/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
+    #('/home/oberstet/scm/crossbario/cookiecutter-crossbar/', 'Add a Crossbar.io OSS router'),
 
     #('gh:crossbario/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
 

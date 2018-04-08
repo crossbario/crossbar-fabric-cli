@@ -11,9 +11,9 @@ WORKDIR /build
 
 #RUN pip install https://s3-eu-west-1.amazonaws.com/fabric-deploy/autobahn/autobahn-0.17.2-py2.py3-none-any.whl
 
-COPY ./dist/crossbarfabricshell-*.tar.gz /build
-RUN pip install crossbarfabricshell-*.tar.gz
+COPY ./dist/cbsh-*.tar.gz /build
+RUN pip install cbsh-*.tar.gz
 
 # this builds /build/dist/cbsh
-COPY crossbarfabricshell/ /build/crossbarfabricshell/
-RUN pyinstaller --onefile --name cbsh crossbarfabricshell/cli.py
+COPY cbsh/ /build/cbsh/
+RUN pyinstaller --onefile --name cbsh cbsh/cli.py
