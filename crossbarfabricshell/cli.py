@@ -54,7 +54,7 @@ if False:
     click.argument = _new_click_argument
 
 
-from crossbarfabricshell import app, command
+from crossbarfabricshell import app, command, quickstart
 from crossbarfabricshell import __version__
 
 
@@ -134,6 +134,12 @@ def cli(ctx, profile, realm, role):
 @click.pass_obj
 def cmd_version(cfg):
     click.echo("Crossbar.io Fabric Shell {}".format(__version__))
+
+
+@cli.command(name='quickstart', help='generate a complete starter container stack')
+@click.pass_obj
+def cmd_quickstart(cfg):
+    quickstart.run(cfg)
 
 
 @cli.command(name='auth', help='authenticate user profile / key-pair with Crossbar.io Fabric')

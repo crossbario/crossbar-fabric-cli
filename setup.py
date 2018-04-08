@@ -51,7 +51,8 @@ setup(
         'pygments>=2.2.0',          # BSD
         'humanize>=0.5.1',          # MIT
         'tabulate>=0.7.7',          # MIT
-        'pyyaml>=3.12'              # MIT
+        'pyyaml>=3.12',             # MIT
+        'cookiecutter>=1.6.0',      # BSD
     ],
     extras_require={
     },

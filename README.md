@@ -30,10 +30,9 @@ Crossbar.io Fabric Shell 17.7.1
 
 ## Usage
 
-Write me.
+### Registering
 
-
-### Authentication
+> Note: if you are running a local CFC, please see [Using a local CFC](#using-a-local-cfc)).
 
 To use Crossbar.io Fabric Shell with Crossbar.io Fabric Center, the first thing to do is to register or login as a user:
 
@@ -136,8 +135,10 @@ CBSH will connect and present an interactive REPL loop:
 >>
 ```
 
+---
 
-### Authentication against a OEM CFC
+
+### Using a local CFC
 
 When running CFC on-premise (for OEMs), you will need to configure your CFC listening URL in `~/.cbf/config.ini`, eg:
 
@@ -203,3 +204,6 @@ Entering event loop ..
         session     : 7988562296859153
 
 ```
+
+---
+
