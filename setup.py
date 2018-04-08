@@ -37,7 +37,7 @@ with open('README.rst') as f:
 
 setup(
     name='cbsh',
-    version=__version__,
+    version=__version__,  # noqa
     description='Crossbar.io Shell (cbsh) is a tool belt for Crossbar.io',
     long_description=docstr,
     author='Crossbar.io Technologies GmbH',
@@ -91,5 +91,5 @@ setup(
         'Topic :: Documentation :: Sphinx',
         'Topic :: Software Development :: Documentation',
     ],
-    keywords='crossbar.io xbr crossbar autobahn wamp idl router cli administration management'
+    keywords='crossbar xbr autobahn wamp idl router cli administration'
 )
