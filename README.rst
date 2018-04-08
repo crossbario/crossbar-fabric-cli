@@ -1,7 +1,7 @@
-Crossbar.io Fabric Shell
+Crossbar.io Shell
 ========================
 
-Crossbar.io Fabric Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
+Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 
 * an **interactive shell** to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from one central place and command line
 * a **service scaffolding** system that gets you started quickly using templates for Crossbar.io and Autobahn:
@@ -43,6 +43,6 @@ You can then check the path and version of **cbsh**:
     (cbsh) oberstet@thinkpad-t430s:~$ which cbsh
     /home/oberstet/cbsh/bin/cbsh
     (cbsh) oberstet@thinkpad-t430s:~$ cbsh version
-    Crossbar.io Fabric Shell 18.4.3
+    Crossbar.io Shell 18.4.3
 
 ---------

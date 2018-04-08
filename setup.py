@@ -38,7 +38,7 @@ with open('README.rst') as f:
 setup(
     name='cbsh',
     version=__version__,
-    description='Crossbar.io Fabric Shell (cbsh) is a tool belt for Crossbar.io',
+    description='Crossbar.io Shell (cbsh) is a tool belt for Crossbar.io',
     long_description=docstr,
     author='Crossbar.io Technologies GmbH',
     url='http://crossbario.com',

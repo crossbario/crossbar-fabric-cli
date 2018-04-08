@@ -133,7 +133,7 @@ def cli(ctx, profile, realm, role):
 @cli.command(name='version', help='print version information')
 @click.pass_obj
 def cmd_version(cfg):
-    click.echo("Crossbar.io Fabric Shell {}".format(__version__))
+    click.echo("Crossbar.io Shell {}".format(__version__))
 
 
 @cli.command(name='quickstart', help='generate a complete starter container stack')
@@ -162,7 +162,7 @@ def cmd_auth(ctx, code, new_code):
     ctx.obj.app.run_context(ctx)
 
 
-@cli.command(name='shell', help='run an interactive Crossbar.io Fabric shell')
+@cli.command(name='shell', help='run an interactive Crossbar.io Shell')
 @click.pass_context
 def cmd_shell(ctx):
     ctx.obj.app.run_context(ctx)

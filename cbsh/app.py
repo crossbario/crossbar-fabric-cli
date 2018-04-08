@@ -129,7 +129,7 @@ class Application(object):
 
     Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
     Type "help" to get help. Try TAB for auto-completion.
-    """.format(title=style_crossbar('Crossbar.io Fabric Shell'), version=__version__)
+    """.format(title=style_crossbar('Crossbar.io Shell'), version=__version__)
 
     CONNECTED = """    Connection:
 
@@ -342,7 +342,7 @@ class Application(object):
         if cmd not in [u'auth', u'shell']:
             raise click.ClickException('"{}" command can only be run in shell'.format(cmd))
 
-        click.echo('Crossbar.io Fabric Shell: {}'.format(style_ok('v{}'.format(__version__))))
+        click.echo('Crossbar.io Shell: {}'.format(style_ok('v{}'.format(__version__))))
 
         # load user profile and key for given profile name
         key, profile = self._load_profile(profile=cfg.profile)
