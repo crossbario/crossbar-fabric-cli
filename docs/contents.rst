@@ -12,3 +12,4 @@ Contents
    index
    installation
    templates
+   interfaces

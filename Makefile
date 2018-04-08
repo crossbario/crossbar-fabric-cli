@@ -1,3 +1,5 @@
+.PHONY: docs
+
 default:
 	@echo "targets: clean, install, flake8, upload"
 
@@ -6,8 +8,12 @@ clean:
 	-rm -rf build
 	-rm -rf dist
 	-rm -rf *.egg-info
+	-rm -rf ./docs/_build/*
 	-find . -type d -name "__pycache__" -exec rm -rf {} \;
 	-find . -name "*.pyc" -exec rm -f {} \;
+
+docs:
+	sphinx-build -b html ./docs ./docs/_build
 
 install:
 	pip install -e .
@@ -21,7 +27,7 @@ upload: clean
 
 # This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:
-	flake8 --ignore=E501 cdc
+	flake8 --ignore=E501 cbsh
 
 pep8:
 	pep8 --statistics --ignore=E501 -qq .

@@ -41,7 +41,7 @@ setup(
     description='Crossbar.io Shell (cbsh) is a tool belt for Crossbar.io',
     long_description=docstr,
     author='Crossbar.io Technologies GmbH',
-    url='http://crossbario.com',
+    url='https://crossbario.com',
     platforms=('Any'),
     install_requires=[
         'autobahn[asyncio,serialization,encryption]>=18.3.1',   # MIT
@@ -55,6 +55,7 @@ setup(
         'cookiecutter>=1.6.0',      # BSD
         'sphinx>=1.7.2',            # BSD
         'sphinx_rtd_theme>=0.3.0',  # MIT
+        'stringcase>=1.2.0',        # MIT
     ],
     extras_require={
     },
@@ -63,12 +64,15 @@ setup(
             'cbsh = cbsh.cli:main'
         ]
     },
-    packages=find_packages(),
+    packages=[
+        'cbsh',
+        'sphinxcontrib'
+    ],
     include_package_data=True,
     data_files=[
         ('.', ['LICENSE', 'README.rst'])
     ],
-    zip_safe=True,
+    zip_safe=False,
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=["License :: OSI Approved :: MIT License",
                  "Development Status :: 4 - Beta",
@@ -81,5 +85,5 @@ setup(
                  "Programming Language :: Python :: 3.6",
                  "Programming Language :: Python :: Implementation :: CPython",
                  "Programming Language :: Python :: Implementation :: PyPy"],
-    keywords='crossbar.io crossbar wamp router cli administration management'
+    keywords='crossbar.io xbr crossbar autobahn wamp idl router cli administration management'
 )
