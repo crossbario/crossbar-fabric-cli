@@ -1,24 +1,42 @@
 # Crossbar.io Fabric Shell
 
+
+Installation:
+
+python3 -m venv ~/cbsh
+source ~/cbsh/bin/activate
+pip install cbsh
+cbsh version
+
+Add ${HOME}/cbsh/bin to your PATH
+
+Update:
+
+pip install --no-cache --upgrade cbsh
+
+
+
+
+
 Interactive shell to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from the command line.
 
 ## Installation
 
-Crossbar.io Fabric Shell is [available from PyPI](https://pypi.python.org/pypi/crossbarfabricshell) and requires Python 3.5 or higher.
+Crossbar.io Fabric Shell is [available from PyPI](https://pypi.python.org/pypi/cbsh) and requires Python 3.5 or higher.
 
 We recommend installation into a dedicated Python [virtualenv](https://virtualenv.pypa.io/en/stable/):
 
 ```console
 virtualenv venv
 source venv/bin/activate
-pip install crossbarfabricshell
+pip install cbsh
 ```
 
 A straigforward way to install into a shared directory outside your personal user HOME is installing into `/opt/cbsh` by creating a virtualenv:
 
 ```console
 sudo virtualenv -p /usr/bin/python3 /opt/cbsh
-sudo /opt/cbsh/bin/pip3 install crossbarfabricshell
+sudo /opt/cbsh/bin/pip3 install cbsh
 ```
 
 To test the installation:

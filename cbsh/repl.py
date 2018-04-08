@@ -43,7 +43,7 @@ from prompt_toolkit.token import Token
 
 from autobahn.wamp.exception import ApplicationError
 
-from crossbarfabricshell.util import style_error
+from cbsh.util import style_error
 
 
 def _get_bottom_toolbar_tokens(cli):

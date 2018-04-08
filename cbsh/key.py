@@ -129,7 +129,7 @@ def _parse_keyfile(key_path, private=True):
 
 
 import click
-from crossbarfabricshell.util import style_ok, style_error
+from cbsh.util import style_ok, style_error
 
 
 class UserKey(object):

@@ -16,8 +16,8 @@ install:
 upload: clean
 	python setup.py bdist_wheel
 	aws s3 cp --acl public-read \
-		dist/crossbarfabricshell-*.whl \
-		s3://fabric-deploy/crossbarfabricshell/
+		dist/cbsh-*.whl \
+		s3://fabric-deploy/cbsh/
 
 # This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:
@@ -44,12 +44,12 @@ build_linux_exe: clean
 upload_linux_exe:
 	aws s3 cp --acl public-read \
 		dist/cbsh \
-		s3://fabric-deploy/crossbarfabricshell/linux/
+		s3://fabric-deploy/cbsh/linux/
 
 build:
 	python setup.py sdist bdist_wheel
 
 
-publish: clean
-	python setup.py sdist bdist_wheel
+publish: build
 	twine upload dist/*
+#	twine upload --repository-url=https://pypi.org/pypi dist/*

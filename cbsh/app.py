@@ -47,14 +47,14 @@ from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationRunner
 
-from crossbarfabricshell.util import (
+from cbsh.util import (
     style_crossbar,
     style_finished_line,
     style_error,
     style_ok,
     localnow
 )
-from crossbarfabricshell import client, repl, config, key, __version__
+from cbsh import client, repl, config, key, __version__
 
 
 _DEFAULT_CFC_URL = u'wss://fabric.crossbario.com/ws'
