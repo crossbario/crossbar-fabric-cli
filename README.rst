@@ -47,4 +47,6 @@ You can then check the path and version of **cbsh**:
 Usage
 -----
 
-<a href="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB" target="_blank"><img src="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB.png" /></a>
+.. raw:: html
+
+    <a href="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB" target="_blank"><img src="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB.png" /></a>
