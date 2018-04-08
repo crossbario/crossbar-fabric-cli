@@ -1,10 +1,10 @@
 Crossbar.io Shell
-========================
+=================
 
 Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 
-* an **interactive shell** to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from one central place and command line
-* a **service scaffolding** system that gets you started quickly using templates for Crossbar.io and Autobahn:
+1. an **interactive shell** to access Crossbar.io Fabric Center and manage your Crossbar.io Fabric nodes from one central place and command line
+2. a **service scaffolding** system that gets you started quickly using templates for Crossbar.io and Autobahn:
 
 .. raw:: html
 
@@ -13,36 +13,17 @@ Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 ---------
 
 
-Installation
-------------
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-**cbsh** requires Python 3.5 or higher. Further, we strongly recommend installation into a dedicated virtual Python environment (see below).
+   installation.rst
+   templates.rst
 
-The service scaffolding in addition requires:
 
-* `Docker <https://docs.docker.com/install/>`_ and
-* `Docker Compose <https://docs.docker.com/compose/install/>`_
+Indices and tables
+------------------
 
-To install **cbsh**, create a new dedicated virtual Python environment
-
-.. code-block:: console
-
-    python3 -m venv ~/cbsh
-    source ~/cbsh/bin/activate
-
-and install cbsh from `PyPi <https://pypi.org/project/cbsh/>`_ :
-
-.. code-block:: console
-
-    pip install cbsh
-
-You can then check the path and version of **cbsh**:
-
-.. code-block:: console
-
-    (cbsh) oberstet@thinkpad-t430s:~$ which cbsh
-    /home/oberstet/cbsh/bin/cbsh
-    (cbsh) oberstet@thinkpad-t430s:~$ cbsh version
-    Crossbar.io Shell 18.4.3
-
----------
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
