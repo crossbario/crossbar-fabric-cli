@@ -43,16 +43,31 @@ using [Docker Compose](https://docs.docker.com/compose/).
 To check and view the services configuration:
 
 ```console
-docker-compose up
+make version
 ```
 
 To start your services:
 
 ```console
-docker-compose up
+make start
 ```
 
-> Note: to start the services in the background, type `docker-compose up --detach`.
+> Note: the latter is simply starting all services with `docker-compose up`. To start
+the services in the background, type `docker-compose up --detach`.
+"""
+
+MAKEFILE = """
+SUBDIRS = $(shell ls -d */)
+
+version:
+\tfor dir in $(SUBDIRS) ; do \
+\t\techo "$$dir" ; \
+\t\tcat $$dir/service.json ; \
+\t\tmake -C  $$dir version ; \
+\tdone
+
+start:
+\tdocker-compose up
 """
 
 _cookiecutters = [
@@ -109,6 +124,12 @@ def run(cfg):
             with open(readme_filename, 'w') as fd:
                 fd.write(README)
             click.echo('{} created'.format(readme_filename))
+
+        makefile_filename = 'Makefile'
+        if not os.path.isfile(makefile_filename):
+            with open(makefile_filename, 'w') as fd:
+                fd.write(MAKEFILE)
+            click.echo('{} created'.format(makefile_filename))
 
         docker_compose_filename = 'docker-compose.yml'
         if not os.path.isfile(docker_compose_filename):
