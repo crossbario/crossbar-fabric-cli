@@ -25,10 +25,13 @@
 ###############################################################################
 
 import os
+import uuid
 
 import click
 import yaml
 from cookiecutter.main import cookiecutter
+
+from autobahn import util
 
 README = """# Crossbar.io Quickstart Project
 
@@ -54,8 +57,8 @@ docker-compose up
 
 _cookiecutters = [
     # Crossbar.io
-    ('gh:crossbario/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
-    #('/home/oberstet/scm/crossbario/cookiecutter-crossbar/', 'Add a Crossbar.io OSS router'),
+    #('gh:crossbario/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
+    ('/home/oberstet/scm/crossbario/cookiecutter-crossbar/', 'Add a Crossbar.io OSS router'),
 
     #('gh:crossbario/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
 
@@ -81,14 +84,21 @@ def run(cfg):
 
     select = None
     while select not in range(num):
-        select = click.prompt('Please select a template to initialize, or 0 to exit', type=int, default=0)
+        select = click.prompt('Please select a template to initialize, or 0 to exit', type=int, default=1)
 
     if select > 0:
         click.echo('Initializing cookiecutter {} ...'.format(template))
 
+        extra_context = {
+            'uid': os.getuid(),
+            'service_uuid': str(uuid.uuid4()),
+            'generated': util.utcnow(),
+        }
+        output_dir='.'
+
         # cookiecutter returns the fully qualified path within which the template
         # was initialized.
-        output_dir = cookiecutter(template, output_dir='.')
+        output_dir = cookiecutter(template, output_dir=output_dir, extra_context=extra_context)
 
         # the last part of the fully qualified output directory is the service name
         # that comes from "cookiecutter.json"
