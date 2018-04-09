@@ -38,9 +38,10 @@ with open('README.rst') as f:
 setup(
     name='cbsh',
     version=__version__,  # noqa
+    author='Crossbar.io Technologies GmbH',
+    author_email='support@crossbario.com',
     description='Crossbar.io Shell (cbsh) is a tool belt for Crossbar.io',
     long_description=docstr,
-    author='Crossbar.io Technologies GmbH',
     url='https://crossbario.com',
     platforms=('Any'),
     install_requires=[
@@ -72,7 +73,7 @@ setup(
     data_files=[
         ('.', ['LICENSE', 'README.rst'])
     ],
-    zip_safe=False,
+    zip_safe=True,
     license='MIT License',
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
