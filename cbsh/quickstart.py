@@ -26,6 +26,7 @@
 
 import os
 import uuid
+import six
 
 import click
 import yaml
@@ -97,32 +98,43 @@ _cookiecutters = [
     # ('{}/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
 
     # Autobahn
-    ('{}/cookiecutter-autobahn-python', 'Add an AutobahnPython (Python 3) based component'),
-    # ('{}/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based component'),
-    # ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based component'),
-    # ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based component'),
+    ('{}/cookiecutter-autobahn-python', 'Add an AutobahnPython based service'),
+    ('{}/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based service'),
+    # ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based service'),
+    # ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based service'),
 
     # third-party
 ]
 
 
+def hl(text):
+    if type(text) != six.text_type:
+        text = '{}'.format(text)
+    return click.style(text, fg='yellow', bold=True)
+
+
 def run(cfg):
-    click.echo('Crossbar.io project quickstart:\n')
+    click.echo('\n {cb} project quickstart:\n'.format(cb=hl('Crossbar.io')))
 
     _templates = {}
 
-    click.echo('  0: Exit')
-    num = 1
+    num = 0
+    click.echo('  {}: Exit'.format(hl(num)))
+
     for template, desc in _cookiecutters:
+        num += 1
+        if DEVMODE:
+            template_disp = hl(template.format('filesystem'))
+        else:
+            template_disp = hl(template.format(_cookiecutters_prefix))
         template = template.format(_cookiecutters_prefix)
         _templates[num] = template
-        click.echo('  {num}: {template:50s} -> {desc}'.format(num=num, desc=desc, template=template))
-        num += 1
+        click.echo('  {num}: {desc:50s} [{template}]'.format(num=hl(num), desc=desc, template=template_disp))
     click.echo('')
 
     select = None
-    while select not in range(num):
-        select = click.prompt('Please select a template to initialize, or 0 to exit', type=int, default=1)
+    while select not in range(0, num + 1):
+        select = click.prompt('Please select', type=int, default=0)
 
     if select > 0:
         template = _templates[select]
