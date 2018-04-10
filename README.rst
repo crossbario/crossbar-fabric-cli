@@ -12,7 +12,7 @@ Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 
 .. raw:: html
 
-    <a href="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB" target="_blank"><img src="https://asciinema.org/a/1XcqtsTSojDY6SS3R3bhI2WpB.png" /></a>
+    <a href="https://asciinema.org/a/NMVxWjvqTrIN6l2bZDNTOLfLR" target="_blank"><img src="https://asciinema.org/a/NMVxWjvqTrIN6l2bZDNTOLfLR.png" /></a>
 
 --------------
 
