@@ -5,10 +5,13 @@ default:
 
 clean:
 	-rm -f ./.cbsh-history
+	-rm -rf ./.tox
 	-rm -rf build
 	-rm -rf dist
 	-rm -rf *.egg-info
-	-rm -rf ./docs/_build/*
+	-rm -rf ./docs/_build
+	-rm -rf ./tests/_build
+	-rm -rf ./.pytest_cache
 	-find . -type d -name "__pycache__" -exec rm -rf {} \;
 	-find . -name "*.pyc" -exec rm -f {} \;
 

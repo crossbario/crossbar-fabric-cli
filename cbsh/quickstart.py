@@ -40,7 +40,13 @@ This project was generated using quickstart templates for Crossbar.io based serv
 The services are [Docker](https://www.docker.com/) based, and the service bundling is
 using [Docker Compose](https://docs.docker.com/compose/).
 
-To check and view the services configuration:
+To build your services:
+
+```console
+make build
+```
+
+To check the service versions:
 
 ```console
 make version
@@ -59,6 +65,8 @@ the services in the background, type `docker-compose up --detach`.
 MAKEFILE = """
 SUBDIRS = $(shell ls -d */)
 
+default: start
+
 version:
 \tfor dir in $(SUBDIRS) ; do \
 \t\techo "$$dir" ; \
@@ -66,22 +74,33 @@ version:
 \t\tmake -C  $$dir version ; \
 \tdone
 
+# the following will automatically build the images from the Dockerfiles
+# references in docker-compose.yml, and it will also rebuild those images
+# and recreate containers as needed (eg when the Dockerfile or again a file
+# referenced therein, such as your actual application source code files, changes)
+#
 start:
-\tdocker-compose up
+\tdocker-compose up --build
 """
+
+DEVMODE = True
+
+if DEVMODE:
+    _cookiecutters_prefix = '/home/oberstet/scm/crossbario'
+else:
+    _cookiecutters_prefix = 'gh:crossbario'
 
 _cookiecutters = [
     # Crossbar.io
-    ('gh:crossbario/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
-    #('/home/oberstet/scm/crossbario/cookiecutter-crossbar/', 'Add a Crossbar.io OSS router'),
+    ('{}/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
 
-    #('gh:crossbario/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
+    # ('{}/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
 
     # Autobahn
-    #('gh:crossbario/cookiecutter-autobahn-python', 'Add an AutobahnPython (Python 3) based component'),
-    #('gh:crossbario/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based component'),
-    #('gh:crossbario/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based component'),
-    #('gh:crossbario/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based component'),
+    ('{}/cookiecutter-autobahn-python', 'Add an AutobahnPython (Python 3) based component'),
+    # ('{}/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based component'),
+    # ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based component'),
+    # ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based component'),
 
     # third-party
 ]
@@ -90,9 +109,13 @@ _cookiecutters = [
 def run(cfg):
     click.echo('Crossbar.io project quickstart:\n')
 
+    _templates = {}
+
     click.echo('  0: Exit')
     num = 1
     for template, desc in _cookiecutters:
+        template = template.format(_cookiecutters_prefix)
+        _templates[num] = template
         click.echo('  {num}: {template:50s} -> {desc}'.format(num=num, desc=desc, template=template))
         num += 1
     click.echo('')
@@ -102,6 +125,7 @@ def run(cfg):
         select = click.prompt('Please select a template to initialize, or 0 to exit', type=int, default=1)
 
     if select > 0:
+        template = _templates[select]
         click.echo('Initializing cookiecutter {} ...'.format(template))
 
         extra_context = {
