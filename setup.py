@@ -69,7 +69,7 @@ setup(
     },
     packages=[
         'cbsh',
-        'sphinxcontrib'
+        'sphinxcontrib.xbr'
     ],
     include_package_data=True,
     data_files=[

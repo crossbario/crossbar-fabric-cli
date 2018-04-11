@@ -576,11 +576,11 @@ def main():
             except ImportError:
                 raise click.Abort('could not import docker-compose - command forwarding failed!')
             else:
-                argv = [sys.argv[0]]
+                argv = ['docker-compose']
                 if len(sys.argv) > 2:
                     argv.extend(sys.argv[2:])
                 sys.argv = argv
-                return _forward_main()
+                sys.exit(_forward_main())
 
         # forward to sphinx-build
         elif sys.argv[1] == 'sphinx':

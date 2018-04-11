@@ -74,6 +74,8 @@ exe:
 	pyinstaller \
 		--onefile \
 		--name cbsh \
+		--hidden-import "sphinx.util.compat" \
+		--hidden-import "sphinxcontrib.xbr" \
 		--hidden-import "cookiecutter.extensions" \
 		--hidden-import "jinja2_time" \
 		cbsh/cli.py
