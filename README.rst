@@ -27,5 +27,5 @@ Please refer to the `documentation <https://cbsh.readthedocs.io/en/latest/>`_ fo
 .. |Coverage| image:: https://codecov.io/github/crossbario/crossbar-shell/coverage.svg?branch=master
    :target: https://codecov.io/github/crossbario/crossbar-shell
 
-.. |Docs| image:: https://readthedocs.org/projects/cbsh/badge/?version=latest
-   :target: https://cbsh.readthedocs.io/en/latest/
+.. |Docs| image:: https://readthedocs.org/projects/crossbar-shell/badge/?version=latest
+   :target: https://crossbar-shell.readthedocs.io/en/latest/

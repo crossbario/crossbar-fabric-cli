@@ -74,6 +74,12 @@ exe:
 	pyinstaller \
 		--onefile \
 		--name cbsh \
+		--hidden-import "cookiecutter.extensions" \
+		--hidden-import "jinja2_time" \
 		cbsh/cli.py
+
+exe_install: exe
+	sudo mkdir -p /opt/cbsh/bin
+	sudo cp ./dist/cbsh /opt/cbsh/bin/
 
 #		--add-data $(CB)/crossbar/keys:crossbar/keys \

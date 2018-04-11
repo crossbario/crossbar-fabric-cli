@@ -45,7 +45,7 @@ setup(
     url='https://crossbario.com',
     platforms=('Any'),
     install_requires=[
-        'autobahn[asyncio,serialization,encryption]>=18.3.1',   # MIT
+        'autobahn[asyncio,serialization,encryption]>=18.4.1',   # MIT
         'click>=6.7',               # BSD
         'prompt_toolkit>=1.0.13',   # BSD
         'colorama>=0.3.7',          # BSD
@@ -55,6 +55,7 @@ setup(
         'pyyaml>=3.12',             # MIT
         'cookiecutter>=1.6.0',      # BSD
         'sphinx>=1.7.2',            # BSD
+        'sphinxcontrib-websupport>=1.0.1',  # BSD
         'sphinx_rtd_theme>=0.3.0',  # MIT
         'stringcase>=1.2.0',        # MIT
         'docker_compose>=1.21.0',   # Apache 2.0
