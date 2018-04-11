@@ -75,6 +75,9 @@ version:
 \t\tmake -C  $$dir version ; \
 \tdone
 
+build:
+\tdocker-compose build
+
 # the following will automatically build the images from the Dockerfiles
 # references in docker-compose.yml, and it will also rebuild those images
 # and recreate containers as needed (eg when the Dockerfile or again a file
@@ -91,19 +94,19 @@ if DEVMODE:
 else:
     _cookiecutters_prefix = 'gh:crossbario'
 
+
+# built-in cookiecutters.
+#
 _cookiecutters = [
     # Crossbar.io
     ('{}/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
-
-    # ('{}/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
+    ('{}/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
 
     # Autobahn
     ('{}/cookiecutter-autobahn-python', 'Add an AutobahnPython based service'),
     ('{}/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based service'),
-    # ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based service'),
-    # ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based service'),
-
-    # third-party
+    ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based service'),
+    ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based service'),
 ]
 
 

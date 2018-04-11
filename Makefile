@@ -65,3 +65,15 @@ build:
 publish: build
 	twine upload dist/*
 #	twine upload --repository-url=https://pypi.org/pypi dist/*
+
+prepare_exe:
+	pip install --no-cache --upgrade pyinstaller
+	pip uninstall -y enum34
+
+exe:
+	pyinstaller \
+		--onefile \
+		--name cbsh \
+		cbsh/cli.py
+
+#		--add-data $(CB)/crossbar/keys:crossbar/keys \

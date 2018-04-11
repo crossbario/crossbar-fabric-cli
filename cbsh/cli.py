@@ -24,6 +24,12 @@
 #
 ###############################################################################
 
+import sys
+import platform
+import importlib
+import hashlib
+
+import six
 import click
 
 # this is for pyinstaller! otherwise it fails to find this dep.
@@ -56,6 +62,12 @@ if False:
 
 from cbsh import app, command, quickstart
 from cbsh import __version__
+
+
+def hl(text):
+    if type(text) != six.text_type:
+        text = '{}'.format(text)
+    return click.style(text, fg='yellow', bold=True)
 
 
 USAGE = """
@@ -133,7 +145,69 @@ def cli(ctx, profile, realm, role):
 @cli.command(name='version', help='print version information')
 @click.pass_obj
 def cmd_version(cfg):
-    click.echo("Crossbar.io Shell {}".format(__version__))
+
+    def get_version(name_or_module):
+        if isinstance(name_or_module, str):
+            name_or_module = importlib.import_module(name_or_module)
+        try:
+            return name_or_module.__version__
+        except AttributeError:
+            return ''
+
+    # Python (language)
+    py_ver = '.'.join([str(x) for x in list(sys.version_info[:3])])
+    py_ver_string = "[%s]" % sys.version.replace('\n', ' ')
+    py_ver = '.'.join([str(x) for x in sys.version_info[:3]])
+
+    # Python (implementation)
+    if 'pypy_version_info' in sys.__dict__:
+        py_ver_detail = "{}-{}".format(platform.python_implementation(), '.'.join(str(x) for x in sys.pypy_version_info[:3]))
+    else:
+        py_ver_detail = platform.python_implementation()
+
+    # Autobahn
+    ab_ver = get_version('autobahn')
+
+    # Pyinstaller (frozen EXE)
+    py_is_frozen = getattr(sys, 'frozen', False)
+    if py_is_frozen:
+        m = hashlib.sha256()
+        with open(sys.executable, 'rb') as fd:
+            m.update(fd.read())
+        fingerprint = m.hexdigest()
+    else:
+        fingerprint = None
+
+    # Docker Compose
+    try:
+        import compose
+    except ImportError:
+        compose_ver = 'not installed'
+    else:
+        compose_ver = compose.__version__
+
+    # Sphinx
+    try:
+        import sphinx
+    except ImportError:
+        sphinx_ver = 'not installed'
+    else:
+        sphinx_ver = sphinx.__version__
+
+    platform_str = platform.platform(terse=True, aliased=True)
+
+    click.echo()
+    click.echo(hl("  Crossbar.io Shell {}\n".format(__version__)))
+    click.echo('  {:<24}: {}'.format('Platform', hl(platform_str)))
+    click.echo('  {:<24}: {}'.format('Python (language)', hl(py_ver)))
+    click.echo('  {:<24}: {}'.format('Python (implementation)', hl(py_ver_detail)))
+    click.echo('  {:<24}: {}'.format('Autobahn', hl(ab_ver)))
+    click.echo('  {:<24}: {}'.format('Docker Compose', hl(compose_ver)))
+    click.echo('  {:<24}: {}'.format('Sphinx', hl(sphinx_ver)))
+    click.echo('  {:<24}: {}'.format('Frozen executable', hl('yes' if py_is_frozen else 'no')))
+    if py_is_frozen:
+        click.echo('  {:<24}: {}'.format('Executable SHA256', hl(fingerprint)))
+    click.echo()
 
 
 @cli.command(name='quickstart', help='generate a complete starter container stack')
@@ -493,7 +567,33 @@ def main():
     """
     Main entry point into CLI.
     """
-    cli()
+
+    _forward = None
+
+    if len(sys.argv) > 1:
+
+        # forward to docker-compose
+        if sys.argv[1] == 'docker':
+            try:
+                from compose.cli.main import main as _forward
+            except ImportError:
+                raise click.Abort('could not import docker-compose - command forwarding failed!')
+
+        # forward to sphinx-build
+        elif sys.argv[1] == 'sphinx':
+            try:
+                from sphinx.cmd.build import main as _forward
+            except ImportError:
+                raise click.Abort('could not import sphinx-build - command forwarding failed!')
+
+    if _forward:
+        argv = [sys.argv[0]]
+        if len(sys.argv) > 2:
+            argv.extend(sys.argv[2:])
+        sys.argv = argv
+        return _forward()
+    else:
+        cli()
 
 
 if __name__ == '__main__':

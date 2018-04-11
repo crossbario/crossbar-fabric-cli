@@ -57,6 +57,7 @@ setup(
         'sphinx>=1.7.2',            # BSD
         'sphinx_rtd_theme>=0.3.0',  # MIT
         'stringcase>=1.2.0',        # MIT
+        'docker_compose>=1.21.0',   # Apache 2.0
     ],
     extras_require={
     },
