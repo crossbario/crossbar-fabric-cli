@@ -87,7 +87,7 @@ start:
 \tdocker-compose up --build
 """
 
-DEVMODE = True
+DEVMODE = False
 
 if DEVMODE:
     CC1 = '/home/oberstet/scm/crossbario'

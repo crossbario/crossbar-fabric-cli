@@ -567,34 +567,20 @@ def main():
     """
     Main entry point into CLI.
     """
-    if len(sys.argv) > 1:
 
-        # forward to docker-compose
-        if sys.argv[1] == 'docker':
-            try:
-                from compose.cli.main import main as _forward_main
-            except ImportError:
-                raise click.Abort('could not import docker-compose - command forwarding failed!')
-            else:
-                argv = ['docker-compose']
-                if len(sys.argv) > 2:
-                    argv.extend(sys.argv[2:])
-                sys.argv = argv
-                sys.exit(_forward_main())
-
-        # forward to sphinx-build
-        elif sys.argv[1] == 'sphinx':
-            try:
-                from sphinx.cmd.build import main as _forward_main
-            except ImportError:
-                raise click.Abort('could not import sphinx-build - command forwarding failed!')
-            else:
-                argv = []
-                if len(sys.argv) > 2:
-                    argv.extend(sys.argv[2:])
-                sys.exit(_forward_main(argv=argv))
-
-    sys.exit(cli())
+    # forward to sphinx-build
+    if len(sys.argv) > 1 and sys.argv[1] == 'sphinx':
+        try:
+            from sphinx.cmd.build import main as _forward_main
+        except ImportError:
+            raise click.Abort('could not import sphinx-build - command forwarding failed!')
+        else:
+            argv = []
+            if len(sys.argv) > 2:
+                argv.extend(sys.argv[2:])
+            sys.exit(_forward_main(argv=argv))
+    else:
+        sys.exit(cli())
 
 
 if __name__ == '__main__':

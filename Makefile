@@ -21,7 +21,7 @@ docs:
 install:
 	#pip install -r requirements-test.txt
 	#pip install -r requirements-rtd.txt
-	pip install -e .[all]
+	pip install -e .
 
 # upload to our internal deployment system
 upload: clean
@@ -52,11 +52,6 @@ build_linux_exe: clean
 	docker rm --force cbsh-build
 	docker rmi cbsh
 
-upload_linux_exe:
-	aws s3 cp --acl public-read \
-		dist/cbsh \
-		s3://fabric-deploy/cbsh/linux/
-
 build:
 	python setup.py sdist
 	python setup.py bdist_wheel
@@ -64,32 +59,40 @@ build:
 
 publish: build
 	twine upload dist/*
-#	twine upload --repository-url=https://pypi.org/pypi dist/*
 
-prepare_exe:
+
+#
+# cbsh as a one-file executable (below is for Linux)
+#
+
+# install pyinstaller
+exe_dev:
 	pip install --no-cache --upgrade pyinstaller
 	pip uninstall -y enum34
 
-exe: install
+# build one-file executable using pyinstaller
+exe_build: install
 	pyinstaller \
+		--clean \
 		--onefile \
 		--name cbsh \
 		--hidden-import "cookiecutter.extensions" \
 		--hidden-import "jinja2_time" \
-		cbsh/cli.py
-
-exe_full: install
-	pyinstaller \
-		--onefile \
-		--name cbsh \
 		--hidden-import "sphinx.util.compat" \
 		--hidden-import "sphinxcontrib.xbr" \
-		--hidden-import "cookiecutter.extensions" \
-		--hidden-import "jinja2_time" \
 		cbsh/cli.py
 
-exe_install: exe
+# upload to S3:
+# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/linux/cbsh
+exe_upload: exe_build
+	aws s3 cp --acl public-read \
+		./dist/cbsh \
+		s3://download.crossbario.com/cbsh/linux/cbsh
+
+# install exe locally
+exe_install: exe_build
 	sudo mkdir -p /opt/cbsh/bin
 	sudo cp ./dist/cbsh /opt/cbsh/bin/
 
-#		--add-data $(CB)/crossbar/keys:crossbar/keys \
+# new release (do all of above)
+exe_release: exe_install exe_upload
