@@ -16,7 +16,47 @@ Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 
 --------------
 
+Installation
+------------
+
+Run this command to download the latest version of Crossbar.io Shell:
+
+.. code-block:: console
+
+    sudo curl -L https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/linux/cbsh -o /usr/local/bin/cbsh
+
+Apply executable permissions to the binary:
+
+.. code-block:: console
+
+    sudo chmod +x /usr/local/bin/cbsh
+
+Test the installation:
+
+.. code-block:: console
+
+    oberstet@thinkpad-t430s:~$ which cbsh
+    /usr/local/bin/cbsh
+    oberstet@thinkpad-t430s:~$ cbsh version
+
+    Crossbar.io Shell 18.4.5
+
+    Platform                : Linux-4.4.0-119-generic-x86_64-with-glibc2.3.4
+    Python (language)       : 3.6.5
+    Python (implementation) : CPython
+    Autobahn                : 18.4.1
+    Docker Compose          : not installed
+    Sphinx                  : 1.7.2
+    Frozen executable       : yes
+    Executable SHA256       : e45ecb24515b7a75521ecfb2084ca93745ca941e0b5146e0d0fe11b94834b85c
+
+-------------
+
+Documentation
+-------------
+
 Please refer to the `documentation <https://cbsh.readthedocs.io/en/latest/>`_ for description and usage **cbsh**.
+
 
 .. |Version| image:: https://img.shields.io/pypi/v/cbsh.svg
    :target: https://pypi.python.org/pypi/cbsh
