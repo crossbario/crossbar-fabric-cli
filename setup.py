@@ -54,13 +54,15 @@ setup(
         'tabulate>=0.7.7',          # MIT
         'pyyaml>=3.12',             # MIT
         'cookiecutter>=1.6.0',      # BSD
-        'sphinx>=1.7.2',            # BSD
-        'sphinxcontrib-websupport>=1.0.1',  # BSD
-        'sphinx_rtd_theme>=0.3.0',  # MIT
         'stringcase>=1.2.0',        # MIT
-        'docker_compose>=1.21.0',   # Apache 2.0
     ],
     extras_require={
+        'all': [
+            'sphinx>=1.7.2',                    # BSD
+            'sphinxcontrib-websupport>=1.0.1',  # BSD
+            'sphinx_rtd_theme>=0.3.0',          # MIT
+            'docker_compose>=1.21.0',           # Apache 2.0
+        ]
     },
     entry_points={
         'console_scripts': [

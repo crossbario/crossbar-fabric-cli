@@ -19,9 +19,9 @@ docs:
 	sphinx-build -b html ./docs ./docs/_build
 
 install:
-	pip install -r requirements-test.txt
-	pip install -r requirements-rtd.txt
-	pip install -e .
+	#pip install -r requirements-test.txt
+	#pip install -r requirements-rtd.txt
+	pip install -e .[all]
 
 # upload to our internal deployment system
 upload: clean
@@ -70,7 +70,15 @@ prepare_exe:
 	pip install --no-cache --upgrade pyinstaller
 	pip uninstall -y enum34
 
-exe:
+exe: install
+	pyinstaller \
+		--onefile \
+		--name cbsh \
+		--hidden-import "cookiecutter.extensions" \
+		--hidden-import "jinja2_time" \
+		cbsh/cli.py
+
+exe_full: install
 	pyinstaller \
 		--onefile \
 		--name cbsh \

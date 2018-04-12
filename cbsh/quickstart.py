@@ -90,23 +90,33 @@ start:
 DEVMODE = True
 
 if DEVMODE:
-    _cookiecutters_prefix = '/home/oberstet/scm/crossbario'
+    CC1 = '/home/oberstet/scm/crossbario'
+    CC2 = '/home/oberstet/scm/xbr'
 else:
-    _cookiecutters_prefix = 'gh:crossbario'
+    CC1 = 'gh:crossbario'
+    CC2 = 'gh:xbr'
 
 
 # built-in cookiecutters.
 #
 _cookiecutters = [
     # Crossbar.io
-    ('{}/cookiecutter-crossbar', 'Add a Crossbar.io OSS router'),
-    ('{}/cookiecutter-crossbar-fabric', 'Add a Crossbar.io Fabric router'),
+    (None, 'Crossbar.io'),
+    ('{}/cookiecutter-crossbar'.format(CC1), 'Create a Crossbar.io OSS app router'),
+    ('{}/cookiecutter-crossbar-fabric'.format(CC1), 'Create a Crossbar.io Fabric app router'),
+    ('{}/cookiecutter-crossbar-fabric-center'.format(CC1), 'Create a Crossbar.io Fabric cluster controller'),
+
+    # XBR
+    (None, 'XBR'),
+    ('{}/cookiecutter-xbr-api'.format(CC2), 'Create a XBR API bundle'),
+    ('{}/cookiecutter-crossbar-fabric-xbr'.format(CC1), 'Create a Crossbar.io XBR data market'),
 
     # Autobahn
-    ('{}/cookiecutter-autobahn-python', 'Add an AutobahnPython based service'),
-    ('{}/cookiecutter-autobahn-js', 'Add an AutobahnJS (NodeJS) based service'),
-    ('{}/cookiecutter-autobahn-java', 'Add an AutobahnJava (Java8 / Netty) based service'),
-    ('{}/cookiecutter-autobahn-cpp', 'Add an AutobahnC++ (GCC / ASIO) based service'),
+    (None, 'Autobahn'),
+    ('{}/cookiecutter-autobahn-python'.format(CC1), 'Create a Python based app or XBR service'),
+    ('{}/cookiecutter-autobahn-js'.format(CC1), 'Create a JavaScript based app or XBR service'),
+    ('{}/cookiecutter-autobahn-java'.format(CC1), 'Create a Java based app or XBR service'),
+    ('{}/cookiecutter-autobahn-cpp'.format(CC1), 'Create a C++ based app or XBR service'),
 ]
 
 
@@ -117,7 +127,7 @@ def hl(text):
 
 
 def run(cfg):
-    click.echo('\n {cb} project quickstart:\n'.format(cb=hl('Crossbar.io')))
+    click.echo('\n{cb} Project Quickstart\n'.format(cb=hl('Crossbar.io / XBR')))
 
     _templates = {}
 
@@ -125,14 +135,13 @@ def run(cfg):
     click.echo('  {}: Exit'.format(hl(num)))
 
     for template, desc in _cookiecutters:
-        num += 1
-        if DEVMODE:
-            template_disp = hl(template.format('filesystem'))
+        if template:
+            num += 1
+            _templates[num] = template
+            template_disp = hl(template)
+            click.echo('  {num}: {desc:46s} [{template}]'.format(num=hl(num), desc=desc, template=template_disp))
         else:
-            template_disp = hl(template.format(_cookiecutters_prefix))
-        template = template.format(_cookiecutters_prefix)
-        _templates[num] = template
-        click.echo('  {num}: {desc:50s} [{template}]'.format(num=hl(num), desc=desc, template=template_disp))
+            click.echo('\n {}:\n'.format(hl(desc)))
     click.echo('')
 
     select = None
