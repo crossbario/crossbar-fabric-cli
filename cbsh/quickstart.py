@@ -122,6 +122,11 @@ _cookiecutters = [
     ('{}/cookiecutter-autobahn-js'.format(CC1), 'Create a JavaScript based app or XBR service'),
     ('{}/cookiecutter-autobahn-java'.format(CC1), 'Create a Java based app or XBR service'),
     ('{}/cookiecutter-autobahn-cpp'.format(CC1), 'Create a C++ based app or XBR service'),
+
+    # Community project
+    (None, 'Community'),
+    ('{}/cookiecutter-wampsharp'.format(CC1), 'Create a WampSharp/C# based app'),
+    ('{}/cookiecutter-nexus-go'.format(CC1), 'Create a Nexus/Go based app'),
 ]
 
 
