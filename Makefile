@@ -37,7 +37,7 @@ upload: clean
 
 # This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:
-	flake8 --ignore=E501 cbsh
+	flake8 --ignore=E501,E402,N802 cbsh
 
 pep8:
 	pep8 --statistics --ignore=E501 -qq .
