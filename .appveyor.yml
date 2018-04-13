@@ -34,12 +34,12 @@ after_test:
 
   # patch pip because of issue with namespace packages. otherwise pip
   # and setuptools become unusable later. we need to patch this file:
-  #   C:\Python36\lib\site-packages\pkg_resources\__init__.py
+  #   C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py
   # and replace
   #   orig_path.sort(key=position_in_sys_path)
   # with
   #   orig_path = sorted(orig_path, key=position_in_sys_path)
-  - ps: "(Get-Content C:\Python36\lib\site-packages\pkg_resources\__init__.py).replace('orig_path.sort(key=position_in_sys_path)', 'orig_path = sorted(orig_path, key=position_in_sys_path)') | Set-Content C:\Python36\lib\site-packages\pkg_resources\__init__.py"
+  - ps: "(Get-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py).replace('orig_path.sort(key=position_in_sys_path)', 'orig_path = sorted(orig_path, key=position_in_sys_path)') | Set-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py"
   
   # create Python binary packages
   - python setup.py sdist
