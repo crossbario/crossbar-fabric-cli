@@ -24,7 +24,7 @@ install:
   - pip install -r requirements-dev.txt
 
 build_script:
-  - python setup.py build
+  - pip install .
 
 test_script:
   - echo "FIXME: insert unit tests"
@@ -33,16 +33,21 @@ after_test:
   # if tests are successful ...
   
   # create Python binary packages
+  - python setup.py build
+  - python setup.py sdist
+  - python setup.py bdist_wheel --universal
   - python setup.py bdist_wheel
   - python setup.py bdist_wininst
   - python setup.py bdist_msi
   - ps: "ls dist"
 
   # create one-file executable
-  - python setup.py install
   - pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
   - ps: "ls dist"
   - cmd: dist\cbsh.exe version
+
+
+#  twine upload dist/*
 
 # Directory: C:\projects\crossbar-shell\dist
 # Mode                LastWriteTime         Length Name                                                                                                                                                                                
