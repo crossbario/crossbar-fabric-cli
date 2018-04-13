@@ -1,7 +1,7 @@
 Crossbar.io Shell
 =================
 
-| |Version| |Build Status| |Coverage| |Docs|
+| |Version| |Travis| |Appveyor|  |Coverage| |Docs|
 
 --------------
 
@@ -118,6 +118,23 @@ To update **cbsh** at a later time, run:
 -------------
 
 
+
+Requires Microsoft Windows 10 Professional or Enterprise 64-bit 
+https://www.docker.com/docker-windows
+https://store.docker.com/editions/community/docker-ce-desktop-windows
+
+
+
+Get Docker Community Edition for Windows
+
+Docker for Windows is available for free.
+
+Requires Microsoft Windows 10 Professional or Enterprise 64-bit. For previous versions get Docker Toolbox.
+By downloading this, you agree to the terms of the Docker Software End User License Agreement
+
+
+
+
 Documentation
 -------------
 
@@ -127,8 +144,11 @@ Please refer to the `documentation <https://cbsh.readthedocs.io/en/latest/>`_ fo
 .. |Version| image:: https://img.shields.io/pypi/v/cbsh.svg
    :target: https://pypi.python.org/pypi/cbsh
 
-.. |Build Status| image:: https://travis-ci.org/crossbario/crossbar-shell.svg?branch=master
+.. |Travis| image:: https://travis-ci.org/crossbario/crossbar-shell.svg?branch=master
    :target: https://travis-ci.org/crossbario/crossbar-shell
+
+.. |Appveyor| image:: https://ci.appveyor.com/api/projects/status/github/crossbario/crossbar-shell?branch=master&svg=true
+    :target: https://ci.appveyor.com/project/crossbar/crossbar-shell
 
 .. |Coverage| image:: https://codecov.io/github/crossbario/crossbar-shell/coverage.svg?branch=master
    :target: https://codecov.io/github/crossbario/crossbar-shell

@@ -30,6 +30,12 @@ install:
 
 # build/install the package itself
 build_script:
+  # make appveyor build number available as "cbsh._version.__build__"
+  - ps: (Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py
+
+  # make appveyor build environment available as ."buildenv.json" in the package
+  - python -c "import os, json; fd = open('cbsh\\.buildenv.json', 'w'); json.dump({key: os.environ[key] for key in os.environ if key.startswith('SQB')}, fd); fd.close()"
+
   # install cbsh (which includes the sphinxcontrib.xbr namespace package)
   - pip install .
 
@@ -39,13 +45,7 @@ build_script:
   #   orig_path.sort(key=position_in_sys_path)
   # with
   #   orig_path = sorted(orig_path, key=position_in_sys_path)
-  - ps: "(Get-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py).replace('orig_path.sort(key=position_in_sys_path)', 'orig_path = sorted(orig_path, key=position_in_sys_path)') | Set-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py"
-
-  # make appveyor build number available as "cbsh._version.__build__"
-  - ps: "(Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py"
-
-  - python -c "import os, json; fd = open('cbsh\\.buildenv.json', 'w'); json.dump({key: os.environ[key] for key in os.environ if key.startswith('SQB')}, fd); fd.close()"
-
+  - ps: (Get-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py).replace('orig_path.sort(key=position_in_sys_path)', 'orig_path = sorted(orig_path, key=position_in_sys_path)') | Set-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py
 
 # run unit tests
 test_script:
@@ -59,7 +59,7 @@ after_test:
   - python setup.py bdist_wheel
   - python setup.py bdist_wininst
   - python setup.py bdist_msi
-  - ps: "ls dist"
+  - ps: ls dist
 
   # create one-file executable using pyinstaller
   #
@@ -67,12 +67,12 @@ after_test:
   # WARNING: lib not found: api-ms-win-crt-runtime-l1-1-0.dll dependency of c:\python36\python.exe
   # appear to be harmless - the generated EXE seems to be fine (roughly 30MB)
   - pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
-  - ps: "ls dist"
+  - ps: ls dist
   - cmd: dist\cbsh.exe version
 
   # we move the file, so that when uploading, the "dist" path part is gone (maybe there
   # is a more elegant way to configure that in the "deploy" step - couldn't find one)
-  - ps: "move dist\cbsh.exe ."
+  - ps: move dist\cbsh.exe .
 
 # define the stuff we actually upload (a single file)
 #
