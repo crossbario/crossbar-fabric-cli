@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import
 
-from cbsh._version import __version__
+from cbsh._version import __version__, __build__
 
 version = __version__
+build = __build__

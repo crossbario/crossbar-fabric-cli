@@ -61,7 +61,7 @@ if False:
 
 
 from cbsh import app, command, quickstart
-from cbsh import __version__
+from cbsh import __version__, __build__
 
 
 def hl(text):
@@ -156,8 +156,6 @@ def cmd_version(cfg):
 
     # Python (language)
     py_ver = '.'.join([str(x) for x in list(sys.version_info[:3])])
-    py_ver_string = "[%s]" % sys.version.replace('\n', ' ')
-    py_ver = '.'.join([str(x) for x in sys.version_info[:3]])
 
     # Python (implementation)
     if 'pypy_version_info' in sys.__dict__:
@@ -197,7 +195,8 @@ def cmd_version(cfg):
     platform_str = platform.platform(terse=True, aliased=True)
 
     click.echo()
-    click.echo(hl("  Crossbar.io Shell {}\n".format(__version__)))
+    click.echo(hl("  Crossbar.io Shell\n"))
+    click.echo('  {:<24}: {}'.format('Version', hl('{} (build {})'.format(__version__, __build__))))
     click.echo('  {:<24}: {}'.format('Platform', hl(platform_str)))
     click.echo('  {:<24}: {}'.format('Python (language)', hl(py_ver)))
     click.echo('  {:<24}: {}'.format('Python (implementation)', hl(py_ver_detail)))
@@ -580,7 +579,7 @@ def main():
                 argv.extend(sys.argv[2:])
             sys.exit(_forward_main(argv=argv))
     else:
-        sys.exit(cli())
+        cli()
 
 
 if __name__ == '__main__':
