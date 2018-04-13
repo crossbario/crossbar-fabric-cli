@@ -21,13 +21,13 @@ init:
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python -m pip install -U pip
-  - "%CMD_IN_ENV% pip install -r requirements-dev.txt"
+  - pip install -r requirements-dev.txt
 
 build_script:
   - python setup.py build
 
 test_script:
-  - ps: "FIXME: insert unit tests"
+  - echo "FIXME: insert unit tests"
 
 after_test:
   # if tests are successful, create binary packages
