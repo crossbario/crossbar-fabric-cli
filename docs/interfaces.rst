@@ -1,6 +1,21 @@
 XBR Interfaces
 ==============
 
+Test Python syntax highlighting:
+
+.. code-block:: python
+
+    def position_in_sys_path(path):
+        """
+        Return the ordinal of the path based on its position in sys.path
+        """
+        path_parts = path.split(os.sep)
+        module_parts = package_name.count('.') + 1
+        parts = path_parts[:-module_parts]
+        return safe_sys_path_index(_normalize_cached(os.sep.join(parts)))
+
+-------
+
 **cbsh** includes a Sphinx extension that allows to embed XBR IDL interface definition blocks in documentation markup (ReST).
 
 Based on such markup, **cbsh** allows to:

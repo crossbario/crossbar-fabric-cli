@@ -88,6 +88,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+#pygments_style = 'monokai'
+#pygments_style = 'native'
+#pygments_style = 'pastie'
+#pygments_style = 'friendly'
 
 
 # -- Options for HTML output -------------------------------------------------

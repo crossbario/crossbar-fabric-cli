@@ -21,11 +21,27 @@ init:
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python -m pip install -U pip
-  - pip install cbsh
+  - "%CMD_IN_ENV% pip install -r requirements-dev.txt"
 
-build: off
+build_script:
+  - python setup.py build
 
 test_script:
-  - cbsh version
+  - ps: "FIXME: insert unit tests"
 
-deploy: off
+after_test:
+  # if tests are successful, create binary packages
+  - python setup.py bdist_wheel
+  - python setup.py bdist_wininst
+  - python setup.py bdist_msi
+  - ps: "ls dist"
+
+# C:\Users\crossbar\Documents\GitHub\crossbario\crossbar-shell>pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
+
+#artifacts:
+#  # Archive the generated packages in the ci.appveyor.com build report.
+#  - path: dist\*
+
+#on_success:
+#  - TODO: upload the content of dist/*.whl to a public wheelhouse
+#
