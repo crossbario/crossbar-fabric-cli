@@ -92,7 +92,7 @@ makefile_filename = 'Makefile'
 docker_compose_filename = 'docker-compose.yml'
 
 
-DEVMODE = False
+DEVMODE = True
 
 if DEVMODE:
     CC1 = '/home/oberstet/scm/crossbario'
@@ -125,15 +125,15 @@ _cookiecutters = [
 
     # Community project
     (None, 'Community'),
-    ('{}/cookiecutter-wampsharp'.format(CC1), 'Create a WampSharp/C# based app'),
-    ('{}/cookiecutter-nexus-go'.format(CC1), 'Create a Nexus/Go based app'),
+    ('{}/cookiecutter-wampsharp'.format(CC1), 'Create a WampSharp/C# based app service'),
+    ('{}/cookiecutter-nexus-go'.format(CC1), 'Create a Nexus/Go based app service'),
 ]
 
 
-def hl(text):
+def hl(text, color='yellow', bold=True):
     if type(text) != six.text_type:
         text = '{}'.format(text)
-    return click.style(text, fg='yellow', bold=True)
+    return click.style(text, fg=color, bold=bold)
 
 
 def _initialize():
@@ -183,8 +183,8 @@ def run(cfg):
         if template:
             num += 1
             _templates[num] = template
-            template_disp = hl(template)
-            click.echo('  {num}: {desc:46s} [{template}]'.format(num=hl(num), desc=desc, template=template_disp))
+            template_disp = hl(template, bold=False)
+            click.echo('  {num}: {desc:46s} [{template}]'.format(num=hl(str(num).ljust(3)), desc=desc, template=template_disp))
         else:
             click.echo('\n {}:\n'.format(hl(desc)))
     click.echo('')
