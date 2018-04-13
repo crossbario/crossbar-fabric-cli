@@ -28,6 +28,7 @@ install:
 
 build_script:
   - pip install .
+  - ps: "(Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py"
 
 test_script:
   - echo "FIXME: insert unit tests"

@@ -158,8 +158,10 @@ def cmd_version(cfg):
     py_ver = '.'.join([str(x) for x in list(sys.version_info[:3])])
 
     # Python (implementation)
-    if 'pypy_version_info' in sys.__dict__:
-        py_ver_detail = "{}-{}".format(platform.python_implementation(), '.'.join(str(x) for x in sys.pypy_version_info[:3]))
+    if hasattr(sys, 'pypy_version_info'):
+        pypy_version_info = getattr(sys, 'pypy_version_info')
+        py_impl_str = '.'.join(str(x) for x in pypy_version_info[:3])
+        py_ver_detail = "{}-{}".format(platform.python_implementation(), py_impl_str)
     else:
         py_ver_detail = platform.python_implementation()
 
@@ -579,7 +581,7 @@ def main():
                 argv.extend(sys.argv[2:])
             sys.exit(_forward_main(argv=argv))
     else:
-        cli()
+        cli()  # pylint: disable=E1120
 
 
 if __name__ == '__main__':
