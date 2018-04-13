@@ -1,28 +1,32 @@
-###############################################################################
+#####################################################################################
 #
-# The MIT License (MIT)
+#  Copyright (c) Crossbar.io Technologies GmbH
 #
-# Copyright (c) Crossbar.io Technologies GmbH
+#  Unless a separate license agreement exists between you and Crossbar.io GmbH (e.g.
+#  you have purchased a commercial license), the license terms below apply.
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+#  Should you enter into a separate license agreement after having received a copy of
+#  this software, then the terms of such license agreement replace the terms below at
+#  the time at which such license agreement becomes effective.
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+#  In case a separate license agreement ends, and such agreement ends without being
+#  replaced by another separate license agreement, the license terms below apply
+#  from the time at which said agreement ends.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", fWITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+#  LICENSE TERMS
 #
-###############################################################################
+#  This program is free software: you can redistribute it and/or modify it under the
+#  terms of the GNU General Public License, version 3, as published by the
+#  Free Software Foundation. This program is distributed in the hope that it will be
+#  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# 
+#  See the GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
+#
+#####################################################################################
 
 import os
 from six.moves import configparser

@@ -3,6 +3,7 @@ version: '1.0.{build}'
 image: Visual Studio 2017
 shallow_clone: true
 
+# only commits to master trigger appveyor
 branches:
   only:
   - master
@@ -21,30 +22,37 @@ init:
   - ps: chcp 65001
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
+# install any build/dev requirements
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python -m pip install -U pip
   - pip install -r requirements-dev.txt
 
+# build/install the package itself
 build_script:
+  # install cbsh (which includes the sphinxcontrib.xbr namespace package)
   - pip install .
-  - ps: "(Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py"
 
-test_script:
-  - echo "FIXME: insert unit tests"
-
-after_test:
-  # if tests are successful ...
-
-  # patch pip because of issue with namespace packages. otherwise pip
-  # and setuptools become unusable later. we need to patch this file:
+  # patch pip because of issue with namespace packages. we need to patch this file:
   #   C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py
   # and replace
   #   orig_path.sort(key=position_in_sys_path)
   # with
   #   orig_path = sorted(orig_path, key=position_in_sys_path)
   - ps: "(Get-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py).replace('orig_path.sort(key=position_in_sys_path)', 'orig_path = sorted(orig_path, key=position_in_sys_path)') | Set-Content C:\\Python36\\lib\\site-packages\\pkg_resources\\__init__.py"
-  
+
+  # make appveyor build number available as "cbsh._version.__build__"
+  - ps: "(Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py"
+
+  - python -c "import os, json; fd = open('cbsh\\.buildenv.json', 'w'); json.dump({key: os.environ[key] for key in os.environ if key.startswith('SQB')}, fd); fd.close()"
+
+
+# run unit tests
+test_script:
+  - echo "FIXME: insert unit tests"
+
+# if tests are successful ...
+after_test:
   # create Python binary packages
   - python setup.py sdist
   - python setup.py bdist_wheel --universal
@@ -62,21 +70,31 @@ after_test:
   - ps: "ls dist"
   - cmd: dist\cbsh.exe version
 
-# this step uploads cbsh.exe to
-# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/dist/cbsh.exe
+  # we move the file, so that when uploading, the "dist" path part is gone (maybe there
+  # is a more elegant way to configure that in the "deploy" step - couldn't find one)
+  - ps: "move dist\cbsh.exe ."
+
+# define the stuff we actually upload (a single file)
 #
-# to generate the encrypted key material for S3 IAM access below, go to:
-# https://ci.appveyor.com/tools/encrypt
+artifacts:
+  - path: cbsh.exe
+    name: Crossbar.io Shell
+
+# this step uploads cbsh.exe to bucket "download.crossbario.com", available at URL
+# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/dist/cbsh.exe
 #
 deploy:
   provider: S3
-  access_key_id:
-    secure: O8zpApNyYa9l577lVw5YzaYALUtZhY06CHkRQZQxOm8=
-  secret_access_key:
-    secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
   bucket: download.crossbario.com
   region: eu-central-1
   unzip: false
   set_public: true
   folder: cbsh/windows
   artifact: Crossbar.io Shell
+
+  # to generate the encrypted key material for S3 IAM access below, go to:
+  # https://ci.appveyor.com/tools/encrypt
+  access_key_id:
+    secure: O8zpApNyYa9l577lVw5YzaYALUtZhY06CHkRQZQxOm8=
+  secret_access_key:
+    secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
