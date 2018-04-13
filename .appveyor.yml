@@ -54,7 +54,40 @@ after_test:
   - ps: "ls dist"
   - cmd: dist\cbsh.exe version
 
+ 
+  
+#environment:
+#  nodejs_version: "6"
+#  NETWORK: "mainnet"
+#  AWS_ACCESS_KEY_ID:
+#    secure: O0+bBTm/Ud3pxP8nvC3ZuDSkmmlr+b8hVluqpRdJGBg=
+#  AWS_SECRET_ACCESS_KEY:
+#    secure: DbpP02aDGoC3Tdsi3+ONm8ov0nuXzEF/Yi453SBKj38qjROzvPXo6qW44bYiKBf4
+#  CERT_PASS:
+#    secure: K+PY2zF/5qeJnnKhcCZaqLnVZuAXvuxCXosnzHdtje1C+BMLfAbCJZVt2wTMEyJT
+##  # Avoid long paths on Windows
+#STACK_ROOT: "c:\\sr"
 
+artifacts:
+  - path: dist\cbsh.exe
+    name: Crossbar.io Shell
+
+# https://ci.appveyor.com/tools/encrypt
+
+deploy:
+  provider: S3
+  access_key_id:
+    secure: O8zpApNyYa9l577lVw5YzaYALUtZhY06CHkRQZQxOm8=
+  secret_access_key:
+    secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
+  bucket: download.crossbario.com
+  region: eu-central-1
+  unzip: false
+  set_public: true
+  folder: cbsh/windows
+  artifact: Crossbar.io Shell
+
+  
 #  twine upload dist/*
 
 # Directory: C:\projects\crossbar-shell\dist
