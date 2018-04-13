@@ -1,0 +1,33 @@
+version: '1.0.{build}'
+
+image: Visual Studio 2017
+shallow_clone: true
+
+branches:
+  only:
+  - master
+
+init:
+  - cmd: git config --global core.autocrlf true
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.3"
+      PYTHON_ARCH: "32"
+      APPVEYOR: "true"
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - python -m pip install -U pip
+  - pip install cbsh
+
+build: off
+
+test_script:
+  - cbsh version
+
+deploy: off

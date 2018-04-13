@@ -75,11 +75,11 @@ We recommend installation into a dedicated Python virtual environment:
 .. code-block:: console
 
     python3 -m venv cbsh
-    cbsh/bin/pip3 install --no-cache
+    cbsh/bin/pip3 install --no-cache cbsh
 
 .. note::
 
-    To install a specific version, add eg ``cbsh==18.4.6.dev2`` to above last command.
+    To install a specific version, use eg ``cbsh==18.4.1`` in above last command.
 
 To check the installation:
 
@@ -113,7 +113,7 @@ To update **cbsh** at a later time, run:
 
 .. code-block:: console
 
-    cbsh/bin/pip3 install --no-cache --upgrade
+    cbsh/bin/pip3 install --no-cache --upgrade cbsh
 
 -------------
 
