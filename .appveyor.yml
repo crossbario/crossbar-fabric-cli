@@ -39,8 +39,10 @@ after_test:
   - ps: "ls dist"
 
   # create one-file executable
+  - python setup.py install
   - pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
   - ps: "ls dist"
+  - cmd: dist\cbsh.exe version
 
 # Directory: C:\projects\crossbar-shell\dist
 # Mode                LastWriteTime         Length Name                                                                                                                                                                                
