@@ -23,6 +23,11 @@ install:
 	#pip install -r requirements-rtd.txt
 	pip install -e .
 
+travis:
+	sudo apt install ruby-dev
+	sudo gem install travis
+	# /usr/local/bin/travis encrypt access_key_id="..."
+
 # upload to our internal deployment system
 upload: clean
 	python setup.py bdist_wheel

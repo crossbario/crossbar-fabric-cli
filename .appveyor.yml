@@ -14,8 +14,11 @@ environment:
       PYTHON_ARCH: "32"
       APPVEYOR: "true"
 
+# rgd chcp 65001: needed for cbor and pyyaml, because of this
+# https://github.com/pypa/pip/issues/4251
 init:
   - cmd: git config --global core.autocrlf true
+  - ps: chcp 65001
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 install:
@@ -49,31 +52,21 @@ after_test:
   - python setup.py bdist_msi
   - ps: "ls dist"
 
-  # create one-file executable
+  # create one-file executable using pyinstaller
+  #
+  # note: the warning messages during the build that refer to "api-ms-win-crt-*" as in
+  # WARNING: lib not found: api-ms-win-crt-runtime-l1-1-0.dll dependency of c:\python36\python.exe
+  # appear to be harmless - the generated EXE seems to be fine (roughly 30MB)
   - pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
   - ps: "ls dist"
   - cmd: dist\cbsh.exe version
 
- 
-  
-#environment:
-#  nodejs_version: "6"
-#  NETWORK: "mainnet"
-#  AWS_ACCESS_KEY_ID:
-#    secure: O0+bBTm/Ud3pxP8nvC3ZuDSkmmlr+b8hVluqpRdJGBg=
-#  AWS_SECRET_ACCESS_KEY:
-#    secure: DbpP02aDGoC3Tdsi3+ONm8ov0nuXzEF/Yi453SBKj38qjROzvPXo6qW44bYiKBf4
-#  CERT_PASS:
-#    secure: K+PY2zF/5qeJnnKhcCZaqLnVZuAXvuxCXosnzHdtje1C+BMLfAbCJZVt2wTMEyJT
-##  # Avoid long paths on Windows
-#STACK_ROOT: "c:\\sr"
-
-artifacts:
-  - path: dist\cbsh.exe
-    name: Crossbar.io Shell
-
+# this step uploads cbsh.exe to
+# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/dist/cbsh.exe
+#
+# to generate the encrypted key material for S3 IAM access below, go to:
 # https://ci.appveyor.com/tools/encrypt
-
+#
 deploy:
   provider: S3
   access_key_id:
@@ -86,24 +79,3 @@ deploy:
   set_public: true
   folder: cbsh/windows
   artifact: Crossbar.io Shell
-
-  
-#  twine upload dist/*
-
-# Directory: C:\projects\crossbar-shell\dist
-# Mode                LastWriteTime         Length Name                                                                                                                                                                                
-# ----                -------------         ------ ----                                                                                                                                                                                
-# -a----        4/13/2018   9:44 AM          49490 cbsh-18.4.6-py2.py3-none-any.whl                                                                                                                                                    
-# -a----        4/13/2018   9:44 AM         548439 cbsh-18.4.6.win32.exe                                                                                                                                                               
-# -a----        4/13/2018   9:44 AM         204800 cbsh-18.4.6.win32.msi                   
-
-
-# C:\Users\crossbar\Documents\GitHub\crossbario\crossbar-shell>pyinstaller --onefile --clean --name cbsh --hidden-import "cookiecutter.extensions" --hidden-import "jinja2_time" --hidden-import "sphinx.util.compat" --hidden-import "sphinxcontrib.xbr" cbsh/cli.py
-
-#artifacts:
-#  # Archive the generated packages in the ci.appveyor.com build report.
-#  - path: dist\*
-
-#on_success:
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse
-#
