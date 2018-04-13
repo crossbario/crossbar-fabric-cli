@@ -19,7 +19,14 @@ Crossbar.io Shell (**cbsh**) is a tool belt for Crossbar.io featuring:
 Installation
 ------------
 
-Run this command to download the latest version of Crossbar.io Shell:
+Linux
+.....
+
+For Linux (64-bit), we provide `cbsh` as a one-file executable that is completely
+statically linked and should run on basically any Linux distribution.
+
+Run this command to download the latest version of the Crossbar.io Shell executable
+and install to ``/usr/local/bin``:
 
 .. code-block:: console
 
@@ -31,7 +38,7 @@ Apply executable permissions to the binary:
 
     sudo chmod +x /usr/local/bin/cbsh
 
-Test the installation:
+Test the installed binary:
 
 .. code-block:: console
 
@@ -50,7 +57,66 @@ Test the installation:
     Frozen executable       : yes
     Executable SHA256       : e45ecb24515b7a75521ecfb2084ca93745ca941e0b5146e0d0fe11b94834b85c
 
+As the installation path ``/usr/local/bin`` is in the search PATH of most Linux systems by default,
+**cbsh** will be automatically available *for all users* on the system.
+
+To update **cbsh** at a later time, just download the new version by rerunning above ``curl`` command.
+
 -------------
+
+
+Other OS
+........
+
+**cbsh** should run on any system with a recent Python 3, and we publish releases on PyPI.
+
+We recommend installation into a dedicated Python virtual environment:
+
+.. code-block:: console
+
+    python3 -m venv cbsh
+    cbsh/bin/pip3 install --no-cache
+
+.. note::
+
+    To install a specific version, add eg ``cbsh==18.4.6.dev2`` to above last command.
+
+To check the installation:
+
+.. code-block:: console
+
+    oberstet@thinkpad-t430s:~$ cbsh/bin/cbsh version
+
+    Crossbar.io Shell 18.4.6-dev2
+
+    Platform                : Linux-4.4.0-119-generic-x86_64-with-glibc2.9
+    Python (language)       : 3.5.2
+    Python (implementation) : CPython
+    Autobahn                : 18.4.1
+    Docker Compose          : 1.21.0
+    Sphinx                  : 1.7.2
+    Frozen executable       : no
+
+You can also activate the Python virtual environment by doing (on Unix):
+
+    source cbsh/bin/activate
+
+This will make the Python of the virtual environment, and the **cbsh**
+installed therein available without qualifying paths - in the current
+terminal session.
+
+Finally, you can add the directory path ``cbsh/bin/`` to your environment search PATH,
+eg on Unix systems by ``export PATH=${HOME}/cbsh/bin:${PATH}``. That will make **cbsh**
+available in terminal sessions automtically.
+
+To update **cbsh** at a later time, run:
+
+.. code-block:: console
+
+    cbsh/bin/pip3 install --no-cache --upgrade
+
+-------------
+
 
 Documentation
 -------------

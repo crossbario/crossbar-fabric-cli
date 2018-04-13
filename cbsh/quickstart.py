@@ -92,7 +92,7 @@ makefile_filename = 'Makefile'
 docker_compose_filename = 'docker-compose.yml'
 
 
-DEVMODE = True
+DEVMODE = False
 
 if DEVMODE:
     CC1 = '/home/oberstet/scm/crossbario'
