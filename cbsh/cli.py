@@ -201,7 +201,11 @@ def cmd_version(cfg):
     platform_str = platform.platform(terse=True, aliased=True)
 
     click.echo()
-    click.echo(hl("  Crossbar.io Shell\n"))
+    click.echo(hl("  Crossbar.io Shell") + ' - Interactive shell and toolbelt for Crossbar.io')
+    click.echo()
+    click.echo(("  Copyright (c) Crossbar.io Technologies GmbH. Licensed under the GPL 3.0 license"))
+    click.echo(("  unless a separate license agreement exists between you and Crossbar.io GmbH."))
+    click.echo()
     click.echo('  {:<24}: {}'.format('Version', hl('{} (build {})'.format(__version__, __build__))))
     click.echo('  {:<24}: {}'.format('Platform', hl(platform_str)))
     click.echo('  {:<24}: {}'.format('Python (language)', hl(py_ver)))
@@ -212,7 +216,6 @@ def cmd_version(cfg):
     click.echo('  {:<24}: {}'.format('Frozen executable', hl('yes' if py_is_frozen else 'no')))
     if py_is_frozen:
         click.echo('  {:<24}: {}'.format('Executable SHA256', hl(fingerprint)))
-    click.echo(("\n  Copyright (c) Crossbar.io Technologies GmbH. Open-source licensed under the MIT license."))
     click.echo()
 
 

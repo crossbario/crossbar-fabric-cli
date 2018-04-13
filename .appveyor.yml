@@ -31,7 +31,7 @@ install:
 # build/install the package itself
 build_script:
   # make appveyor build number available as "cbsh._version.__build__"
-  - ps: (Get-Content .\\cbsh\\_version.py).replace('00000', '{build}') | Set-Content .\\cbsh\\_version.py
+  - ps: (Get-Content .\\cbsh\\_version.py).replace('00000', '$(build)') | Set-Content .\\cbsh\\_version.py
 
   # make appveyor build environment available as ."buildenv.json" in the package
   - python -c "import os, json; fd = open('cbsh\\.buildenv.json', 'w'); json.dump({key: os.environ[key] for key in os.environ if key.startswith('SQB')}, fd); fd.close()"
@@ -81,7 +81,7 @@ artifacts:
     name: Crossbar.io Shell
 
 # this step uploads cbsh.exe to bucket "download.crossbario.com", available at URL
-# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/dist/cbsh.exe
+# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/cbsh.exe
 #
 deploy:
   provider: S3
