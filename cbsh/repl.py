@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -154,14 +154,14 @@ class ClickCompleter(Completer):
             c = c.parent
         cmds.reverse()
 
-        #print(cmds)
+        # print(cmds)
 
-        #if ctx.parent:
+        # if ctx.parent:
         #    print('COMMAND: ', ctx.parent.command.name)
         #print('COMMAND: ', ctx.command.name)
-        #pprint(dir(ctx.command))
-        #print(document.get_word_before_cursor())
-        #print(document.get_word_before_cursor(WORD=True))
+        # pprint(dir(ctx.command))
+        # print(document.get_word_before_cursor())
+        # print(document.get_word_before_cursor(WORD=True))
 
         choices = []
         for param in ctx.command.params:
@@ -244,8 +244,8 @@ async def repl(
                                 history=history,
                                 patch_stdout=False,
                                 # https://github.com/jonathanslenders/python-prompt-toolkit/blob/master/examples/get-multiline-input.py
-                                #multiline=True,
-                                #get_continuation_tokens=continuation_tokens,
+                                # multiline=True,
+                                # get_continuation_tokens=continuation_tokens,
                                 get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
                                 get_prompt_tokens=get_prompt_tokens,
                                 style=style,

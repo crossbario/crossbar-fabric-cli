@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -78,12 +78,12 @@ def _creator():
     """
     try:
         user = getpass.getuser()
-    except:
+    except BaseException:
         user = u'unknown'
 
     try:
         hostname = socket.gethostname()
-    except:
+    except BaseException:
         hostname = u'unknown'
 
     return u'{}@{}'.format(user, hostname)

@@ -66,13 +66,13 @@ xbr_sig_re = re.compile(
 
 
 pairindextypes = {
-    'namespace':    _('namespace'),
-    'keyword':   _('keyword'),
-    'operator':  _('operator'),
-    'object':    _('object'),
+    'namespace': _('namespace'),
+    'keyword': _('keyword'),
+    'operator': _('operator'),
+    'object': _('object'),
     'exception': _('exception'),
     'statement': _('statement'),
-    'builtin':   _('built-in function'),
+    'builtin': _('built-in function'),
 }  # Dict[unicode, unicode]
 
 
@@ -137,7 +137,7 @@ class XBRXrefMixin(object):
                   ):
         # type: (...) -> nodes.Node
         result = super(XBRXrefMixin, self).make_xref(rolename, domain, target,  # type: ignore
-                                                    innernode, contnode, env)
+                                                     innernode, contnode, env)
         result['refspecific'] = True
         if target.startswith(('.', '~')):
             prefix, result['reftarget'] = target[0], target[1:]
@@ -206,29 +206,29 @@ class XBRObject(ObjectDescription):
 
     doc_field_types = [
         XBRTypedField('parameter', label=_('Parameters'),
-                     names=('param', 'parameter', 'arg', 'argument',
-                            'keyword', 'kwarg', 'kwparam'),
-                     typerolename='interface', typenames=('paramtype', 'type'),
-                     can_collapse=True),
+                      names=('param', 'parameter', 'arg', 'argument',
+                             'keyword', 'kwarg', 'kwparam'),
+                      typerolename='interface', typenames=('paramtype', 'type'),
+                      can_collapse=True),
 
         XBRTypedField('variable', label=_('Variables'), rolename='obj',
-                     names=('var', 'ivar', 'cvar'),
-                     typerolename='interface', typenames=('vartype',),
-                     can_collapse=True),
+                      names=('var', 'ivar', 'cvar'),
+                      typerolename='interface', typenames=('vartype',),
+                      can_collapse=True),
 
         XBRGroupedField('exceptions', label=_('Raises'), rolename='exc',
-                       names=('raises', 'raise', 'exception', 'except'),
-                       can_collapse=True),
+                        names=('raises', 'raise', 'exception', 'except'),
+                        can_collapse=True),
 
 
         XBRGroupedField('publications', label=_('Publications'), rolename='pub',
-                       names=('publishes', 'publish', 'publication'),
-                       can_collapse=True),
+                        names=('publishes', 'publish', 'publication'),
+                        can_collapse=True),
 
         Field('returnvalue', label=_('Returns'), has_arg=False,
               names=('returns', 'return')),
         XBRField('returntype', label=_('Return type'), has_arg=False,
-                names=('rtype',), bodyrolename='interface'),
+                 names=('rtype',), bodyrolename='interface'),
 
         Field('price', label=_('Price'), has_arg=False,
               names=('price',)),
@@ -413,7 +413,7 @@ class XBRObject(ObjectDescription):
             except IndexError:
                 pass
         self.env.ref_context['xbr:interface'] = (interfaces[-1] if len(interfaces) > 0
-                                            else None)
+                                                 else None)
         if 'namespace' in self.options:
             namespaces = self.env.ref_context.setdefault('xbr:namespaces', [])
             if namespaces:
@@ -524,7 +524,7 @@ class XBRInterfacemember(XBRObject):
                     return '%s()' % name
             if nsname:
                 return _('%s() (%s.%s interface method)') % (methname, nsname,
-                                                         ifcname)
+                                                             ifcname)
             else:
                 return _('%s() (%s interface method)') % (methname, ifcname)
         elif self.objtype == 'attribute':
@@ -547,6 +547,7 @@ class XBRDecoratorMixin(object):
     """
     Mixin for decorator directives.
     """
+
     def handle_signature(self, sig, signode):
         # type: (unicode, addnodes.desc_signature) -> Tuple[unicode, unicode]
         ret = super(XBRDecoratorMixin, self).handle_signature(sig, signode)  # type: ignore
@@ -562,6 +563,7 @@ class XBRDecoratorFunction(XBRDecoratorMixin, XBRNamespacelevel):
     """
     Directive to mark functions meant to be used as decorators.
     """
+
     def run(self):
         # type: () -> List[nodes.Node]
         # a decorator function is a function after all
@@ -573,6 +575,7 @@ class XBRDecoratorMethod(XBRDecoratorMixin, XBRInterfacemember):
     """
     Directive to mark methods meant to be used as decorators.
     """
+
     def run(self):
         # type: () -> List[nodes.Node]
         self.name = 'xbr:method'
@@ -686,7 +689,7 @@ class XBRNamespaceIndex(Index):
         ignores = sorted(ignores, key=len, reverse=True)
         # list of all namespaces, sorted by namespace name
         namespaces = sorted(iteritems(self.domain.data['namespaces']),
-                         key=lambda x: x[0].lower())
+                            key=lambda x: x[0].lower())
         # sort out collapsable namespaces
         prev_nsname = ''
         num_toplevels = 0
@@ -745,49 +748,49 @@ class XBRDomain(Domain):
     name = 'xbr'
     label = 'XBR'
     object_types = {
-        'function':     ObjType(_('function'),      'func', 'obj'),
-        'data':         ObjType(_('data'),          'data', 'obj'),
-        'interface':        ObjType(_('interface'),         'interface', 'exc', 'obj'),
-        'exception':    ObjType(_('exception'),     'exc', 'interface', 'obj'),
-        'method':       ObjType(_('method'),        'meth', 'obj'),
-        'interfacemethod':  ObjType(_('interface method'),  'meth', 'obj'),
+        'function': ObjType(_('function'), 'func', 'obj'),
+        'data': ObjType(_('data'), 'data', 'obj'),
+        'interface': ObjType(_('interface'), 'interface', 'exc', 'obj'),
+        'exception': ObjType(_('exception'), 'exc', 'interface', 'obj'),
+        'method': ObjType(_('method'), 'meth', 'obj'),
+        'interfacemethod': ObjType(_('interface method'), 'meth', 'obj'),
         'staticmethod': ObjType(_('static method'), 'meth', 'obj'),
-        'attribute':    ObjType(_('attribute'),     'attr', 'obj'),
-        'namespace':       ObjType(_('namespace'),        'ns', 'obj'),
+        'attribute': ObjType(_('attribute'), 'attr', 'obj'),
+        'namespace': ObjType(_('namespace'), 'ns', 'obj'),
     }  # type: Dict[unicode, ObjType]
 
     directives = {
-        'function':        XBRNamespacelevel,
-        'data':            XBRNamespacelevel,
-        'interface':           XBRInterfacelike,
-        'exception':       XBRInterfacelike,
-        'method':          XBRInterfacemember,
+        'function': XBRNamespacelevel,
+        'data': XBRNamespacelevel,
+        'interface': XBRInterfacelike,
+        'exception': XBRInterfacelike,
+        'method': XBRInterfacemember,
 
-        'interfacemethod':     XBRInterfacemember,
+        'interfacemethod': XBRInterfacemember,
 
-        'event':     XBRInterfacemember,
-        'procedure':     XBRInterfacemember,
-        'error':     XBRInterfacemember,
+        'event': XBRInterfacemember,
+        'procedure': XBRInterfacemember,
+        'error': XBRInterfacemember,
 
 
-        'staticmethod':    XBRInterfacemember,
-        'attribute':       XBRInterfacemember,
-        'namespace':          XBRNamespace,
-        'currentnamespace':   XBRCurrentNamespace,
-        'decorator':       XBRDecoratorFunction,
+        'staticmethod': XBRInterfacemember,
+        'attribute': XBRInterfacemember,
+        'namespace': XBRNamespace,
+        'currentnamespace': XBRCurrentNamespace,
+        'decorator': XBRDecoratorFunction,
         'decoratormethod': XBRDecoratorMethod,
     }
     roles = {
-        'data':  XBRXRefRole(),
-        'exc':   XBRXRefRole(),
-        'pub':   XBRXRefRole(),
-        'func':  XBRXRefRole(fix_parens=True),
+        'data': XBRXRefRole(),
+        'exc': XBRXRefRole(),
+        'pub': XBRXRefRole(),
+        'func': XBRXRefRole(fix_parens=True),
         'interface': XBRXRefRole(),
         'const': XBRXRefRole(),
-        'attr':  XBRXRefRole(),
-        'meth':  XBRXRefRole(fix_parens=True),
-        'ns':   XBRXRefRole(),
-        'obj':   XBRXRefRole(),
+        'attr': XBRXRefRole(),
+        'meth': XBRXRefRole(fix_parens=True),
+        'ns': XBRXRefRole(),
+        'obj': XBRXRefRole(),
     }
     initial_data = {
         'objects': {},  # fullname -> docname, objtype
@@ -898,7 +901,7 @@ class XBRDomain(Domain):
 
         if obj[1] == 'namespace':
             return self._make_namespace_refnode(builder, fromdocname, name,
-                                             contnode)
+                                                contnode)
         else:
             return make_refnode(builder, fromdocname, obj[0], name,
                                 contnode, name)
@@ -916,7 +919,7 @@ class XBRDomain(Domain):
             if obj[1] == 'namespace':
                 results.append(('xbr:ns',
                                 self._make_namespace_refnode(builder, fromdocname,
-                                                          name, contnode)))
+                                                             name, contnode)))
             else:
                 results.append(('xbr:' + self.role_for_objtype(obj[1]),
                                 make_refnode(builder, fromdocname, obj[0], name,
@@ -1000,13 +1003,14 @@ class XBRBuilder(Builder):
         print('XBR: write_doc(docname={}, doctree={})'.format(docname, type(doctree)))
 
         from pprint import pprint
+
         def _print(nodes):
             for node in nodes:
                 print('\nNODE:', dir(node), node.attributes, node.list_attributes)
                 if 'interface' in str(node):
                     print(node)
-                #print(node.attributes)
-                #pprint(dir(node))
+                # print(node.attributes)
+                # pprint(dir(node))
             if node.children:
                 print('\nCHILDREN:')
                 _print(node.children)

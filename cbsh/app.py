@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -157,15 +157,15 @@ class Application(object):
             Token.Toolbar: '#fce94f bg:#333333',
 
             # User input.
-            #Token:          '#ff0066',
+            # Token:          '#ff0066',
 
             # Prompt.
-            #Token.Username: '#884444',
-            #Token.At:       '#00aa00',
-            #Token.Colon:    '#00aa00',
-            #Token.Pound:    '#00aa00',
-            #Token.Host:     '#000088 bg:#aaaaff',
-            #Token.Path:     '#884444 underline',
+            # Token.Username: '#884444',
+            # Token.At:       '#00aa00',
+            # Token.Colon:    '#00aa00',
+            # Token.Pound:    '#00aa00',
+            # Token.Host:     '#000088 bg:#aaaaff',
+            # Token.Path:     '#884444 underline',
         })
 
         self._output_style = 'fruity'
@@ -325,11 +325,11 @@ class Application(object):
     def _get_prompt_tokens(self, cli):
         return [
             (Token.Username, 'john'),
-            (Token.At,       '@'),
-            (Token.Host,     'localhost'),
-            (Token.Colon,    ':'),
-            (Token.Path,     '/user/john'),
-            (Token.Pound,    '# '),
+            (Token.At, '@'),
+            (Token.Host, 'localhost'),
+            (Token.Colon, ':'),
+            (Token.Path, '/user/john'),
+            (Token.Pound, '# '),
         ]
 
     def run_context(self, ctx):
@@ -413,7 +413,7 @@ class Application(object):
             click.echo('Entering event loop ..')
             transport, protocol = loop.run_until_complete(_res)
             #click.echo('transport, protocol: {} {}'.format(transport, protocol))
-            #loop.run_forever()
+            # loop.run_forever()
             session_details = loop.run_until_complete(ready)
             #click.echo('SessionDetails: {}'.format(session_details))
 
@@ -517,7 +517,7 @@ class Application(object):
                 shell_task = loop.create_task(
                     repl.repl(ctx,
                               get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
-                              #get_prompt_tokens=self._get_prompt_tokens,
+                              # get_prompt_tokens=self._get_prompt_tokens,
                               style=self._style,
                               prompt_kwargs=prompt_kwargs)
                 )
@@ -541,4 +541,4 @@ class Application(object):
             authid=style_crossbar(session_details.authid) if session_details else None,
             authrole=style_crossbar(session_details.authrole) if session_details else None,
             session=session_details.session if session_details else None
-            ))
+        ))

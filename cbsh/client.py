@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -151,6 +151,7 @@ class _ShellClient(object):
 class ShellClient(_ShellClient, BaseCryptosignClientSession):
     pass
 
+
 class ShellAnonymousClient(_ShellClient, BaseAnonymousClientSession):
     pass
 
@@ -190,6 +191,7 @@ class _ManagementClientSession(object):
 
 class ManagementClientSession(_ManagementClientSession, BaseCryptosignClientSession):
     pass
+
 
 class ManagementAnonymousClientSession(_ManagementClientSession, BaseAnonymousClientSession):
     pass

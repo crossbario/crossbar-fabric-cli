@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -135,7 +135,7 @@ _cookiecutters = [
 
 
 def hl(text, color='yellow', bold=True):
-    if type(text) != six.text_type:
+    if not isinstance(text, six.text_type):
         text = '{}'.format(text)
     return click.style(text, fg=color, bold=bold)
 
@@ -166,14 +166,14 @@ def _initialize():
         data = fd.read()
         docker_compose = yaml.safe_load(data)
 
-    if type(docker_compose) != dict:
+    if not isinstance(docker_compose, dict):
         raise click.ClickException('invalid type {} found in {} for top level object'.format(type(docker_compose), docker_compose_filename))
 
     if 'services' not in docker_compose:
         raise click.ClickException('no services attribute found in top level object for {}'.format(docker_compose_filename))
 
     return docker_compose
-    
+
 
 def run(cfg):
     click.echo('\n{cb} Project Quickstart\n'.format(cb=hl('Crossbar.io / XBR')))
@@ -211,7 +211,7 @@ def run(cfg):
             'service_uuid': str(uuid.uuid4()),
             'generated': util.utcnow(),
         }
-        output_dir='.'
+        output_dir = '.'
 
         # cookiecutter returns the fully qualified path within which the template
         # was initialized.

@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -90,7 +90,6 @@ PAT_IFC = re.compile(r'^\s*.. xbr:interface:: (?P<name>\S.*)$')
 # (None, [(1, []), (6, []), (8, [])])
 
 
-
 class XBRIDLNode(object):
 
     def __init__(self, level=0, parent=None, start_line=0, line_no=0, line=None):
@@ -104,8 +103,7 @@ class XBRIDLNode(object):
         self.children = []
 
     def __str__(self):
-        return 'XBRIDLNode[{id}](level={level}, parent={parent}, file_line_no={file_line_no}, line="{line}")'.format(id=id(self), level=self.level, parent=id(self.parent), line_no=self.line_no, file_line_no=self.start_line+self.line_no, line=self.line)
-
+        return 'XBRIDLNode[{id}](level={level}, parent={parent}, file_line_no={file_line_no}, line="{line}")'.format(id=id(self), level=self.level, parent=id(self.parent), line_no=self.line_no, file_line_no=self.start_line + self.line_no, line=self.line)
 
 
 def _parse_tree(lines, root):
@@ -138,7 +136,7 @@ def _parse_tree(lines, root):
 
             if level > stack[-1].level:
 
-                #print(line)
+                # print(line)
 
                 node = XBRIDLNode(level,
                                   stack[-1],
@@ -148,7 +146,7 @@ def _parse_tree(lines, root):
                 stack[-1].children.append(node)
 
                 nodes.append(node)
-                #yield node
+                # yield node
 
                 stack.append(node)
 
@@ -160,7 +158,7 @@ def _parse_tree(lines, root):
                 stack[-1].children.append(node)
 
                 nodes.append(node)
-                #yield node
+                # yield node
 
             else:
                 print('>')
@@ -169,22 +167,20 @@ def _parse_tree(lines, root):
                     stack.pop()
                 print('.')
                 node = XBRIDLNode(stack[-1].level, stack[-1].parent, start_line, line_no, line)
-                #stack[-1].children.append(node)
+                # stack[-1].children.append(node)
 
                 nodes.append(node)
-                #yield node
-
+                # yield node
 
         else:
             if False:
                 node = XBRIDLNode(None, None, start_line=start_line, line_no=line_no, line=line)
                 nodes.append(node)
-                #yield node
+                # yield node
             else:
                 # skip empty line
                 pass
     return nodes
-
 
 
 def _test_parse_tree():
@@ -242,6 +238,7 @@ def _extract(root, filterpaths=None):
                     fileblocks[fn] = blocks
     return fileblocks
 
+
 if True:
     filterpaths = ['./api/namespace/network/xbr/mobility/navigation.rst']
     filterpaths = None
@@ -252,12 +249,12 @@ if True:
     for fn, block_nodes in fileblocks.items():
         print('\n{}:'.format(fn))
         for node in block_nodes:
-            #print(node)
+            # print(node)
             for child in node.children:
                 print(node)
-            #if True or '.. xbr:' in node.line or node.level == 0:
+            # if True or '.. xbr:' in node.line or node.level == 0:
             #    print(node)
 
-    #pprint(fileblocks)
+    # pprint(fileblocks)
 
-    #_test_parse_tree()
+    # _test_parse_tree()

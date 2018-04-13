@@ -20,7 +20,7 @@
 #  Free Software Foundation. This program is distributed in the hope that it will be
 #  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 #  See the GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License along
@@ -69,7 +69,7 @@ from cbsh import __version__, __build__
 
 
 def hl(text):
-    if type(text) != six.text_type:
+    if not isinstance(text, six.text_type):
         text = '{}'.format(text)
     return click.style(text, fg='yellow', bold=True)
 
@@ -318,6 +318,7 @@ def _make_set_output_format(output_format):
         cfg.app.set_output_format(output_format)
     return f
 
+
 for output_format in app.Application.OUTPUT_FORMAT:
     _make_set_output_format(output_format)
 
@@ -337,6 +338,7 @@ def _make_set_output_style(output_style):
     def f(cfg):
         cfg.app.set_output_style(output_style)
     return f
+
 
 for output_style in app.Application.OUTPUT_STYLE:
     _make_set_output_style(output_style)
@@ -378,13 +380,13 @@ def cmd_start(cfg):
     pass
 
 
-#@cmd_start.command(name='worker', help='start a worker')
-#@click.argument('node')
-#@click.argument('worker')
-#@click.argument('worker-type')
-#@click.option('--options', help='worker options', default=None)
-#@click.pass_obj
-#async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
+# @cmd_start.command(name='worker', help='start a worker')
+# @click.argument('node')
+# @click.argument('worker')
+# @click.argument('worker-type')
+# @click.option('--options', help='worker options', default=None)
+# @click.pass_obj
+# async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
 #    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
 #    await cfg.app.run_command(cmd)
 
