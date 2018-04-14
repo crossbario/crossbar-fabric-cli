@@ -32,9 +32,16 @@ from __future__ import absolute_import
 
 import re
 
-from docutils import nodes
-from docutils.parsers.rst import Directive, directives
+from typing import List, Tuple, Dict, Iterable, Iterator, Union, Any, Set
+
 from six import iteritems
+
+import docutils
+from docutils import nodes  # noqa
+from docutils.nodes import Node  # noqa
+from docutils.parsers.rst import Directive, directives  # noqa
+
+import sphinx
 from sphinx import addnodes
 from sphinx.builders import Builder
 from sphinx.directives import ObjectDescription
@@ -45,12 +52,10 @@ from sphinx.util import logging
 from sphinx.util.docfields import Field, GroupedField, TypedField
 from sphinx.util.nodes import make_refnode
 
-if False:
-    # For type annotation
-    from typing import Any, Dict, Iterable, Iterator, List, Tuple, Union  # NOQA
-    from sphinx.application import Sphinx  # NOQA
-    from sphinx.builders import Builder  # NOQA
-    from sphinx.environment import BuildEnvironment  # NOQA
+# https://github.com/sphinx-contrib/restbuilder/blob/master/sphinxcontrib/builders/rst.py
+# https://github.com/Arello-Mobile/sphinx-confluence/blob/master/sphinx_confluence/__init__.py
+# https://github.com/cgwrench/rst2md/blob/master/markdown.py
+
 
 logger = logging.getLogger(__name__)
 
@@ -70,11 +75,11 @@ pairindextypes = {
     'exception': _('exception'),
     'statement': _('statement'),
     'builtin': _('built-in function'),
-}  # Dict[unicode, unicode]
+}  # Dict[str, str]
 
 
 def _pseudo_parse_arglist(signode, arglist):
-    # type: (addnodes.desc_signature, unicode) -> None
+    # type: (addnodes.desc_signature, str) -> None
     """"Parse" a list of arguments separated by commas.
 
     Arguments can have "optional" annotations given by enclosing them in
@@ -124,20 +129,22 @@ def _pseudo_parse_arglist(signode, arglist):
 # This override allows our inline type specifiers to behave like :interface: link
 # when it comes to handling "." and "~" prefixes.
 class XBRXrefMixin(object):
+    _EMPHASIS = nodes.emphasis  # type: ignore
+
     def make_xref(
             self,
-            rolename,  # type: unicode
-            domain,  # type: unicode
-            target,  # type: unicode
-            innernode=nodes.emphasis,  # type: nodes.Node
-            contnode=None,  # type: nodes.Node
-            env=None,  # type: BuildEnvironment
+            rolename,  # type: str
+            domain,  # type: str
+            target,  # type: str
+            innernode=_EMPHASIS,  # type: Node
+            contnode=None,  # type: Node
+            env=None,  # type: sphinx.environment.BuildEnvironment
     ):
-        # type: (...) -> nodes.Node
-        result = super(XBRXrefMixin, self).make_xref(
+        # type: (...) -> Node
+        result = super(XBRXrefMixin, self).make_xref(  # type: ignore
             rolename,
             domain,
-            target,  # type: ignore
+            target,
             innernode,
             contnode,
             env)
@@ -148,21 +155,21 @@ class XBRXrefMixin(object):
                 text = target[1:]
             elif prefix == '~':
                 text = target.split('.')[-1]
-            for node in result.traverse(nodes.Text):
-                node.parent[node.parent.index(node)] = nodes.Text(text)
+            for node in result.traverse(nodes.Text):  # type: ignore
+                node.parent[node.parent.index(node)] = nodes.Text(text)  # type: ignore
                 break
         return result
 
     def make_xrefs(
             self,
-            rolename,  # type: unicode
-            domain,  # type: unicode
-            target,  # type: unicode
-            innernode=nodes.emphasis,  # type: nodes.Node
-            contnode=None,  # type: nodes.Node
-            env=None,  # type: BuildEnvironment
+            rolename,  # type: str
+            domain,  # type: str
+            target,  # type: str
+            innernode=_EMPHASIS,  # type: Node
+            contnode=None,  # type: Node
+            env=None,  # type: sphinx.environment.BuildEnvironment
     ):
-        # type: (...) -> List[nodes.Node]
+        # type: (...) -> List[Node]
         delims = r'(\s*[\[\]\(\),](?:\s*or\s)?\s*|\s+or\s+)'
         delims_re = re.compile(delims)
         sub_targets = re.split(delims, target)
@@ -172,9 +179,9 @@ class XBRXrefMixin(object):
         results = []
         for sub_target in filter(None, sub_targets):
             if split_contnode:
-                contnode = nodes.Text(sub_target)
+                contnode = nodes.Text(sub_target)  # type: ignore
 
-            if delims_re.match(sub_target):  # type: ignore
+            if delims_re.match(sub_target):
                 results.append(contnode or innernode(sub_target, sub_target))
             else:
                 results.append(
@@ -255,7 +262,7 @@ class XBRObject(ObjectDescription):
     allow_nesting = False
 
     def get_signature_prefix(self, sig):
-        # type: (unicode) -> unicode
+        # type: (str) -> str
         """May return a prefix to put before the object name in the
         signature.
         """
@@ -269,7 +276,7 @@ class XBRObject(ObjectDescription):
         return False
 
     def handle_signature(self, sig, signode):
-        # type: (unicode, addnodes.desc_signature) -> Tuple[unicode, unicode]
+        # type: (str, addnodes.desc_signature) -> Tuple[str, str]
         """Transform a XBR signature into RST nodes.
 
         Return (fully qualified name of the thing, interfacename if any).
@@ -278,7 +285,7 @@ class XBRObject(ObjectDescription):
         * it is stripped from the displayed name if present
         * it is added to the full name (return value) if not present
         """
-        m = xbr_sig_re.match(sig)  # type: ignore
+        m = xbr_sig_re.match(sig)
         if m is None:
             raise ValueError
         name_prefix, name, arglist, retann = m.groups()
@@ -349,12 +356,12 @@ class XBRObject(ObjectDescription):
         return fullname, name_prefix
 
     def get_index_text(self, nsname, name):
-        # type: (unicode, unicode) -> unicode
+        # type: (str, str) -> str
         """Return the text for the index entry of the object."""
         raise NotImplementedError('must be implemented in subinterfaces')
 
     def add_target_and_index(self, name_ifc, sig, signode):
-        # type: (unicode, unicode, addnodes.desc_signature) -> None
+        # type: (str, str, addnodes.desc_signature) -> None
         nsname = self.options.get('namespace',
                                   self.env.ref_context.get('xbr:namespace'))
         fullname = (nsname and nsname + '.' or '') + name_ifc[0]
@@ -451,7 +458,7 @@ class XBRNamespacelevel(XBRObject):
         return self.objtype == 'function'
 
     def get_index_text(self, nsname, name_ifc):
-        # type: (unicode, unicode) -> unicode
+        # type: (str, str) -> str
         if self.objtype == 'function':
             if not nsname:
                 return _('%s() (built-in function)') % name_ifc[0]
@@ -472,11 +479,11 @@ class XBRInterfacelike(XBRObject):
     allow_nesting = True
 
     def get_signature_prefix(self, sig):
-        # type: (unicode) -> unicode
+        # type: (str) -> str
         return 'XBR {} '.format(self.objtype.capitalize())
 
     def get_index_text(self, nsname, name_ifc):
-        # type: (unicode, unicode) -> unicode
+        # type: (str, str) -> str
         if self.objtype == 'interface':
             if not nsname:
                 return _('%s (built-in interface)') % name_ifc[0]
@@ -497,7 +504,7 @@ class XBRInterfacemember(XBRObject):
         return self.objtype.endswith('method')
 
     def get_signature_prefix(self, sig):
-        # type: (unicode) -> unicode
+        # type: (str) -> str
         if self.objtype == 'staticmethod':
             return 'static '
         elif self.objtype in [
@@ -507,7 +514,7 @@ class XBRInterfacemember(XBRObject):
         return ''
 
     def get_index_text(self, nsname, name_ifc):
-        # type: (unicode, unicode) -> unicode
+        # type: (str, str) -> str
         name, ifc = name_ifc
         add_namespaces = self.env.config.add_module_names
         if self.objtype == 'method':
@@ -570,9 +577,11 @@ class XBRDecoratorMixin(object):
     """
 
     def handle_signature(self, sig, signode):
-        # type: (unicode, addnodes.desc_signature) -> Tuple[unicode, unicode]
-        ret = super(XBRDecoratorMixin,
-                    self).handle_signature(sig, signode)  # type: ignore
+        # type: (str, addnodes.desc_signature) -> Tuple[str, str]
+        # FIXME
+        # ret = super(XBRDecoratorMixin,
+        #             self).handle_signature(sig, signode)
+        ret = None
         signode.insert(0, addnodes.desc_addname('@', '@'))
         return ret
 
@@ -587,7 +596,7 @@ class XBRDecoratorFunction(XBRDecoratorMixin, XBRNamespacelevel):
     """
 
     def run(self):
-        # type: () -> List[nodes.Node]
+        # type: () -> List[Node]
         # a decorator function is a function after all
         self.name = 'xbr:function'
         return XBRNamespacelevel.run(self)
@@ -599,7 +608,7 @@ class XBRDecoratorMethod(XBRDecoratorMixin, XBRInterfacemember):
     """
 
     def run(self):
-        # type: () -> List[nodes.Node]
+        # type: () -> List[Node]
         self.name = 'xbr:method'
         return XBRInterfacemember.run(self)
 
@@ -621,7 +630,7 @@ class XBRNamespace(Directive):
     }
 
     def run(self):
-        # type: () -> List[nodes.Node]
+        # type: () -> List[Node]
         env = self.state.document.settings.env
         nsname = self.arguments[0].strip()
         noindex = 'noindex' in self.options
@@ -635,7 +644,8 @@ class XBRNamespace(Directive):
             # the namespace in XBRDomain.find_obj()
             env.domaindata['xbr']['objects'][nsname] = (env.docname,
                                                         'namespace')
-            targetnode = nodes.target(
+            _tf = nodes.target  # type: ignore
+            targetnode = _tf(
                 '', '', ids=['namespace-' + nsname], ismod=True)
             self.state.document.note_explicit_target(targetnode)
             # the platform and synopsis aren't printed; in fact, they are only
@@ -661,7 +671,7 @@ class XBRCurrentNamespace(Directive):
     option_spec = {}  # type: Dict
 
     def run(self):
-        # type: () -> List[nodes.Node]
+        # type: () -> List[Node]
         env = self.state.document.settings.env
         nsname = self.arguments[0].strip()
         if nsname == 'None':
@@ -673,7 +683,7 @@ class XBRCurrentNamespace(Directive):
 
 class XBRXRefRole(XRefRole):
     def process_link(self, env, refnode, has_explicit_title, title, target):
-        # type: (BuildEnvironment, nodes.Node, bool, unicode, unicode) -> Tuple[unicode, unicode]  # NOQA
+        # type: (sphinx.environment.BuildEnvironment, Node, bool, str, str) -> Tuple[str, str]  # NOQA
         refnode['xbr:namespace'] = env.ref_context.get('xbr:namespace')
         refnode['xbr:interface'] = env.ref_context.get('xbr:interface')
         if not has_explicit_title:
@@ -704,12 +714,12 @@ class XBRNamespaceIndex(Index):
     shortname = _('namespaces')
 
     def generate(self, docnames=None):
-        # type: (Iterable[unicode]) -> Tuple[List[Tuple[unicode, List[List[Union[unicode, int]]]]], bool]  # NOQA
-        content = {}  # type: Dict[unicode, List]
+        # type: (Iterable[str]) -> Tuple[List[Tuple[str, List[List[Union[str, int]]]]], bool]  # NOQA
+        content = {}  # type: Dict[str, List]
         # list of prefixes to ignore
-        ignores = None  # type: List[unicode]
+        ignores = None  # type: List[str]
         ignores = self.domain.env.config[
-            'modindex_common_prefix']  # type: ignore
+            'modindex_common_prefix']
         ignores = sorted(ignores, key=len, reverse=True)
         # list of all namespaces, sorted by namespace name
         namespaces = sorted(
@@ -784,7 +794,7 @@ class XBRDomain(Domain):
         'staticmethod': ObjType(_('static method'), 'meth', 'obj'),
         'attribute': ObjType(_('attribute'), 'attr', 'obj'),
         'namespace': ObjType(_('namespace'), 'ns', 'obj'),
-    }  # type: Dict[unicode, ObjType]
+    }  # type: Dict[str, ObjType]
 
     directives = {
         'function': XBRNamespacelevel,
@@ -818,13 +828,13 @@ class XBRDomain(Domain):
     initial_data = {
         'objects': {},  # fullname -> docname, objtype
         'namespaces': {},  # nsname -> docname, synopsis, platform, deprecated
-    }  # type: Dict[unicode, Dict[unicode, Tuple[Any]]]
+    }  # type: Dict[str, Dict[str, Tuple[Any]]]
     indices = [
         XBRNamespaceIndex,
     ]
 
     def clear_doc(self, docname):
-        # type: (unicode) -> None
+        # type: (str) -> None
         for fullname, (fn, _l) in list(self.data['objects'].items()):
             if fn == docname:
                 del self.data['objects'][fullname]
@@ -833,7 +843,7 @@ class XBRDomain(Domain):
                 del self.data['namespaces'][nsname]
 
     def merge_domaindata(self, docnames, otherdata):
-        # type: (List[unicode], Dict) -> None
+        # type: (List[str], Dict) -> None
         # XXX check duplicates?
         for fullname, (fn, objtype) in otherdata['objects'].items():
             if fn in docnames:
@@ -843,7 +853,7 @@ class XBRDomain(Domain):
                 self.data['namespaces'][nsname] = data
 
     def find_obj(self, env, nsname, interfacename, name, type, searchmode=0):
-        # type: (BuildEnvironment, unicode, unicode, unicode, unicode, int) -> List[Tuple[unicode, Any]]  # NOQA
+        # type: (sphinx.environment.BuildEnvironment, str, str, str, str, int) -> List[Tuple[str, Any]]  # NOQA
         """Find a XBR object for "name", perhaps using the given namespace
         and/or interfacename.  Returns a list of (name, object entry) tuples.
         """
@@ -855,7 +865,7 @@ class XBRDomain(Domain):
             return []
 
         objects = self.data['objects']
-        matches = []  # type: List[Tuple[unicode, Any]]
+        matches = []  # type: List[Tuple[str, Any]]
 
         newname = None
         if searchmode == 1:
@@ -910,7 +920,7 @@ class XBRDomain(Domain):
 
     def resolve_xref(self, env, fromdocname, builder, type, target, node,
                      contnode):
-        # type: (BuildEnvironment, unicode, Builder, unicode, unicode, nodes.Node, nodes.Node) -> nodes.Node  # NOQA
+        # type: (sphinx.environment.BuildEnvironment, str, Builder, str, str, Node, Node) -> Node  # NOQA
         nsname = node.get('xbr:namespace')
         ifcname = node.get('xbr:interface')
         searchmode = node.hasattr('refspecific') and 1 or 0
@@ -936,10 +946,10 @@ class XBRDomain(Domain):
 
     def resolve_any_xref(self, env, fromdocname, builder, target, node,
                          contnode):
-        # type: (BuildEnvironment, unicode, Builder, unicode, nodes.Node, nodes.Node) -> List[Tuple[unicode, nodes.Node]]  # NOQA
+        # type: (sphinx.environment.BuildEnvironment, str, sphinx.builders.Builder, str, Node, Node) -> List[Tuple[str, Node]]  # NOQA
         nsname = node.get('xbr:namespace')
         ifcname = node.get('xbr:interface')
-        results = []  # type: List[Tuple[unicode, nodes.Node]]
+        results = []  # type: List[Tuple[str, Node]]
 
         # always search in "refspecific" mode with the :any: role
         matches = self.find_obj(env, nsname, ifcname, target, None, 1)
@@ -955,7 +965,7 @@ class XBRDomain(Domain):
         return results
 
     def _make_namespace_refnode(self, builder, fromdocname, name, contnode):
-        # type: (Builder, unicode, unicode, nodes.Node) -> nodes.Node
+        # type: (sphinx.builders.Builder, str, str, Node) -> Node
         # get additional info for namespaces
         docname, synopsis, platform, deprecated = self.data['namespaces'][name]
         title = name
@@ -969,7 +979,7 @@ class XBRDomain(Domain):
                             contnode, title)
 
     def get_objects(self):
-        # type: () -> Iterator[Tuple[unicode, unicode, unicode, unicode, unicode, int]]
+        # type: () -> Iterator[Tuple[str, str, str, str, str, int]]
         for nsname, info in iteritems(self.data['namespaces']):
             yield (nsname, nsname, 'namespace', info[0], 'namespace-' + nsname,
                    0)
@@ -978,7 +988,7 @@ class XBRDomain(Domain):
                 yield (refname, refname, type, docname, refname, 1)
 
     def get_full_qualified_name(self, node):
-        # type: (nodes.Node) -> unicode
+        # type: (Node) -> str
         nsname = node.get('xbr:namespace')
         ifcname = node.get('xbr:interface')
         target = node.get('reftarget')
@@ -999,7 +1009,7 @@ class XBRBuilder(Builder):
         pass
 
     def get_outdated_docs(self):
-        # type: () -> Union[unicode, Iterable[unicode]]
+        # type: () -> Union[str, Iterable[str]]
         """Return an iterable of output files that are outdated, or a string
         describing what an update build will build.
 
@@ -1011,12 +1021,12 @@ class XBRBuilder(Builder):
         return 'xbr.json'
 
     def prepare_writing(self, docnames):
-        # type: (Set[unicode]) -> None
+        # type: (Set[str]) -> None
         """A place where you can add logic before :meth:`write_doc` is run"""
         print('XBR: prepare_writing()')
 
     def get_target_uri(self, docname, typ=None):
-        # type: (unicode, unicode) -> unicode
+        # type: (str, str) -> str
         """Return the target URI for a document name.
 
         *typ* can be used to qualify the link characteristic for individual
@@ -1028,7 +1038,7 @@ class XBRBuilder(Builder):
         return target_uri
 
     def write_doc(self, docname, doctree):
-        # type: (unicode, nodes.Node) -> None
+        # type: (str, Node) -> None
         """Where you actually write something to the filesystem."""
         print('XBR: write_doc(docname={}, doctree={})'.format(
             docname, type(doctree)))
@@ -1047,7 +1057,6 @@ class XBRBuilder(Builder):
 
         _print(doctree)
 
-
 #        for node in doctree:
 #            print(dir(node), node.attributes)
 #            for child in node.children:
@@ -1063,7 +1072,6 @@ class XBRBuilder(Builder):
 
 
 def setup(app):
-    # type: (Sphinx) -> Dict[unicode, Any]
     app.add_domain(XBRDomain)
     app.add_builder(XBRBuilder)
 
@@ -1073,8 +1081,3 @@ def setup(app):
         'parallel_read_safe': True,
         'parallel_write_safe': True,
     }
-
-
-# https://github.com/sphinx-contrib/restbuilder/blob/master/sphinxcontrib/builders/rst.py
-# https://github.com/Arello-Mobile/sphinx-confluence/blob/master/sphinx_confluence/__init__.py
-# https://github.com/cgwrench/rst2md/blob/master/markdown.py

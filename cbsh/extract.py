@@ -30,7 +30,7 @@
 
 import re
 import os
-from typing import List
+from typing import List  # noqa: F401
 
 # .. xbr:namespace:: network.xbr.mobility.navigation
 # .. xbr:interface:: INavigationMonitor
