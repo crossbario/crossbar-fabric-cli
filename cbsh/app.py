@@ -192,8 +192,11 @@ class Application(object):
         else:
             click.echo('Active user profile: {}'.format(style_ok(profile)))
 
-        privkey_path = os.path.join(cbf_dir, profile_obj.privkey or u'{}.priv'.format(profile))
-        pubkey_path = os.path.join(cbf_dir, profile_obj.pubkey or u'default.pub')
+        privkey_path = os.path.join(
+            cbf_dir, profile_obj.privkey
+            or u'{}.priv'.format(profile))  # noqa: W503
+        pubkey_path = os.path.join(cbf_dir, profile_obj.pubkey
+                                   or u'default.pub')  # noqa: W503
         key_obj = key.UserKey(privkey_path, pubkey_path)
 
         return key_obj, profile_obj

@@ -251,7 +251,8 @@ def cmd_quickstart(cfg):
     '--new-code',
     is_flag=True,
     default=False,
-    help="Request sending of a new authentication code (even though an old one is still pending)",
+    help=  # noqa: E251
+    "Request sending of a new authentication code (even though an old one is still pending)",
 )
 @click.pass_context
 def cmd_auth(ctx, code, new_code):
