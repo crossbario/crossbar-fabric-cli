@@ -1,8 +1,4 @@
-# https://docs.travis-ci.com/user/reference/overview/#Virtualisation-Environment-vs-Operating-System
-sudo: false
-dist: trusty
-
-language: python 3.6
+language: python
 
 env:
   - TOX_ENV=flake8
