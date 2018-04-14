@@ -47,7 +47,6 @@ txaio.use_asyncio()
 from cbsh import app, command, quickstart  # noqa: E402
 from cbsh import __version__, __build__  # noqa: E402
 
-
 USAGE = """
 Examples:
 To start the interactive shell, use the "shell" command:
@@ -59,7 +58,6 @@ using the "--profile" option:
 
     cbf --profile mister-test1 shell
 """
-
 
 # the global, singleton app object
 _app = app.Application()

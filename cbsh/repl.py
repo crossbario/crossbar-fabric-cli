@@ -143,7 +143,8 @@ class ClickCompleter(Completer):
             incomplete = ''
 
         # FIXME
-        ctx = click._bashcomplete.resolve_ctx(self.cli, '', args)  # type: ignore
+        _bc = click._bashcomplete  # type: ignore
+        ctx = _bc.resolve_ctx(self.cli, '', args)
         if ctx is None:
             return
 

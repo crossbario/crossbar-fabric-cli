@@ -334,7 +334,8 @@ class CmdStartContainerComponent(CmdStart):
             config[u'realm'] = self.realm
 
         if self.transport_type == u'websocket':
-            config[u'transport'][u'url'] = self.transport_ws_url  # type: ignore
+            _t = config[u'transport'][u'url']  # type: ignore
+            _t = self.transport_ws_url
 
         if self.transport_endpoint_type == u'tcp':
             _ep = config[u'transport'][u'endpoint']  # type: ignore

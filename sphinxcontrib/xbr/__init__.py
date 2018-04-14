@@ -56,7 +56,6 @@ from sphinx.util.nodes import make_refnode
 # https://github.com/Arello-Mobile/sphinx-confluence/blob/master/sphinx_confluence/__init__.py
 # https://github.com/cgwrench/rst2md/blob/master/markdown.py
 
-
 logger = logging.getLogger(__name__)
 
 # REs for XBR signatures
@@ -142,12 +141,7 @@ class XBRXrefMixin(object):
     ):
         # type: (...) -> Node
         result = super(XBRXrefMixin, self).make_xref(  # type: ignore
-            rolename,
-            domain,
-            target,
-            innernode,
-            contnode,
-            env)
+            rolename, domain, target, innernode, contnode, env)
         result['refspecific'] = True
         if target.startswith(('.', '~')):
             prefix, result['reftarget'] = target[0], target[1:]
@@ -156,7 +150,8 @@ class XBRXrefMixin(object):
             elif prefix == '~':
                 text = target.split('.')[-1]
             for node in result.traverse(nodes.Text):  # type: ignore
-                node.parent[node.parent.index(node)] = nodes.Text(text)  # type: ignore
+                node.parent[node.parent.index(node)] = nodes.Text(
+                    text)  # type: ignore
                 break
         return result
 
@@ -645,8 +640,7 @@ class XBRNamespace(Directive):
             env.domaindata['xbr']['objects'][nsname] = (env.docname,
                                                         'namespace')
             _tf = nodes.target  # type: ignore
-            targetnode = _tf(
-                '', '', ids=['namespace-' + nsname], ismod=True)
+            targetnode = _tf('', '', ids=['namespace-' + nsname], ismod=True)
             self.state.document.note_explicit_target(targetnode)
             # the platform and synopsis aren't printed; in fact, they are only
             # used in the nsindex currently
@@ -718,8 +712,7 @@ class XBRNamespaceIndex(Index):
         content = {}  # type: Dict[str, List]
         # list of prefixes to ignore
         ignores = None  # type: List[str]
-        ignores = self.domain.env.config[
-            'modindex_common_prefix']
+        ignores = self.domain.env.config['modindex_common_prefix']
         ignores = sorted(ignores, key=len, reverse=True)
         # list of all namespaces, sorted by namespace name
         namespaces = sorted(
@@ -1056,6 +1049,7 @@ class XBRBuilder(Builder):
                 _print(node.children)
 
         _print(doctree)
+
 
 #        for node in doctree:
 #            print(dir(node), node.attributes)

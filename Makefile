@@ -54,7 +54,7 @@ test_pytest:
 
 # auto-format code - WARNING: this my change files, in-place!
 autoformat:
-	autopep8 -ri --aggressive cbsh sphinxcontrib
+	#autopep8 -ri --aggressive cbsh sphinxcontrib
 	yapf -ri cbsh sphinxcontrib
 
 
