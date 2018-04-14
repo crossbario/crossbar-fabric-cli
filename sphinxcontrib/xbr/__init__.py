@@ -150,8 +150,8 @@ class XBRXrefMixin(object):
             elif prefix == '~':
                 text = target.split('.')[-1]
             for node in result.traverse(nodes.Text):  # type: ignore
-                node.parent[node.parent.index(node)] = nodes.Text(
-                    text)  # type: ignore
+                _t = nodes.Text(text)  # type: ignore
+                node.parent[node.parent.index(node)] = _t
                 break
         return result
 
