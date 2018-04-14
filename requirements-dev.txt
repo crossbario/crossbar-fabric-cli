@@ -7,5 +7,7 @@ tox
 twine
 pytest
 sphinx
+pyenchant
+sphinxcontrib-spelling
 sphinx_rtd_theme
 pyinstaller

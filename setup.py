@@ -60,6 +60,8 @@ setup(
         'cookiecutter>=1.6.0',      # BSD
         'stringcase>=1.2.0',        # MIT
         'sphinx>=1.7.2',                    # BSD
+        'pyenchant>=2.0.0',                 # LGPL
+        'sphinxcontrib-spelling>=4.1.0',    # BSD
         'sphinxcontrib-websupport>=1.0.1',  # BSD
         'sphinx_rtd_theme>=0.3.0',          # MIT
     ],
