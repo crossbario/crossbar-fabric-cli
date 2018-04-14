@@ -143,7 +143,7 @@ class ClickCompleter(Completer):
             incomplete = ''
 
         # FIXME
-        ctx = click._bashcomplete.resolve_ctx(self.cli, '', args)  # noqa
+        ctx = click._bashcomplete.resolve_ctx(self.cli, '', args)  # type: ignore
         if ctx is None:
             return
 
@@ -173,7 +173,7 @@ class ClickCompleter(Completer):
 
         if isinstance(ctx.command, click.MultiCommand):
             for name in ctx.command.list_commands(ctx):
-                command = ctx.command.get_command(ctx, name)
+                command = ctx.command.get_command(ctx, name)  # type: ignore
                 choices.append(
                     Completion(
                         name,

@@ -104,7 +104,7 @@ class XBRIDLNode(object):
         self.start_line = start_line
         self.line_no = line_no
         self.line = line
-        self.children = []
+        self.children = []  # type: List[XBRIDLNode]
 
     def __str__(self):
         return 'XBRIDLNode[{id}](level={level}, parent={parent}, file_line_no={file_line_no}, line="{line}")'.format(
@@ -200,14 +200,6 @@ def _parse_tree(lines, root):
                 # skip empty line
                 pass
     return nodes
-
-
-def _test_parse_tree():
-    lines = TEST.splitlines()
-    nodes = _parse_tree(lines)
-
-    for node in nodes:
-        print(node)
 
 
 def _extract_from_block(block, start_line):

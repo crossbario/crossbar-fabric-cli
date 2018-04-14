@@ -32,16 +32,16 @@ from __future__ import absolute_import
 
 import re
 
-from typing import List, Tuple, Dict, Iterable, Iterator, Union, Any, Set
+from typing import List, Tuple, Dict, Iterable, Iterator, Union, Any, Set  # noqa: F401
 
 from six import iteritems
 
-import docutils
+import docutils  # noqa: F401
 from docutils import nodes  # noqa
 from docutils.nodes import Node  # noqa
 from docutils.parsers.rst import Directive, directives  # noqa
 
-import sphinx
+import sphinx  # noqa: F401
 from sphinx import addnodes
 from sphinx.builders import Builder
 from sphinx.directives import ObjectDescription
