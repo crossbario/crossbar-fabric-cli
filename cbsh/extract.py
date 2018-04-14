@@ -30,7 +30,6 @@
 
 import re
 import os
-from pprint import pprint
 
 # .. xbr:namespace:: network.xbr.mobility.navigation
 # .. xbr:interface:: INavigationMonitor
@@ -78,14 +77,14 @@ PAT_IFC = re.compile(r'^\s*.. xbr:interface:: (?P<name>\S.*)$')
 # re.. xbr:event:: on_navigation_started(navigation_id, destination_name, coordinates, estimated_arrival, estimated_distance)
 
 
-####------------------- 1
-########--------------- 2
-########--------------- 3
-############----------- 4
-########--------------- 5
-####------------------- 6
-####------------------- 7
-########--------------- 8
+# ####------------------- 1
+# ########--------------- 2
+# ########--------------- 3
+# ############----------- 4
+# ########--------------- 5
+# ####------------------- 6
+# ####------------------- 7
+# ########--------------- 8
 
 # (None, [(1, []), (6, []), (8, [])])
 
@@ -132,7 +131,7 @@ def _parse_tree(lines, root):
                 print(is_non_empty, level, stack[-1].level, ls, line_no, '||{}||'.format(line))
 
             if level > stack[-1].level + 1:
-                raise ValueError('Indentation too deep: "{}" [level={}, cur_level={}, whitespace={}, line_no={}]'.format(line, level, cur_level, ls, line_no))
+                raise ValueError('Indentation too deep: "{}" [level={}, whitespace={}, line_no={}]'.format(line, level, ls, line_no))
 
             if level > stack[-1].level:
 
@@ -196,10 +195,9 @@ def _extract_from_block(block, start_line):
     l0 = lines[0]
     if l0.startswith('.. xbr:namespace::'):
         ns_match = PAT_NSP.match(lines[0])
-        if ns_match:
-            ns_name = ns_match.group('name')
-        else:
+        if not ns_match:
             raise ValueError('invalid namespace declaration: {}'.format(l0))
+        #     ns_name = ns_match.group('name')
     root = XBRIDLNode(start_line=start_line)
     nodes = _parse_tree(lines, root)
     return nodes

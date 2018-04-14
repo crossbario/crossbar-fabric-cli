@@ -205,7 +205,7 @@ class UserKey(object):
                 msg = u'Crossbar.io user public key\n\n'
                 _write_node_key(pubkey_path, pub_tags, msg)
 
-                click.echo('Re-created user public key from private key: {}'.format(style_ok(pub_path)))
+                click.echo('Re-created user public key from private key: {}'.format(style_ok(pubkey_path)))
 
             click.echo('User public key loaded: {}'.format(style_ok(pubkey_path)))
             click.echo('User private key loaded: {}'.format(style_ok(privkey_path)))

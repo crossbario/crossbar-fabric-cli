@@ -286,7 +286,6 @@ class Application(object):
 
         elif self._output_format == Application.OUTPUT_FORMAT_PLAIN:
 
-            #console_str = u'{}'.format(pprint.pformat(result.result))
             console_str = u'{}'.format(result)
 
         else:
@@ -412,10 +411,10 @@ class Application(object):
             # has been established and is ready
             click.echo('Entering event loop ..')
             transport, protocol = loop.run_until_complete(_res)
-            #click.echo('transport, protocol: {} {}'.format(transport, protocol))
+            # click.echo('transport, protocol: {} {}'.format(transport, protocol))
             # loop.run_forever()
             session_details = loop.run_until_complete(ready)
-            #click.echo('SessionDetails: {}'.format(session_details))
+            # click.echo('SessionDetails: {}'.format(session_details))
 
         except ApplicationError as e:
 

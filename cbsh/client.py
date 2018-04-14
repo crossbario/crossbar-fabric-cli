@@ -29,7 +29,6 @@
 #####################################################################################
 
 import argparse
-import asyncio
 import binascii
 import os
 import sys

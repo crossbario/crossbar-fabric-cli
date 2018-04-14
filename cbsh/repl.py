@@ -155,10 +155,8 @@ class ClickCompleter(Completer):
         cmds.reverse()
 
         # print(cmds)
-
         # if ctx.parent:
         #    print('COMMAND: ', ctx.parent.command.name)
-        #print('COMMAND: ', ctx.command.name)
         # pprint(dir(ctx.command))
         # print(document.get_word_before_cursor())
         # print(document.get_word_before_cursor(WORD=True))

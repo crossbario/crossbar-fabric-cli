@@ -38,7 +38,7 @@ import click
 
 # this is for pyinstaller! otherwise it fails to find this dep.
 # see: http://cffi.readthedocs.io/en/latest/cdef.html
-import _cffi_backend
+import _cffi_backend  # noqa
 
 
 if False:
@@ -56,8 +56,8 @@ if False:
         def decorator(f):
             if 'help' in attrs:
                 attrs['help'] = inspect.cleandoc(attrs['help'])
-            ArgumentClass = attrs.pop('cls', Argument)
-            _param_memo(f, ArgumentClass(param_decls, **attrs))
+            _Klass = attrs.pop('cls', Argument)
+            _param_memo(f, _Klass(param_decls, **attrs))
             return f
         return decorator
 
@@ -389,8 +389,7 @@ def cmd_start(cfg):
 # async def cmd_start_worker(cfg, node, worker, worker_type, options=None):
 #    cmd = command.CmdStartWorker(node, worker, worker_type, worker_options=options)
 #    await cfg.app.run_command(cmd)
-
-from cbsh.command import CmdStartContainerWorker, CmdStartContainerComponent
+# from cbsh.command import CmdStartContainerWorker, CmdStartContainerComponent
 
 
 @cmd_start.command(name='container-worker', help='start a container worker')
