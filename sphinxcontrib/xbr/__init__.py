@@ -37,7 +37,8 @@ from typing import List, Tuple, Dict, Iterable, Iterator, Union, Any, Set  # noq
 from six import iteritems
 
 import docutils  # noqa: F401
-from docutils import nodes  # noqa
+
+from docutils import nodes  # type: ignore
 from docutils.nodes import Node  # noqa
 from docutils.parsers.rst import Directive, directives  # noqa
 

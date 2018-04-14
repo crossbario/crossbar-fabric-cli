@@ -46,7 +46,7 @@ test_yapf:
 
 test_mypy:
 	tox -e mypy
-	#mypy cbsh sphinxcontrib
+	#mypy cbsh
 
 test_pytest:
 	tox -e pytest
