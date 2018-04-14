@@ -35,18 +35,12 @@ upload: clean
 		dist/cbsh-*.whl \
 		s3://fabric-deploy/cbsh/
 
-# This will run pep8, pyflakes and can skip lines that end with # noqa
 flake8:
-	flake8 --ignore=E501,E402,N802 cbsh
+	flake8 --ignore=E501,E402,N802 cbsh sphinxcontrib
 
-pep8:
-	pep8 --statistics --ignore=E501 -qq .
+mypy:
+	mypy cbsh sphinxcontrib
 
-pep8_show_e231:
-	pep8 --select=E231 --show-source
-
-autopep8:
-	autopep8 -ri --aggressive --ignore=E501 .
 
 # build a statically linked executable using Pyinstaller
 build_linux_exe: clean

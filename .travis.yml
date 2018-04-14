@@ -2,8 +2,7 @@
 sudo: false
 dist: trusty
 
-language:
-  - python 3.6
+language: python 3.6
 
 env:
   - TOX_ENV=flake8
