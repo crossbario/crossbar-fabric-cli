@@ -1,86 +1,90 @@
-.PHONY: docs
+.PHONY: install test docs clean
 
 default:
-	@echo "targets: clean, install, flake8, upload"
+	@echo "Main targets: install, test, clean"
 
+
+# cleanup all build artifacts
 clean:
-	-rm -f ./.cbsh-history
-	-rm -rf ./.tox
-	-rm -rf build
-	-rm -rf dist
-	-rm -rf *.egg-info
+	-rm -rf ./build
+	-rm -rf ./dist
 	-rm -rf ./docs/_build
 	-rm -rf ./tests/_build
+	-rm -rf *.egg-info
+	-rm -f ./.cbsh-history
 	-rm -rf ./.pytest_cache
-	-find . -type d -name "__pycache__" -exec rm -rf {} \;
-	-find . -name "*.pyc" -exec rm -f {} \;
 
-docs:
-	sphinx-build -b html ./docs ./docs/_build
 
+# install all dev tools and package in dev mode
 install:
-	#pip install -r requirements-test.txt
-	#pip install -r requirements-rtd.txt
-	pip install -e .
+	pip install --no-cache -r requirements-dev.txt
+	pip install --no-cache -e .
 
-travis:
+# install package only, as users (regular mode)
+install_package:
+	pip install --no-cache .
+
+# to encrypt secret key material so that it can be inserted into .travis files,
+# the travis tool is needed. install using this target.
+# usage: /usr/local/bin/travis encrypt access_key_id="..."
+install_travis:
 	sudo apt install ruby-dev
 	sudo gem install travis
-	# /usr/local/bin/travis encrypt access_key_id="..."
-
-# upload to our internal deployment system
-upload: clean
-	python setup.py bdist_wheel
-	aws s3 cp --acl public-read \
-		dist/cbsh-*.whl \
-		s3://fabric-deploy/cbsh/
-
-test: flake8 yapf mypy
-
-flake8:
-	flake8 --ignore=E501 cbsh sphinxcontrib
-
-yapf:
-	yapf -rd cbsh sphinxcontrib
-
-mypy:
-	mypy cbsh sphinxcontrib
 
 
-format:
+# run all tests via Tox (this is also how tests are run on Travis)
+test:
+	tox -e flake8,yapf,mypy,pytest
+
+test_flake8:
+	tox -e flake8
+	#flake8 --ignore=E501 cbsh sphinxcontrib
+
+test_yapf:
+	tox -e yapf
+	#yapf -rd cbsh sphinxcontrib
+
+test_mypy:
+	tox -e mypy
+	#mypy cbsh sphinxcontrib
+
+test_pytest:
+	tox -e pytest
+	#pytest
+
+# auto-format code - WARNING: this my change files, in-place!
+autoformat:
 	autopep8 -ri --aggressive cbsh sphinxcontrib
 	yapf -ri cbsh sphinxcontrib
 
 
-# build a statically linked executable using Pyinstaller
-build_linux_exe: clean
-	python setup.py sdist
-	docker build -t cbsh -f docker/Dockerfile .
-	docker create --name cbsh-build cbsh
-	docker cp cbsh-build:/build/dist/cbsh ./dist/
-	docker rm --force cbsh-build
-	docker rmi cbsh
+# build documentation
+docs:
+	sphinx-build -b html ./docs ./docs/_build
 
-build:
+
+# build source distribution and universal egg - which is what
+# we publish to pypi
+build_package:
 	python setup.py sdist
 	python setup.py bdist_wheel
 
-
-publish: build
+# publish package to pypi: https://pypi.python.org/pypi/cbsh
+publish_package_pypi: build_package
 	twine upload dist/*
 
+# publish package to crossbar s3
+publish_package_crossbar: build_package
+	aws s3 cp --acl public-read \
+		./dist/cbsh-*.whl \
+		s3://download.crossbario.com/cbsh/wheel/cbsh
 
-#
-# cbsh as a one-file executable (below is for Linux)
-#
+publish_package: publish_package_crossbar publish_package_pypi
 
-# install pyinstaller
-exe_dev:
-	pip install --no-cache --upgrade pyinstaller
-	pip uninstall -y enum34
 
-# build one-file executable using pyinstaller
-exe_build: install
+# build Linux exe
+build_exe:
+	pip install .
 	pyinstaller \
 		--clean \
 		--onefile \
@@ -91,17 +95,13 @@ exe_build: install
 		--hidden-import "sphinxcontrib.xbr" \
 		cbsh/cli.py
 
-# upload to S3:
+# publish Linux exe to crossbar s3:
 # https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/linux/cbsh
-exe_upload: exe_build
+publish_exe: build_exe
 	aws s3 cp --acl public-read \
 		./dist/cbsh \
 		s3://download.crossbario.com/cbsh/linux/cbsh
 
-# install exe locally
-exe_install: exe_build
-	sudo mkdir -p /opt/cbsh/bin
-	sudo cp ./dist/cbsh /opt/cbsh/bin/
-
-# new release (do all of above)
-exe_release: exe_install exe_upload
+# install Linux exe locally
+install_exe: build_exe
+	sudo cp ./dist/cbsh /usr/local/bin/cbsh

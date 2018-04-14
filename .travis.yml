@@ -34,4 +34,4 @@ matrix:
       env: TOX_ENV=mypy
 
     - python: 3.6
-      env: TOX_ENV=py36
+      env: TOX_ENV=pytest
