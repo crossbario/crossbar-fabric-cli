@@ -39,6 +39,5 @@ def test_localnow():
 
 
 class TestClass(object):
-
     def test_one(self):
         assert True

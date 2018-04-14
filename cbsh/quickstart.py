@@ -95,7 +95,6 @@ readme_filename = 'README.md'
 makefile_filename = 'Makefile'
 docker_compose_filename = 'docker-compose.yml'
 
-
 DEVMODE = False
 
 if DEVMODE:
@@ -105,32 +104,41 @@ else:
     CC1 = 'gh:crossbario'
     CC2 = 'gh:xbr'
 
-
 # built-in cookiecutters.
 #
 _cookiecutters = [
     # Crossbar.io
     (None, 'Crossbar.io'),
-    ('{}/cookiecutter-crossbar'.format(CC1), 'Create a Crossbar.io OSS app router'),
-    ('{}/cookiecutter-crossbar-fabric'.format(CC1), 'Create a Crossbar.io Fabric app router'),
-    ('{}/cookiecutter-crossbar-fabric-center'.format(CC1), 'Create a Crossbar.io Fabric cluster controller'),
+    ('{}/cookiecutter-crossbar'.format(CC1),
+     'Create a Crossbar.io OSS app router'),
+    ('{}/cookiecutter-crossbar-fabric'.format(CC1),
+     'Create a Crossbar.io Fabric app router'),
+    ('{}/cookiecutter-crossbar-fabric-center'.format(CC1),
+     'Create a Crossbar.io Fabric cluster controller'),
 
     # XBR
     (None, 'XBR'),
     ('{}/cookiecutter-xbr-api'.format(CC2), 'Create a XBR API bundle'),
-    ('{}/cookiecutter-crossbar-fabric-xbr'.format(CC1), 'Create a Crossbar.io XBR data market'),
+    ('{}/cookiecutter-crossbar-fabric-xbr'.format(CC1),
+     'Create a Crossbar.io XBR data market'),
 
     # Autobahn
     (None, 'Autobahn'),
-    ('{}/cookiecutter-autobahn-python'.format(CC1), 'Create a Python based app or XBR service'),
-    ('{}/cookiecutter-autobahn-js'.format(CC1), 'Create a JavaScript based app or XBR service'),
-    ('{}/cookiecutter-autobahn-java'.format(CC1), 'Create a Java based app or XBR service'),
-    ('{}/cookiecutter-autobahn-cpp'.format(CC1), 'Create a C++ based app or XBR service'),
+    ('{}/cookiecutter-autobahn-python'.format(CC1),
+     'Create a Python based app or XBR service'),
+    ('{}/cookiecutter-autobahn-js'.format(CC1),
+     'Create a JavaScript based app or XBR service'),
+    ('{}/cookiecutter-autobahn-java'.format(CC1),
+     'Create a Java based app or XBR service'),
+    ('{}/cookiecutter-autobahn-cpp'.format(CC1),
+     'Create a C++ based app or XBR service'),
 
     # Community project
     (None, 'Community'),
-    ('{}/cookiecutter-wampsharp'.format(CC1), 'Create a WampSharp/C# based app service'),
-    ('{}/cookiecutter-nexus-go'.format(CC1), 'Create a Nexus/Go based app service'),
+    ('{}/cookiecutter-wampsharp'.format(CC1),
+     'Create a WampSharp/C# based app service'),
+    ('{}/cookiecutter-nexus-go'.format(CC1),
+     'Create a Nexus/Go based app service'),
 ]
 
 
@@ -153,10 +161,7 @@ def _initialize():
 
     docker_compose_filename = 'docker-compose.yml'
     if not os.path.isfile(docker_compose_filename):
-        docker_compose = {
-            'version': '3.0',
-            'services': {}
-        }
+        docker_compose = {'version': '3.0', 'services': {}}
         with open(docker_compose_filename, 'w') as fd:
             fd.write(yaml.safe_dump(docker_compose))
         click.echo('{} created'.format(docker_compose_filename))
@@ -167,16 +172,21 @@ def _initialize():
         docker_compose = yaml.safe_load(data)
 
     if not isinstance(docker_compose, dict):
-        raise click.ClickException('invalid type {} found in {} for top level object'.format(type(docker_compose), docker_compose_filename))
+        raise click.ClickException(
+            'invalid type {} found in {} for top level object'.format(
+                type(docker_compose), docker_compose_filename))
 
     if 'services' not in docker_compose:
-        raise click.ClickException('no services attribute found in top level object for {}'.format(docker_compose_filename))
+        raise click.ClickException(
+            'no services attribute found in top level object for {}'.format(
+                docker_compose_filename))
 
     return docker_compose
 
 
 def run(cfg):
-    click.echo('\n{cb} Project Quickstart\n'.format(cb=hl('Crossbar.io / XBR')))
+    click.echo(
+        '\n{cb} Project Quickstart\n'.format(cb=hl('Crossbar.io / XBR')))
 
     _templates = {}
 
@@ -188,7 +198,8 @@ def run(cfg):
             num += 1
             _templates[num] = template
             template_disp = hl(template, bold=False)
-            click.echo('  {num}: {desc:46s} [{template}]'.format(num=hl(str(num).ljust(3)), desc=desc, template=template_disp))
+            click.echo('  {num}: {desc:46s} [{template}]'.format(
+                num=hl(str(num).ljust(3)), desc=desc, template=template_disp))
         else:
             click.echo('\n {}:\n'.format(hl(desc)))
     click.echo('')
@@ -215,17 +226,21 @@ def run(cfg):
 
         # cookiecutter returns the fully qualified path within which the template
         # was initialized.
-        output_dir = cookiecutter(template, output_dir=output_dir, extra_context=extra_context)
+        output_dir = cookiecutter(
+            template, output_dir=output_dir, extra_context=extra_context)
 
         # the last part of the fully qualified output directory is the service name
         # that comes from "cookiecutter.json"
         service_name = os.path.basename(output_dir)
 
         # we expect the cookiecutter to produce a docker-compose-<service_name>.yml file
-        service_docker_compose_filename = os.path.join(output_dir, 'docker-compose-{}.yml'.format(service_name))
+        service_docker_compose_filename = os.path.join(
+            output_dir, 'docker-compose-{}.yml'.format(service_name))
 
         if not os.path.isfile(service_docker_compose_filename):
-            raise click.ClickException('docker-compose fragment for service was not generated by cookiecutter. missing file:\n{}'.format(service_docker_compose_filename))
+            raise click.ClickException(
+                'docker-compose fragment for service was not generated by cookiecutter. missing file:\n{}'.
+                format(service_docker_compose_filename))
 
         # now load the docker-compose service fragment from the file generated by cookiecutter
         service_docker_compose = None
@@ -235,9 +250,12 @@ def run(cfg):
 
         # update the docker-compose object
         if service_name in docker_compose['services']:
-            click.echo('updating service "{}" existing in docker-compose.yml'.format(service_name))
+            click.echo(
+                'updating service "{}" existing in docker-compose.yml'.format(
+                    service_name))
         else:
-            click.echo('adding service "{}" to docker-compose.yml'.format(service_name))
+            click.echo('adding service "{}" to docker-compose.yml'.format(
+                service_name))
 
         docker_compose['services'][service_name] = service_docker_compose
 

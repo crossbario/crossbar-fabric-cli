@@ -42,7 +42,6 @@ import os
 # traverse in-memory data structure (trie)
 # export data to
 
-
 TEST = """.. xbr:interface:: INavigationMonitor
 
     1.0 baz
@@ -76,7 +75,6 @@ PAT_IFC = re.compile(r'^\s*.. xbr:interface:: (?P<name>\S.*)$')
 
 # re.. xbr:event:: on_navigation_started(navigation_id, destination_name, coordinates, estimated_arrival, estimated_distance)
 
-
 # ####------------------- 1
 # ########--------------- 2
 # ########--------------- 3
@@ -90,10 +88,16 @@ PAT_IFC = re.compile(r'^\s*.. xbr:interface:: (?P<name>\S.*)$')
 
 
 class XBRIDLNode(object):
-
-    def __init__(self, level=0, parent=None, start_line=0, line_no=0, line=None):
+    def __init__(self,
+                 level=0,
+                 parent=None,
+                 start_line=0,
+                 line_no=0,
+                 line=None):
         if parent and parent.level != level - 1:
-            raise Exception('invalid parent level {} for node with level {}'.format(parent.level, level))
+            raise Exception(
+                'invalid parent level {} for node with level {}'.format(
+                    parent.level, level))
         self.level = level
         self.parent = parent or self
         self.start_line = start_line
@@ -102,7 +106,13 @@ class XBRIDLNode(object):
         self.children = []
 
     def __str__(self):
-        return 'XBRIDLNode[{id}](level={level}, parent={parent}, file_line_no={file_line_no}, line="{line}")'.format(id=id(self), level=self.level, parent=id(self.parent), line_no=self.line_no, file_line_no=self.start_line + self.line_no, line=self.line)
+        return 'XBRIDLNode[{id}](level={level}, parent={parent}, file_line_no={file_line_no}, line="{line}")'.format(
+            id=id(self),
+            level=self.level,
+            parent=id(self.parent),
+            line_no=self.line_no,
+            file_line_no=self.start_line + self.line_no,
+            line=self.line)
 
 
 def _parse_tree(lines, root):
@@ -124,24 +134,26 @@ def _parse_tree(lines, root):
 
         if is_non_empty:
             if ls % 4:
-                raise ValueError('Indentation not a multiple of 4 spaces: "{0}" [line {}]'.format(line, line_no))
+                raise ValueError(
+                    'Indentation not a multiple of 4 spaces: "{0}" [line {}]'.
+                    format(line, line_no))
             level = int(ls / 4) + 1
 
             if 'procedure' in line:
-                print(is_non_empty, level, stack[-1].level, ls, line_no, '||{}||'.format(line))
+                print(is_non_empty, level, stack[-1].level, ls, line_no,
+                      '||{}||'.format(line))
 
             if level > stack[-1].level + 1:
-                raise ValueError('Indentation too deep: "{}" [level={}, whitespace={}, line_no={}]'.format(line, level, ls, line_no))
+                raise ValueError(
+                    'Indentation too deep: "{}" [level={}, whitespace={}, line_no={}]'.
+                    format(line, level, ls, line_no))
 
             if level > stack[-1].level:
 
                 # print(line)
 
-                node = XBRIDLNode(level,
-                                  stack[-1],
-                                  stack[-1].start_line,
-                                  line_no,
-                                  line)
+                node = XBRIDLNode(level, stack[-1], stack[-1].start_line,
+                                  line_no, line)
                 stack[-1].children.append(node)
 
                 nodes.append(node)
@@ -153,7 +165,8 @@ def _parse_tree(lines, root):
 
                 print('ZZZ ', line)
 
-                node = XBRIDLNode(level, stack[-1].parent, stack[-1].start_line, line_no, line)
+                node = XBRIDLNode(level, stack[-1].parent,
+                                  stack[-1].start_line, line_no, line)
                 stack[-1].children.append(node)
 
                 nodes.append(node)
@@ -165,7 +178,8 @@ def _parse_tree(lines, root):
                 while level + 1 < stack[-1].level:
                     stack.pop()
                 print('.')
-                node = XBRIDLNode(stack[-1].level, stack[-1].parent, start_line, line_no, line)
+                node = XBRIDLNode(stack[-1].level, stack[-1].parent,
+                                  start_line, line_no, line)
                 # stack[-1].children.append(node)
 
                 nodes.append(node)
@@ -173,7 +187,12 @@ def _parse_tree(lines, root):
 
         else:
             if False:
-                node = XBRIDLNode(None, None, start_line=start_line, line_no=line_no, line=line)
+                node = XBRIDLNode(
+                    None,
+                    None,
+                    start_line=start_line,
+                    line_no=line_no,
+                    line=line)
                 nodes.append(node)
                 # yield node
             else:

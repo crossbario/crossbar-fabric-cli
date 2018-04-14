@@ -40,6 +40,12 @@ import click
 # see: http://cffi.readthedocs.io/en/latest/cdef.html
 import _cffi_backend  # noqa
 
+# import and select network framework in txaio _before_ any further cbsh imports
+import txaio
+txaio.use_asyncio()
+
+from cbsh import app, command, quickstart  # noqa: E402
+from cbsh import __version__, __build__  # noqa: E402
 
 if False:
     # try to monkey patch click to allow arguments to have help
@@ -52,20 +58,16 @@ if False:
     from click.decorators import _param_memo
 
     def _new_click_argument(*param_decls, **attrs):
-
         def decorator(f):
             if 'help' in attrs:
                 attrs['help'] = inspect.cleandoc(attrs['help'])
             _Klass = attrs.pop('cls', Argument)
             _param_memo(f, _Klass(param_decls, **attrs))
             return f
+
         return decorator
 
     click.argument = _new_click_argument
-
-
-from cbsh import app, command, quickstart
-from cbsh import __version__, __build__
 
 
 def hl(text):
@@ -85,7 +87,6 @@ using the "--profile" option:
 
     cbf --profile mister-test1 shell
 """
-
 
 # the global, singleton app object
 _app = app.Application()
@@ -107,10 +108,12 @@ class Config(object):
         self.resource = None
 
     def __str__(self):
-        return u'Config(verbose={}, resource_type={}, resource={})'.format(self.verbose, self.resource_type, self.resource)
+        return u'Config(verbose={}, resource_type={}, resource={})'.format(
+            self.verbose, self.resource_type, self.resource)
 
 
-@click.group(help="Crossbar.io Fabric Command Line", invoke_without_command=True)
+@click.group(
+    help="Crossbar.io Fabric Command Line", invoke_without_command=True)
 @click.option(
     '--profile',
     envvar='CBF_PROFILE',
@@ -149,7 +152,6 @@ def cli(ctx, profile, realm, role):
 @cli.command(name='version', help='print version information')
 @click.pass_obj
 def cmd_version(cfg):
-
     def get_version(name_or_module):
         if isinstance(name_or_module, str):
             name_or_module = importlib.import_module(name_or_module)
@@ -165,7 +167,8 @@ def cmd_version(cfg):
     if hasattr(sys, 'pypy_version_info'):
         pypy_version_info = getattr(sys, 'pypy_version_info')
         py_impl_str = '.'.join(str(x) for x in pypy_version_info[:3])
-        py_ver_detail = "{}-{}".format(platform.python_implementation(), py_impl_str)
+        py_ver_detail = "{}-{}".format(platform.python_implementation(),
+                                       py_impl_str)
     else:
         py_ver_detail = platform.python_implementation()
 
@@ -201,31 +204,44 @@ def cmd_version(cfg):
     platform_str = platform.platform(terse=True, aliased=True)
 
     click.echo()
-    click.echo(hl("  Crossbar.io Shell") + ' - Interactive shell and toolbelt for Crossbar.io')
+    click.echo(
+        hl("  Crossbar.io Shell") +
+        ' - Interactive shell and toolbelt for Crossbar.io')
     click.echo()
-    click.echo(("  Copyright (c) Crossbar.io Technologies GmbH. Licensed under the GPL 3.0 license"))
-    click.echo(("  unless a separate license agreement exists between you and Crossbar.io GmbH."))
+    click.echo((
+        "  Copyright (c) Crossbar.io Technologies GmbH. Licensed under the GPL 3.0 license"
+    ))
+    click.echo((
+        "  unless a separate license agreement exists between you and Crossbar.io GmbH."
+    ))
     click.echo()
-    click.echo('  {:<24}: {}'.format('Version', hl('{} (build {})'.format(__version__, __build__))))
+    click.echo('  {:<24}: {}'.format('Version',
+                                     hl('{} (build {})'.format(
+                                         __version__, __build__))))
     click.echo('  {:<24}: {}'.format('Platform', hl(platform_str)))
     click.echo('  {:<24}: {}'.format('Python (language)', hl(py_ver)))
-    click.echo('  {:<24}: {}'.format('Python (implementation)', hl(py_ver_detail)))
+    click.echo('  {:<24}: {}'.format('Python (implementation)',
+                                     hl(py_ver_detail)))
     click.echo('  {:<24}: {}'.format('Autobahn', hl(ab_ver)))
     click.echo('  {:<24}: {}'.format('Docker Compose', hl(compose_ver)))
     click.echo('  {:<24}: {}'.format('Sphinx', hl(sphinx_ver)))
-    click.echo('  {:<24}: {}'.format('Frozen executable', hl('yes' if py_is_frozen else 'no')))
+    click.echo('  {:<24}: {}'.format('Frozen executable',
+                                     hl('yes' if py_is_frozen else 'no')))
     if py_is_frozen:
         click.echo('  {:<24}: {}'.format('Executable SHA256', hl(fingerprint)))
     click.echo()
 
 
-@cli.command(name='quickstart', help='generate a complete starter container stack')
+@cli.command(
+    name='quickstart', help='generate a complete starter container stack')
 @click.pass_obj
 def cmd_quickstart(cfg):
     quickstart.run(cfg)
 
 
-@cli.command(name='auth', help='authenticate user profile / key-pair with Crossbar.io Fabric')
+@cli.command(
+    name='auth',
+    help='authenticate user profile / key-pair with Crossbar.io Fabric')
 @click.option(
     '--code',
     default=None,
@@ -278,25 +294,30 @@ def cmd_set_output_verbosity(cfg):
     pass
 
 
-@cmd_set_output_verbosity.command(name='silent', help='swallow everything including result, but error messages')
+@cmd_set_output_verbosity.command(
+    name='silent',
+    help='swallow everything including result, but error messages')
 @click.pass_obj
 def cmd_set_output_verbosity_silent(cfg):
     cfg.app.set_output_verbosity('silent')
 
 
-@cmd_set_output_verbosity.command(name='result-only', help='only output the plain command result')
+@cmd_set_output_verbosity.command(
+    name='result-only', help='only output the plain command result')
 @click.pass_obj
 def cmd_set_output_verbosity_result_only(cfg):
     cfg.app.set_output_verbosity('result-only')
 
 
-@cmd_set_output_verbosity.command(name='normal', help='output result and short run-time message')
+@cmd_set_output_verbosity.command(
+    name='normal', help='output result and short run-time message')
 @click.pass_obj
 def cmd_set_output_verbosity_normal(cfg):
     cfg.app.set_output_verbosity('normal')
 
 
-@cmd_set_output_verbosity.command(name='extended', help='output result and extended execution information.')
+@cmd_set_output_verbosity.command(
+    name='extended', help='output result and extended execution information.')
 @click.pass_obj
 def cmd_set_output_verbosity_extended(cfg):
     cfg.app.set_output_verbosity('extended')
@@ -312,10 +333,13 @@ def cmd_set_output_format(cfg):
 
 
 def _make_set_output_format(output_format):
-    @cmd_set_output_format.command(name=output_format, help='set {} output format'.format(output_format.upper()))
+    @cmd_set_output_format.command(
+        name=output_format,
+        help='set {} output format'.format(output_format.upper()))
     @click.pass_obj
     def f(cfg):
         cfg.app.set_output_format(output_format)
+
     return f
 
 
@@ -333,10 +357,13 @@ def cmd_set_output_style(cfg):
 
 
 def _make_set_output_style(output_style):
-    @cmd_set_output_style.command(name=output_style, help='set {} output style'.format(output_style.upper()))
+    @cmd_set_output_style.command(
+        name=output_style,
+        help='set {} output style'.format(output_style.upper()))
     @click.pass_obj
     def f(cfg):
         cfg.app.set_output_style(output_style)
+
     return f
 
 
@@ -350,7 +377,8 @@ def cmd_create(cfg):
     pass
 
 
-@cmd_create.command(name='management-realm', help='create a new management realm')
+@cmd_create.command(
+    name='management-realm', help='create a new management realm')
 @click.argument('realm')
 @click.pass_obj
 async def cmd_create_management_realm(cfg, realm):
@@ -393,54 +421,74 @@ def cmd_start(cfg):
 
 
 @cmd_start.command(name='container-worker', help='start a container worker')
-@click.option('--process-title', help='worker process title (at OS level)', default=None)
+@click.option(
+    '--process-title', help='worker process title (at OS level)', default=None)
 @click.argument('node')
 @click.argument('worker')
 @click.pass_obj
 async def cmd_start_container_worker(cfg, node, worker, process_title=None):
-    cmd = command.CmdStartContainerWorker(node, worker, process_title=process_title)
+    cmd = command.CmdStartContainerWorker(
+        node, worker, process_title=process_title)
     await cfg.app.run_command(cmd)
 
 
-@cmd_start.command(name='container-component', help='start a container component')
-@click.option('--classname', help='fully qualified Python class name', required=True)
+@cmd_start.command(
+    name='container-component', help='start a container component')
+@click.option(
+    '--classname', help='fully qualified Python class name', required=True)
 @click.option('--realm', help='realm to join this component on', required=True)
-@click.option('--transport-type', help='connecting transport type', required=True, type=click.Choice(['websocket', 'rawsocket']))
-@click.option('--transport-ws-url', help='WebSocket transport connecting URL (eg wss://example.com:9000/ws', type=str)
-@click.option('--transport-endpoint-type', help='connecting transport endpoint type', required=True, type=click.Choice(['tcp', 'unix']))
-@click.option('--transport-tcp-host', help='connecting TCP transport host', type=str)
-@click.option('--transport-tcp-port', help='connecting TCP transport port', type=int)
+@click.option(
+    '--transport-type',
+    help='connecting transport type',
+    required=True,
+    type=click.Choice(['websocket', 'rawsocket']))
+@click.option(
+    '--transport-ws-url',
+    help='WebSocket transport connecting URL (eg wss://example.com:9000/ws',
+    type=str)
+@click.option(
+    '--transport-endpoint-type',
+    help='connecting transport endpoint type',
+    required=True,
+    type=click.Choice(['tcp', 'unix']))
+@click.option(
+    '--transport-tcp-host', help='connecting TCP transport host', type=str)
+@click.option(
+    '--transport-tcp-port', help='connecting TCP transport port', type=int)
 @click.argument('node')
 @click.argument('worker')
 @click.argument('component')
 @click.pass_obj
-async def cmd_start_container_component(cfg, node, worker, component,
-                                        classname=None,
-                                        realm=None,
-                                        transport_type=None,
-                                        transport_ws_url=None,
-                                        transport_endpoint_type=None,
-                                        transport_tcp_host=None,
-                                        transport_tcp_port=None,
-                                        ):
-    cmd = command.CmdStartContainerComponent(node, worker, component,
-                                             classname=classname,
-                                             realm=realm,
-                                             transport_type=transport_type,
-                                             transport_ws_url=transport_ws_url,
-                                             transport_endpoint_type=transport_endpoint_type,
-                                             transport_tcp_host=transport_tcp_host,
-                                             transport_tcp_port=transport_tcp_port)
+async def cmd_start_container_component(
+        cfg,
+        node,
+        worker,
+        component,
+        classname=None,
+        realm=None,
+        transport_type=None,
+        transport_ws_url=None,
+        transport_endpoint_type=None,
+        transport_tcp_host=None,
+        transport_tcp_port=None,
+):
+    cmd = command.CmdStartContainerComponent(
+        node,
+        worker,
+        component,
+        classname=classname,
+        realm=realm,
+        transport_type=transport_type,
+        transport_ws_url=transport_ws_url,
+        transport_endpoint_type=transport_endpoint_type,
+        transport_tcp_host=transport_tcp_host,
+        transport_tcp_port=transport_tcp_port)
     await cfg.app.run_command(cmd)
 
 
 @cli.group(name='list', help='list resources')
 @click.option(
-    '--verbose',
-    help='include resource details',
-    is_flag=True,
-    default=False
-)
+    '--verbose', help='include resource details', is_flag=True, default=False)
 @click.pass_obj
 def cmd_list(cfg, verbose):
     cfg.verbose = verbose
@@ -470,11 +518,7 @@ async def cmd_list_workers(cfg, node):
 
 @cli.group(name='show', help='show resources')
 @click.option(
-    '--verbose',
-    help='include resource details',
-    is_flag=True,
-    default=False
-)
+    '--verbose', help='include resource details', is_flag=True, default=False)
 @click.pass_obj
 def cmd_show(cfg, verbose):
     cfg.verbose = verbose
@@ -510,7 +554,8 @@ async def cmd_show_worker(cfg, node, worker):
 @click.argument('transport')
 @click.pass_obj
 async def cmd_show_transport(cfg, node, worker, transport):
-    cmd = command.CmdShowTransport(node, worker, transport, verbose=cfg.verbose)
+    cmd = command.CmdShowTransport(
+        node, worker, transport, verbose=cfg.verbose)
     await cfg.app.run_command(cmd)
 
 
@@ -524,13 +569,15 @@ async def cmd_show_realm(cfg, node, worker, realm):
     await cfg.app.run_command(cmd)
 
 
-@cmd_show.command(name='component', help='show component (for container and router workers)')
+@cmd_show.command(
+    name='component', help='show component (for container and router workers)')
 @click.argument('node')
 @click.argument('worker')
 @click.argument('component')
 @click.pass_obj
 async def cmd_show_component(cfg, node, worker, component):
-    cmd = command.CmdShowComponent(node, worker, component, verbose=cfg.verbose)
+    cmd = command.CmdShowComponent(
+        node, worker, component, verbose=cfg.verbose)
     await cfg.app.run_command(cmd)
 
 
@@ -583,7 +630,8 @@ def main():
         try:
             from sphinx.cmd.build import main as _forward_main
         except ImportError:
-            raise click.Abort('could not import sphinx-build - command forwarding failed!')
+            raise click.Abort(
+                'could not import sphinx-build - command forwarding failed!')
         else:
             argv = []
             if len(sys.argv) > 2:

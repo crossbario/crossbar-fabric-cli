@@ -1,5 +1,7 @@
 wheel
 flake8
+autopep8
+yapf
 tox
 twine
 pytest

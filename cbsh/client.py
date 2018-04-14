@@ -32,13 +32,9 @@ import argparse
 import binascii
 import os
 import sys
+import asyncio
 
 import txaio
-txaio.use_asyncio()
-
-from txaio import make_logger
-
-import asyncio
 from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationSession, ApplicationRunner
 from autobahn.wamp import cryptosign
@@ -52,8 +48,7 @@ __all__ = (
 
 
 class BaseCryptosignClientSession(ApplicationSession):
-
-    def onConnect(self):
+    def onConnect(self):  # noqa: N802
         self.log.debug("BaseCryptosignClientSession connected to router")
 
         self._key = self.config.extra[u'key']
@@ -87,40 +82,42 @@ class BaseCryptosignClientSession(ApplicationSession):
                 extra[k] = self.config.extra[k]
 
         # now request to join ..
-        self.join(self.config.realm,
-                  authmethods=[u'cryptosign'],
-                  authid=self.config.extra.get(u'authid', None),
-                  authrole=self.config.extra.get(u'authrole', None),
-                  authextra=extra)
+        self.join(
+            self.config.realm,
+            authmethods=[u'cryptosign'],
+            authid=self.config.extra.get(u'authid', None),
+            authrole=self.config.extra.get(u'authrole', None),
+            authextra=extra)
 
-    def onChallenge(self, challenge):
+    def onChallenge(self, challenge):  # noqa: N802
         # sign and send back the challenge with our private key.
         return self._key.sign_challenge(self, challenge)
 
-    def onDisconnect(self):
+    def onDisconnect(self):  # noqa: N802
         asyncio.get_event_loop().stop()
 
 
 class BaseAnonymousClientSession(ApplicationSession):
-
-    def onConnect(self):
+    def onConnect(self):  # noqa: N802
         self.log.debug("BaseAnonymousClientSession connected to router")
 
         # now request to join ..
-        self.join(self.config.realm,
-                  authmethods=[u'anonymous'],
-                  authextra=self.config.extra.get(u'authextra', None))
+        self.join(
+            self.config.realm,
+            authmethods=[u'anonymous'],
+            authextra=self.config.extra.get(u'authextra', None))
 
-    def onDisconnect(self):
+    def onDisconnect(self):  # noqa: N802
         asyncio.get_event_loop().stop()
 
 
 class _ShellClient(object):
 
-    log = make_logger()
+    log = txaio.make_logger()
 
-    async def onJoin(self, details):
-        self.log.debug("ShellClient session joined: {details}", details=details)
+    async def onJoin(self, details):  # noqa: N802
+        self.log.debug(
+            "ShellClient session joined: {details}", details=details)
 
         self._ticks = 0
 
@@ -135,14 +132,15 @@ class _ShellClient(object):
 
         self.log.debug("session ready!")
 
-    def onLeave(self, details):
+    def onLeave(self, details):  # noqa: N802
         self.log.debug("session closed: {details}", details=details)
 
         # reason=<wamp.error.authentication_failed>
         if details.reason != u'wamp.close.normal':
             done = self.config.extra.get(u'done', None)
             if done and not done.done():
-                done.set_exception(ApplicationError(details.reason, details.message))
+                done.set_exception(
+                    ApplicationError(details.reason, details.message))
 
         self.disconnect()
 
@@ -157,10 +155,11 @@ class ShellAnonymousClient(_ShellClient, BaseAnonymousClientSession):
 
 class _ManagementClientSession(object):
 
-    log = make_logger()
+    log = txaio.make_logger()
 
-    async def onJoin(self, details):
-        self.log.debug("ManagementClientSession joined: {details}", details=details)
+    async def onJoin(self, details):  # noqa: N802
+        self.log.debug(
+            "ManagementClientSession joined: {details}", details=details)
 
         main = self.config.extra.get(u'main', None)
         if main:
@@ -171,7 +170,8 @@ class _ManagementClientSession(object):
             except Exception as e:
                 # something bad happened: investigate your side or pls file an issue;)
                 return_code = -1
-                self.log.error('Error during management session main(): {error}', error=e)
+                self.log.error(
+                    'Error during management session main(): {error}', error=e)
             finally:
                 # in any case, shutdown orderly
                 if return_code:
@@ -183,33 +183,54 @@ class _ManagementClientSession(object):
             self.log.warn('no main() configured!')
             self.leave()
 
-    def onLeave(self, details):
+    def onLeave(self, details):  # noqa: N802
         self.log.debug("CFC session closed: {details}", details=details)
         self.disconnect()
 
 
-class ManagementClientSession(_ManagementClientSession, BaseCryptosignClientSession):
+class ManagementClientSession(_ManagementClientSession,
+                              BaseCryptosignClientSession):
     pass
 
 
-class ManagementAnonymousClientSession(_ManagementClientSession, BaseAnonymousClientSession):
+class ManagementAnonymousClientSession(_ManagementClientSession,
+                                       BaseAnonymousClientSession):
     pass
 
 
 def run(main=None, parser=None):
     # parse command line arguments
     parser = parser or argparse.ArgumentParser()
-    parser.add_argument('--debug', dest='debug', action='store_true', default=False,
-                        help='Enable logging at level "debug".')
-    parser.add_argument('--url', dest='url', type=str, default=u'wss://fabric.crossbario.com',
-                        help='The Crossbar.io Fabric Center (CFC) WebSocket URL '
-                             '(default: wss://fabric.crossbario.com')
-    parser.add_argument('--realm', dest='realm', type=str,
-                        help='The management realm to join on CFC')
-    parser.add_argument('--keyfile', dest='keyfile', type=str, default=u'~/.cbf/default.priv',
-                        help='The private client key file to use for authentication.')
-    parser.add_argument('--authmethod', dest='authmethod', type=str, default=u'cryptosign',
-                        help='Authentication method: cryptosign or anonymous')
+    parser.add_argument(
+        '--debug',
+        dest='debug',
+        action='store_true',
+        default=False,
+        help='Enable logging at level "debug".')
+    parser.add_argument(
+        '--url',
+        dest='url',
+        type=str,
+        default=u'wss://fabric.crossbario.com',
+        help='The Crossbar.io Fabric Center (CFC) WebSocket URL '
+        '(default: wss://fabric.crossbario.com')
+    parser.add_argument(
+        '--realm',
+        dest='realm',
+        type=str,
+        help='The management realm to join on CFC')
+    parser.add_argument(
+        '--keyfile',
+        dest='keyfile',
+        type=str,
+        default=u'~/.cbf/default.priv',
+        help='The private client key file to use for authentication.')
+    parser.add_argument(
+        '--authmethod',
+        dest='authmethod',
+        type=str,
+        default=u'cryptosign',
+        help='Authentication method: cryptosign or anonymous')
     args = parser.parse_args()
 
     if args.debug:
@@ -227,7 +248,8 @@ def run(main=None, parser=None):
         user_id = None
 
         if not os.path.exists(privkey_file):
-            raise Exception('private key file {} does not exist'.format(privkey_file))
+            raise Exception(
+                'private key file {} does not exist'.format(privkey_file))
         else:
             with open(privkey_file, 'r') as f:
                 data = f.read()
@@ -243,7 +265,8 @@ def run(main=None, parser=None):
         if user_id is None:
             raise Exception('no user ID found in keyfile!')
 
-        key = cryptosign.SigningKey.from_key_bytes(binascii.a2b_hex(privkey_hex))
+        key = cryptosign.SigningKey.from_key_bytes(
+            binascii.a2b_hex(privkey_hex))
 
         extra = {
             u'args': args,
@@ -255,11 +278,7 @@ def run(main=None, parser=None):
 
     elif args.authmethod == u'anonymous':
 
-        extra = {
-            u'args': args,
-            u'main': main,
-            u'return_code': None
-        }
+        extra = {u'args': args, u'main': main, u'return_code': None}
 
     else:
         raise Exception('logic error')

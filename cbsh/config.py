@@ -46,7 +46,15 @@ class Profile(object):
 
     log = make_logger()
 
-    def __init__(self, name=None, url=None, reconnect=None, debug=None, realm=None, role=None, pubkey=None, privkey=None):
+    def __init__(self,
+                 name=None,
+                 url=None,
+                 reconnect=None,
+                 debug=None,
+                 realm=None,
+                 role=None,
+                 pubkey=None,
+                 privkey=None):
         self.name = name
         self.url = url
         self.reconnect = reconnect
@@ -89,7 +97,8 @@ class Profile(object):
                 # skip unknown attribute
                 Profile.log.warn('unprocessed config attribute "{}"'.format(k))
 
-        return Profile(name, url, reconnect, debug, realm, role, pubkey, privkey)
+        return Profile(name, url, reconnect, debug, realm, role, pubkey,
+                       privkey)
 
 
 class UserConfig(object):
@@ -112,4 +121,5 @@ class UserConfig(object):
 
         self.profiles = profiles
 
-        self.log.debug('profiles loaded for: {}'.format(sorted(self.profiles.keys())))
+        self.log.debug('profiles loaded for: {}'.format(
+            sorted(self.profiles.keys())))

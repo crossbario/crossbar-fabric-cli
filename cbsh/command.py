@@ -32,17 +32,16 @@ from autobahn.util import rtime
 
 
 class CmdRunResult(object):
-
     def __init__(self, result, duration=None):
         self.result = result
         self.duration = duration
 
     def __str__(self):
-        return u'CmdRunResult(result={}, duration={})'.format(self.result, self.duration)
+        return u'CmdRunResult(result={}, duration={})'.format(
+            self.result, self.duration)
 
 
 class Cmd(object):
-
     def __init__(self):
         self._started = None
 
@@ -58,7 +57,6 @@ class Cmd(object):
 
 
 class CmdPair(Cmd):
-
     def __init__(self):
         Cmd.__init__(self)
 
@@ -77,12 +75,13 @@ class CmdPairNode(CmdPair):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.mrealm.pair_node', self.pubkey, self.realm, self.node_id, self.authextra)
+        result = await session.call(u'crossbarfabriccenter.mrealm.pair_node',
+                                    self.pubkey, self.realm, self.node_id,
+                                    self.authextra)
         return self._post(session, result)
 
 
 class CmdCreate(Cmd):
-
     def __init__(self):
         Cmd.__init__(self)
 
@@ -98,12 +97,12 @@ class CmdCreateManagementRealm(CmdCreate):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.mrealm.create_realm', self.realm)
+        result = await session.call(
+            u'crossbarfabriccenter.mrealm.create_realm', self.realm)
         return self._post(session, result)
 
 
 class CmdList(Cmd):
-
     def __init__(self):
         Cmd.__init__(self)
 
@@ -132,7 +131,8 @@ class CmdListNodes(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.mrealm.get_nodes', verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.mrealm.get_nodes', verbose=self.verbose)
         return self._post(session, result)
 
 
@@ -147,42 +147,43 @@ class CmdListWorkers(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.list_workers', self.node, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.list_workers',
+            self.node,
+            verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShow(Cmd):
-
     def __init__(self, verbose=False):
         Cmd.__init__(self)
         self.verbose = verbose
 
 
 class CmdShowFabric(CmdShow):
-
     def __init__(self, verbose=False):
         CmdShow.__init__(self, verbose)
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_fabric', verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_fabric', verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShowNode(CmdShow):
-
     def __init__(self, node, verbose=False):
         CmdShow.__init__(self, verbose)
         self.node = node
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_node', self.node, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_node', self.node, verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShowWorker(CmdShow):
-
     def __init__(self, node, worker, verbose=False):
         CmdShow.__init__(self, verbose)
         self.node = node
@@ -190,12 +191,15 @@ class CmdShowWorker(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_worker', self.node, self.worker, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_worker',
+            self.node,
+            self.worker,
+            verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShowTransport(CmdShow):
-
     def __init__(self, node, worker, transport, verbose=False):
         CmdShow.__init__(self, verbose)
         self.node = node
@@ -204,12 +208,16 @@ class CmdShowTransport(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_transport', self.node, self.worker, self.transport, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_transport',
+            self.node,
+            self.worker,
+            self.transport,
+            verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShowRealm(CmdShow):
-
     def __init__(self, node, worker, realm, verbose=False):
         CmdShow.__init__(self, verbose)
         self.node = node
@@ -218,12 +226,16 @@ class CmdShowRealm(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_realm', self.node, self.worker, self.realm, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_realm',
+            self.node,
+            self.worker,
+            self.realm,
+            verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdShowComponent(CmdShow):
-
     def __init__(self, node, worker, component, verbose=False):
         CmdShow.__init__(self, verbose)
         self.node = node
@@ -232,18 +244,21 @@ class CmdShowComponent(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.show_component', self.node, self.worker, self.component, verbose=self.verbose)
+        result = await session.call(
+            u'crossbarfabriccenter.show_component',
+            self.node,
+            self.worker,
+            self.component,
+            verbose=self.verbose)
         return self._post(session, result)
 
 
 class CmdStart(Cmd):
-
     def __init__(self):
         Cmd.__init__(self)
 
 
 class CmdStartWorker(CmdStart):
-
     def __init__(self, node_id, worker_id, worker_type, worker_options=None):
         CmdStart.__init__(self)
         self.node_id = node_id
@@ -253,16 +268,16 @@ class CmdStartWorker(CmdStart):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(u'crossbarfabriccenter.start_worker',
-                                    node_id=self.node_id,
-                                    worker_id=self.worker_id,
-                                    worker_type=self.worker_type,
-                                    worker_options=self.worker_options)
+        result = await session.call(
+            u'crossbarfabriccenter.start_worker',
+            node_id=self.node_id,
+            worker_id=self.worker_id,
+            worker_type=self.worker_type,
+            worker_options=self.worker_options)
         return self._post(session, result)
 
 
 class CmdStartContainerWorker(CmdStart):
-
     def __init__(self, node_id, worker_id, process_title=None):
         CmdStart.__init__(self)
         self.node_id = node_id
@@ -276,24 +291,19 @@ class CmdStartContainerWorker(CmdStart):
         if self.process_title:
             options[u'title'] = self.process_title
 
-        result = await session.call(u'crossbarfabriccenter.start_worker',
-                                    node_id=self.node_id,
-                                    worker_id=self.worker_id,
-                                    worker_type=u'container',
-                                    worker_options=options)
+        result = await session.call(
+            u'crossbarfabriccenter.start_worker',
+            node_id=self.node_id,
+            worker_id=self.worker_id,
+            worker_type=u'container',
+            worker_options=options)
         return self._post(session, result)
 
 
 class CmdStartContainerComponent(CmdStart):
-
-    def __init__(self, node_id, worker_id, component_id,
-                 classname,
-                 realm,
-                 transport_type,
-                 transport_ws_url,
-                 transport_endpoint_type,
-                 transport_tcp_host,
-                 transport_tcp_port):
+    def __init__(self, node_id, worker_id, component_id, classname, realm,
+                 transport_type, transport_ws_url, transport_endpoint_type,
+                 transport_tcp_host, transport_tcp_port):
         CmdStart.__init__(self)
         self.node_id = node_id
         self.worker_id = worker_id
@@ -327,12 +337,15 @@ class CmdStartContainerComponent(CmdStart):
             config[u'transport'][u'url'] = self.transport_ws_url
 
         if self.transport_endpoint_type == u'tcp':
-            config[u'transport'][u'endpoint'][u'host'] = self.transport_tcp_host
-            config[u'transport'][u'endpoint'][u'port'] = self.transport_tcp_port
+            config[u'transport'][u'endpoint'][
+                u'host'] = self.transport_tcp_host
+            config[u'transport'][u'endpoint'][
+                u'port'] = self.transport_tcp_port
 
-        result = await session.call(u'crossbarfabriccenter.start_container_component',
-                                    node_id=self.node_id,
-                                    worker_id=self.worker_id,
-                                    component_id=self.component_id,
-                                    config=config)
+        result = await session.call(
+            u'crossbarfabriccenter.start_container_component',
+            node_id=self.node_id,
+            worker_id=self.worker_id,
+            component_id=self.component_id,
+            config=config)
         return self._post(session, result)

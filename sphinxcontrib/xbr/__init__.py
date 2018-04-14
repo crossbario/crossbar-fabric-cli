@@ -54,16 +54,13 @@ if False:
 
 logger = logging.getLogger(__name__)
 
-
 # REs for XBR signatures
-xbr_sig_re = re.compile(
-    r'''^ ([\w.]*\.)?            # interface name(s)
+xbr_sig_re = re.compile(r'''^ ([\w.]*\.)?            # interface name(s)
           (\w+)  \s*             # thing name
           (?: \(\s*(.*)\s*\)     # optional: arguments
            (?:\s* -> \s* (.*))?  #           return annotation
           )? $                   # and nothing more
           ''', re.VERBOSE)
-
 
 pairindextypes = {
     'namespace': _('namespace'),
@@ -127,17 +124,23 @@ def _pseudo_parse_arglist(signode, arglist):
 # This override allows our inline type specifiers to behave like :interface: link
 # when it comes to handling "." and "~" prefixes.
 class XBRXrefMixin(object):
-    def make_xref(self,
-                  rolename,                  # type: unicode
-                  domain,                    # type: unicode
-                  target,                    # type: unicode
-                  innernode=nodes.emphasis,  # type: nodes.Node
-                  contnode=None,             # type: nodes.Node
-                  env=None,                  # type: BuildEnvironment
-                  ):
+    def make_xref(
+            self,
+            rolename,  # type: unicode
+            domain,  # type: unicode
+            target,  # type: unicode
+            innernode=nodes.emphasis,  # type: nodes.Node
+            contnode=None,  # type: nodes.Node
+            env=None,  # type: BuildEnvironment
+    ):
         # type: (...) -> nodes.Node
-        result = super(XBRXrefMixin, self).make_xref(rolename, domain, target,  # type: ignore
-                                                     innernode, contnode, env)
+        result = super(XBRXrefMixin, self).make_xref(
+            rolename,
+            domain,
+            target,  # type: ignore
+            innernode,
+            contnode,
+            env)
         result['refspecific'] = True
         if target.startswith(('.', '~')):
             prefix, result['reftarget'] = target[0], target[1:]
@@ -150,14 +153,15 @@ class XBRXrefMixin(object):
                 break
         return result
 
-    def make_xrefs(self,
-                   rolename,                  # type: unicode
-                   domain,                    # type: unicode
-                   target,                    # type: unicode
-                   innernode=nodes.emphasis,  # type: nodes.Node
-                   contnode=None,             # type: nodes.Node
-                   env=None,                  # type: BuildEnvironment
-                   ):
+    def make_xrefs(
+            self,
+            rolename,  # type: unicode
+            domain,  # type: unicode
+            target,  # type: unicode
+            innernode=nodes.emphasis,  # type: nodes.Node
+            contnode=None,  # type: nodes.Node
+            env=None,  # type: BuildEnvironment
+    ):
         # type: (...) -> List[nodes.Node]
         delims = r'(\s*[\[\]\(\),](?:\s*or\s)?\s*|\s+or\s+)'
         delims_re = re.compile(delims)
@@ -173,8 +177,9 @@ class XBRXrefMixin(object):
             if delims_re.match(sub_target):  # type: ignore
                 results.append(contnode or innernode(sub_target, sub_target))
             else:
-                results.append(self.make_xref(rolename, domain, sub_target,
-                                              innernode, contnode, env))
+                results.append(
+                    self.make_xref(rolename, domain, sub_target, innernode,
+                                   contnode, env))
 
         return results
 
@@ -205,33 +210,46 @@ class XBRObject(ObjectDescription):
     }
 
     doc_field_types = [
-        XBRTypedField('parameter', label=_('Parameters'),
-                      names=('param', 'parameter', 'arg', 'argument',
-                             'keyword', 'kwarg', 'kwparam'),
-                      typerolename='interface', typenames=('paramtype', 'type'),
-                      can_collapse=True),
-
-        XBRTypedField('variable', label=_('Variables'), rolename='obj',
-                      names=('var', 'ivar', 'cvar'),
-                      typerolename='interface', typenames=('vartype',),
-                      can_collapse=True),
-
-        XBRGroupedField('exceptions', label=_('Raises'), rolename='exc',
-                        names=('raises', 'raise', 'exception', 'except'),
-                        can_collapse=True),
-
-
-        XBRGroupedField('publications', label=_('Publications'), rolename='pub',
-                        names=('publishes', 'publish', 'publication'),
-                        can_collapse=True),
-
-        Field('returnvalue', label=_('Returns'), has_arg=False,
-              names=('returns', 'return')),
-        XBRField('returntype', label=_('Return type'), has_arg=False,
-                 names=('rtype',), bodyrolename='interface'),
-
-        Field('price', label=_('Price'), has_arg=False,
-              names=('price',)),
+        XBRTypedField(
+            'parameter',
+            label=_('Parameters'),
+            names=('param', 'parameter', 'arg', 'argument', 'keyword', 'kwarg',
+                   'kwparam'),
+            typerolename='interface',
+            typenames=('paramtype', 'type'),
+            can_collapse=True),
+        XBRTypedField(
+            'variable',
+            label=_('Variables'),
+            rolename='obj',
+            names=('var', 'ivar', 'cvar'),
+            typerolename='interface',
+            typenames=('vartype', ),
+            can_collapse=True),
+        XBRGroupedField(
+            'exceptions',
+            label=_('Raises'),
+            rolename='exc',
+            names=('raises', 'raise', 'exception', 'except'),
+            can_collapse=True),
+        XBRGroupedField(
+            'publications',
+            label=_('Publications'),
+            rolename='pub',
+            names=('publishes', 'publish', 'publication'),
+            can_collapse=True),
+        Field(
+            'returnvalue',
+            label=_('Returns'),
+            has_arg=False,
+            names=('returns', 'return')),
+        XBRField(
+            'returntype',
+            label=_('Return type'),
+            has_arg=False,
+            names=('rtype', ),
+            bodyrolename='interface'),
+        Field('price', label=_('Price'), has_arg=False, names=('price', )),
     ]
 
     allow_nesting = False
@@ -266,8 +284,8 @@ class XBRObject(ObjectDescription):
         name_prefix, name, arglist, retann = m.groups()
 
         # determine namespace and interface name (if applicable), as well as full name
-        nsname = self.options.get(
-            'namespace', self.env.ref_context.get('xbr:namespace'))
+        nsname = self.options.get('namespace',
+                                  self.env.ref_context.get('xbr:namespace'))
         interfacename = self.env.ref_context.get('xbr:interface')
         if interfacename:
             add_namespace = False
@@ -337,8 +355,8 @@ class XBRObject(ObjectDescription):
 
     def add_target_and_index(self, name_ifc, sig, signode):
         # type: (unicode, unicode, addnodes.desc_signature) -> None
-        nsname = self.options.get(
-            'namespace', self.env.ref_context.get('xbr:namespace'))
+        nsname = self.options.get('namespace',
+                                  self.env.ref_context.get('xbr:namespace'))
         fullname = (nsname and nsname + '.' or '') + name_ifc[0]
         # note target
         if fullname not in self.state.document.ids:
@@ -358,8 +376,8 @@ class XBRObject(ObjectDescription):
 
         indextext = self.get_index_text(nsname, name_ifc)
         if indextext:
-            self.indexnode['entries'].append(('single', indextext,
-                                              fullname, '', None))
+            self.indexnode['entries'].append(('single', indextext, fullname,
+                                              '', None))
 
     def before_content(self):
         # type: () -> None
@@ -388,7 +406,8 @@ class XBRObject(ObjectDescription):
         if prefix:
             self.env.ref_context['xbr:interface'] = prefix
             if self.allow_nesting:
-                interfaces = self.env.ref_context.setdefault('xbr:interfaces', [])
+                interfaces = self.env.ref_context.setdefault(
+                    'xbr:interfaces', [])
                 interfaces.append(prefix)
         if 'namespace' in self.options:
             namespaces = self.env.ref_context.setdefault('xbr:namespaces', [])
@@ -412,8 +431,8 @@ class XBRObject(ObjectDescription):
                 interfaces.pop()
             except IndexError:
                 pass
-        self.env.ref_context['xbr:interface'] = (interfaces[-1] if len(interfaces) > 0
-                                                 else None)
+        self.env.ref_context['xbr:interface'] = (interfaces[-1] if
+                                                 len(interfaces) > 0 else None)
         if 'namespace' in self.options:
             namespaces = self.env.ref_context.setdefault('xbr:namespaces', [])
             if namespaces:
@@ -481,7 +500,9 @@ class XBRInterfacemember(XBRObject):
         # type: (unicode) -> unicode
         if self.objtype == 'staticmethod':
             return 'static '
-        elif self.objtype in ['interfacemethod', 'event', 'procedure', 'error']:
+        elif self.objtype in [
+                'interfacemethod', 'event', 'procedure', 'error'
+        ]:
             return 'XBR {} '.format(self.objtype.capitalize())
         return ''
 
@@ -550,7 +571,8 @@ class XBRDecoratorMixin(object):
 
     def handle_signature(self, sig, signode):
         # type: (unicode, addnodes.desc_signature) -> Tuple[unicode, unicode]
-        ret = super(XBRDecoratorMixin, self).handle_signature(sig, signode)  # type: ignore
+        ret = super(XBRDecoratorMixin,
+                    self).handle_signature(sig, signode)  # type: ignore
         signode.insert(0, addnodes.desc_addname('@', '@'))
         return ret
 
@@ -611,9 +633,10 @@ class XBRNamespace(Directive):
                  self.options.get('platform', ''), 'deprecated' in self.options)
             # make a duplicate entry in 'objects' to facilitate searching for
             # the namespace in XBRDomain.find_obj()
-            env.domaindata['xbr']['objects'][nsname] = (env.docname, 'namespace')
-            targetnode = nodes.target('', '', ids=['namespace-' + nsname],
-                                      ismod=True)
+            env.domaindata['xbr']['objects'][nsname] = (env.docname,
+                                                        'namespace')
+            targetnode = nodes.target(
+                '', '', ids=['namespace-' + nsname], ismod=True)
             self.state.document.note_explicit_target(targetnode)
             # the platform and synopsis aren't printed; in fact, they are only
             # used in the nsindex currently
@@ -654,7 +677,7 @@ class XBRXRefRole(XRefRole):
         refnode['xbr:namespace'] = env.ref_context.get('xbr:namespace')
         refnode['xbr:interface'] = env.ref_context.get('xbr:interface')
         if not has_explicit_title:
-            title = title.lstrip('.')    # only has a meaning for the target
+            title = title.lstrip('.')  # only has a meaning for the target
             target = target.lstrip('~')  # only has a meaning for the title
             # if the first character is a tilde, don't display the namespace/interface
             # parts of the contents
@@ -685,11 +708,13 @@ class XBRNamespaceIndex(Index):
         content = {}  # type: Dict[unicode, List]
         # list of prefixes to ignore
         ignores = None  # type: List[unicode]
-        ignores = self.domain.env.config['modindex_common_prefix']  # type: ignore
+        ignores = self.domain.env.config[
+            'modindex_common_prefix']  # type: ignore
         ignores = sorted(ignores, key=len, reverse=True)
         # list of all namespaces, sorted by namespace name
-        namespaces = sorted(iteritems(self.domain.data['namespaces']),
-                            key=lambda x: x[0].lower())
+        namespaces = sorted(
+            iteritems(self.domain.data['namespaces']),
+            key=lambda x: x[0].lower())
         # sort out collapsable namespaces
         prev_nsname = ''
         num_toplevels = 0
@@ -727,9 +752,11 @@ class XBRNamespaceIndex(Index):
                 subtype = 0
 
             qualifier = deprecated and _('Deprecated') or ''
-            entries.append([stripped + nsname, subtype, docname,
-                            'namespace-' + stripped + nsname, platforms,
-                            qualifier, synopsis])
+            entries.append([
+                stripped + nsname, subtype, docname,
+                'namespace-' + stripped + nsname, platforms, qualifier,
+                synopsis
+            ])
             prev_nsname = nsname
 
         # apply heuristics when to collapse nsindex at page load:
@@ -765,14 +792,10 @@ class XBRDomain(Domain):
         'interface': XBRInterfacelike,
         'exception': XBRInterfacelike,
         'method': XBRInterfacemember,
-
         'interfacemethod': XBRInterfacemember,
-
         'event': XBRInterfacemember,
         'procedure': XBRInterfacemember,
         'error': XBRInterfacemember,
-
-
         'staticmethod': XBRInterfacemember,
         'attribute': XBRInterfacemember,
         'namespace': XBRNamespace,
@@ -855,8 +878,7 @@ class XBRDomain(Domain):
                         # "fuzzy" searching mode
                         searchname = '.' + name
                         matches = [(oname, objects[oname]) for oname in objects
-                                   if oname.endswith(searchname) and
-                                   objects[oname][1] in objtypes]
+                                   if oname.endswith(searchname) and objects[oname][1] in objtypes]
         else:
             # NOTE: searching for exact match, object type is not considered
             if name in objects:
@@ -883,31 +905,34 @@ class XBRDomain(Domain):
             matches.append((newname, objects[newname]))
         return matches
 
-    def resolve_xref(self, env, fromdocname, builder,
-                     type, target, node, contnode):
+    def resolve_xref(self, env, fromdocname, builder, type, target, node,
+                     contnode):
         # type: (BuildEnvironment, unicode, Builder, unicode, unicode, nodes.Node, nodes.Node) -> nodes.Node  # NOQA
         nsname = node.get('xbr:namespace')
         ifcname = node.get('xbr:interface')
         searchmode = node.hasattr('refspecific') and 1 or 0
-        matches = self.find_obj(env, nsname, ifcname, target,
-                                type, searchmode)
+        matches = self.find_obj(env, nsname, ifcname, target, type, searchmode)
         if not matches:
             return None
         elif len(matches) > 1:
-            logger.warning(__('more than one target found for cross-reference %r: %s'),
-                           target, ', '.join(match[0] for match in matches),
-                           type='ref', subtype='xbr', location=node)
+            logger.warning(
+                __('more than one target found for cross-reference %r: %s'),
+                target,
+                ', '.join(match[0] for match in matches),
+                type='ref',
+                subtype='xbr',
+                location=node)
         name, obj = matches[0]
 
         if obj[1] == 'namespace':
             return self._make_namespace_refnode(builder, fromdocname, name,
                                                 contnode)
         else:
-            return make_refnode(builder, fromdocname, obj[0], name,
-                                contnode, name)
+            return make_refnode(builder, fromdocname, obj[0], name, contnode,
+                                name)
 
-    def resolve_any_xref(self, env, fromdocname, builder, target,
-                         node, contnode):
+    def resolve_any_xref(self, env, fromdocname, builder, target, node,
+                         contnode):
         # type: (BuildEnvironment, unicode, Builder, unicode, nodes.Node, nodes.Node) -> List[Tuple[unicode, nodes.Node]]  # NOQA
         nsname = node.get('xbr:namespace')
         ifcname = node.get('xbr:interface')
@@ -918,12 +943,12 @@ class XBRDomain(Domain):
         for name, obj in matches:
             if obj[1] == 'namespace':
                 results.append(('xbr:ns',
-                                self._make_namespace_refnode(builder, fromdocname,
-                                                             name, contnode)))
+                                self._make_namespace_refnode(
+                                    builder, fromdocname, name, contnode)))
             else:
                 results.append(('xbr:' + self.role_for_objtype(obj[1]),
-                                make_refnode(builder, fromdocname, obj[0], name,
-                                             contnode, name)))
+                                make_refnode(builder, fromdocname, obj[0],
+                                             name, contnode, name)))
         return results
 
     def _make_namespace_refnode(self, builder, fromdocname, name, contnode):
@@ -937,13 +962,14 @@ class XBRDomain(Domain):
             title += _(' (deprecated)')
         if platform:
             title += ' (' + platform + ')'
-        return make_refnode(builder, fromdocname, docname,
-                            'namespace-' + name, contnode, title)
+        return make_refnode(builder, fromdocname, docname, 'namespace-' + name,
+                            contnode, title)
 
     def get_objects(self):
         # type: () -> Iterator[Tuple[unicode, unicode, unicode, unicode, unicode, int]]
         for nsname, info in iteritems(self.data['namespaces']):
-            yield (nsname, nsname, 'namespace', info[0], 'namespace-' + nsname, 0)
+            yield (nsname, nsname, 'namespace', info[0], 'namespace-' + nsname,
+                   0)
         for refname, (docname, type) in iteritems(self.data['objects']):
             if type != 'namespace':  # namespaces are already handled
                 yield (refname, refname, type, docname, refname, 1)
@@ -994,17 +1020,20 @@ class XBRBuilder(Builder):
         builders.
         """
         target_uri = 'network.xbr'
-        print('XBR: get_target_uri(docname={}, typ={}) -> {}'.format(docname, typ, target_uri))
+        print('XBR: get_target_uri(docname={}, typ={}) -> {}'.format(
+            docname, typ, target_uri))
         return target_uri
 
     def write_doc(self, docname, doctree):
         # type: (unicode, nodes.Node) -> None
         """Where you actually write something to the filesystem."""
-        print('XBR: write_doc(docname={}, doctree={})'.format(docname, type(doctree)))
+        print('XBR: write_doc(docname={}, doctree={})'.format(
+            docname, type(doctree)))
 
         def _print(nodes):
             for node in nodes:
-                print('\nNODE:', dir(node), node.attributes, node.list_attributes)
+                print('\nNODE:', dir(node), node.attributes,
+                      node.list_attributes)
                 if 'interface' in str(node):
                     print(node)
                 # print(node.attributes)
@@ -1014,6 +1043,7 @@ class XBRBuilder(Builder):
                 _print(node.children)
 
         _print(doctree)
+
 
 #        for node in doctree:
 #            print(dir(node), node.attributes)

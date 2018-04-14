@@ -107,8 +107,7 @@ def _help_internal():
         formatter.write_dl(
             (', '.join((':{0}'.format(mnemonic)
                         for mnemonic in sorted(mnemonics))), description)
-            for description, mnemonics in six.iteritems(info_table)
-        )
+            for description, mnemonics in six.iteritems(info_table))
     return formatter.getvalue()
 
 
@@ -167,24 +166,22 @@ class ClickCompleter(Completer):
                 continue
             for options in (param.opts, param.secondary_opts):
                 for o in options:
-                    choices.append(Completion(o, -len(incomplete),
-                                              display_meta=param.help))
+                    choices.append(
+                        Completion(
+                            o, -len(incomplete), display_meta=param.help))
 
         if isinstance(ctx.command, click.MultiCommand):
             for name in ctx.command.list_commands(ctx):
                 command = ctx.command.get_command(ctx, name)
-                choices.append(Completion(
-                    name,
-                    -len(incomplete),
-                    display_meta=getattr(command, 'short_help')
-                ))
+                choices.append(
+                    Completion(
+                        name,
+                        -len(incomplete),
+                        display_meta=getattr(command, 'short_help')))
 
         for item in choices:
             if item.text.startswith(incomplete):
                 yield item
-
-
-from prompt_toolkit.token import Token
 
 
 def continuation_tokens(cli, width):
@@ -195,16 +192,14 @@ def continuation_tokens(cli, width):
     return [(Token, '.' * (width - 1) + ' ')]
 
 
-async def repl(
-        old_ctx,
-        prompt_kwargs=None,
-        allow_system_commands=True,
-        allow_internal_commands=True,
-        once=False,
-        get_bottom_toolbar_tokens=_get_bottom_toolbar_tokens,
-        get_prompt_tokens=None,
-        style=_style
-):
+async def repl(old_ctx,
+               prompt_kwargs=None,
+               allow_system_commands=True,
+               allow_internal_commands=True,
+               once=False,
+               get_bottom_toolbar_tokens=_get_bottom_toolbar_tokens,
+               get_prompt_tokens=None,
+               style=_style):
     """
     Start an interactive shell. All subcommands are available in it.
 
@@ -238,16 +233,17 @@ async def repl(
             or ClickCompleter(group)
 
         def get_command():
-            return prompt_async(completer=completer,
-                                history=history,
-                                patch_stdout=False,
-                                # https://github.com/jonathanslenders/python-prompt-toolkit/blob/master/examples/get-multiline-input.py
-                                # multiline=True,
-                                # get_continuation_tokens=continuation_tokens,
-                                get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
-                                get_prompt_tokens=get_prompt_tokens,
-                                style=style,
-                                **prompt_kwargs)
+            return prompt_async(
+                completer=completer,
+                history=history,
+                patch_stdout=False,
+                # https://github.com/jonathanslenders/python-prompt-toolkit/blob/master/examples/get-multiline-input.py
+                # multiline=True,
+                # get_continuation_tokens=continuation_tokens,
+                get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
+                get_prompt_tokens=get_prompt_tokens,
+                style=style,
+                **prompt_kwargs)
     else:
         get_command = sys.stdin.readline
 

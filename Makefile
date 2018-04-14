@@ -35,11 +35,21 @@ upload: clean
 		dist/cbsh-*.whl \
 		s3://fabric-deploy/cbsh/
 
+test: flake8 yapf mypy
+
 flake8:
-	flake8 --ignore=E501,E402,N802 cbsh sphinxcontrib
+	flake8 --ignore=E501 cbsh sphinxcontrib
+
+yapf:
+	yapf -rd cbsh sphinxcontrib
 
 mypy:
 	mypy cbsh sphinxcontrib
+
+
+format:
+	autopep8 -ri --aggressive cbsh sphinxcontrib
+	yapf -ri cbsh sphinxcontrib
 
 
 # build a statically linked executable using Pyinstaller

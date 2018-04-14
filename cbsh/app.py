@@ -28,16 +28,13 @@
 #
 #####################################################################################
 
+import sys
 import os
 import socket
 import json
 import yaml
 import asyncio
 import click
-
-import txaio
-import sys
-txaio.use_asyncio()
 
 import pygments
 from pygments import highlight, lexers, formatters
@@ -46,20 +43,15 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
+import txaio
 from autobahn.websocket.util import parse_url
 from autobahn.wamp.types import ComponentConfig
 from autobahn.wamp.exception import ApplicationError
 from autobahn.asyncio.wamp import ApplicationRunner
 
-from cbsh.util import (
-    style_crossbar,
-    style_finished_line,
-    style_error,
-    style_ok,
-    localnow
-)
+from cbsh.util import (style_crossbar, style_finished_line, style_error,
+                       style_ok, localnow)
 from cbsh import client, repl, config, key, __version__
-
 
 _DEFAULT_CFC_URL = u'wss://fabric.crossbario.com/ws'
 
@@ -87,7 +79,10 @@ def _prompt_for_url():
     """
     Prompt user for CFC URL to create a new ~/.cbf/config.ini file
     """
-    value = click.prompt('Crossbar.io Fabric Center URL', type=WebSocketURL(), default=_DEFAULT_CFC_URL)
+    value = click.prompt(
+        'Crossbar.io Fabric Center URL',
+        type=WebSocketURL(),
+        default=_DEFAULT_CFC_URL)
     return value
 
 
@@ -108,21 +103,20 @@ class Application(object):
     OUTPUT_FORMAT_YAML = 'yaml'
     OUTPUT_FORMAT_YAML_COLORED = 'yaml-color'
 
-    OUTPUT_FORMAT = [OUTPUT_FORMAT_PLAIN,
-                     OUTPUT_FORMAT_JSON,
-                     OUTPUT_FORMAT_JSON_COLORED,
-                     OUTPUT_FORMAT_YAML,
-                     OUTPUT_FORMAT_YAML_COLORED]
+    OUTPUT_FORMAT = [
+        OUTPUT_FORMAT_PLAIN, OUTPUT_FORMAT_JSON, OUTPUT_FORMAT_JSON_COLORED,
+        OUTPUT_FORMAT_YAML, OUTPUT_FORMAT_YAML_COLORED
+    ]
 
     OUTPUT_VERBOSITY_SILENT = 'silent'
     OUTPUT_VERBOSITY_RESULT_ONLY = 'result-only'
     OUTPUT_VERBOSITY_NORMAL = 'normal'
     OUTPUT_VERBOSITY_EXTENDED = 'extended'
 
-    OUTPUT_VERBOSITY = [OUTPUT_VERBOSITY_SILENT,
-                        OUTPUT_VERBOSITY_RESULT_ONLY,
-                        OUTPUT_VERBOSITY_NORMAL,
-                        OUTPUT_VERBOSITY_EXTENDED]
+    OUTPUT_VERBOSITY = [
+        OUTPUT_VERBOSITY_SILENT, OUTPUT_VERBOSITY_RESULT_ONLY,
+        OUTPUT_VERBOSITY_NORMAL, OUTPUT_VERBOSITY_EXTENDED
+    ]
 
     # list of all available Pygments styles (including ones loaded from plugins)
     # https://www.complang.tuwien.ac.at/doc/python-pygments/styles.html
@@ -133,7 +127,8 @@ class Application(object):
 
     Press Ctrl-C to cancel the current command, and Ctrl-D to exit the shell.
     Type "help" to get help. Try TAB for auto-completion.
-    """.format(title=style_crossbar('Crossbar.io Shell'), version=__version__)
+    """.format(
+        title=style_crossbar('Crossbar.io Shell'), version=__version__)
 
     CONNECTED = """    Connection:
 
@@ -178,14 +173,16 @@ class Application(object):
         cbf_dir = os.path.expanduser(dotdir)
         if not os.path.isdir(cbf_dir):
             os.mkdir(cbf_dir)
-            click.echo(u'Created new local user directory: {}'.format(style_ok(cbf_dir)))
+            click.echo(u'Created new local user directory: {}'.format(
+                style_ok(cbf_dir)))
 
         config_path = os.path.join(cbf_dir, 'config.ini')
         if not os.path.isfile(config_path):
             with open(config_path, 'w') as f:
                 url = _prompt_for_url()
                 f.write(_DEFAULT_CONFIG.format(url=url))
-            click.echo(u'Created new local user configuration: {}'.format(style_ok(config_path)))
+            click.echo(u'Created new local user configuration: {}'.format(
+                style_ok(config_path)))
 
         config_obj = config.UserConfig(config_path)
 
@@ -211,7 +208,9 @@ class Application(object):
         if output_format in Application.OUTPUT_FORMAT:
             self._output_format = output_format
         else:
-            raise Exception('invalid value {} for output_format (not in {})'.format(output_format, Application.OUTPUT_FORMAT))
+            raise Exception(
+                'invalid value {} for output_format (not in {})'.format(
+                    output_format, Application.OUTPUT_FORMAT))
 
     def set_output_verbosity(self, output_verbosity):
         """
@@ -223,7 +222,9 @@ class Application(object):
         if output_verbosity in Application.OUTPUT_VERBOSITY:
             self._output_verbosity = output_verbosity
         else:
-            raise Exception('invalid value {} for output_verbosity (not in {})'.format(output_verbosity, Application.OUTPUT_VERBOSITY))
+            raise Exception(
+                'invalid value {} for output_verbosity (not in {})'.format(
+                    output_verbosity, Application.OUTPUT_VERBOSITY))
 
     def set_output_style(self, output_style):
         """
@@ -235,13 +236,16 @@ class Application(object):
         if output_style in Application.OUTPUT_STYLE:
             self._output_style = output_style
         else:
-            raise Exception('invalid value {} for output_style (not in {})'.format(output_style, Application.OUTPUT_STYLE))
+            raise Exception(
+                'invalid value {} for output_style (not in {})'.format(
+                    output_style, Application.OUTPUT_STYLE))
 
     def error(self, msg):
         click.echo()
 
     def format_selected(self):
-        return u'{} -> {}.\n'.format(self.current_resource_type, self.current_resource)
+        return u'{} -> {}.\n'.format(self.current_resource_type,
+                                     self.current_resource)
 
     def print_selected(self):
         click.echo(self.format_selected())
@@ -250,7 +254,8 @@ class Application(object):
         return self.current_resource_type, self.current_resource
 
     def __str__(self):
-        return u'Application(current_resource_type={}, current_resource={})'.format(self.current_resource_type, self.current_resource)
+        return u'Application(current_resource_type={}, current_resource={})'.format(
+            self.current_resource_type, self.current_resource)
 
     async def run_command(self, cmd):
         try:
@@ -258,29 +263,38 @@ class Application(object):
         except Exception as e:
             print(e)
 
-        if self._output_format in [Application.OUTPUT_FORMAT_JSON, Application.OUTPUT_FORMAT_JSON_COLORED]:
+        if self._output_format in [
+                Application.OUTPUT_FORMAT_JSON,
+                Application.OUTPUT_FORMAT_JSON_COLORED
+        ]:
 
-            json_str = json.dumps(result.result,
-                                  separators=(', ', ': '),
-                                  sort_keys=True,
-                                  indent=4,
-                                  ensure_ascii=False)
+            json_str = json.dumps(
+                result.result,
+                separators=(', ', ': '),
+                sort_keys=True,
+                indent=4,
+                ensure_ascii=False)
 
             if self._output_format == Application.OUTPUT_FORMAT_JSON_COLORED:
-                console_str = highlight(json_str,
-                                        lexers.JsonLexer(),
-                                        formatters.Terminal256Formatter(style=self._output_style))
+                console_str = highlight(
+                    json_str,
+                    lexers.JsonLexer(),
+                    formatters.Terminal256Formatter(style=self._output_style))
             else:
                 console_str = json_str
 
-        elif self._output_format in [Application.OUTPUT_FORMAT_YAML, Application.OUTPUT_FORMAT_YAML_COLORED]:
+        elif self._output_format in [
+                Application.OUTPUT_FORMAT_YAML,
+                Application.OUTPUT_FORMAT_YAML_COLORED
+        ]:
 
             yaml_str = yaml.safe_dump(result.result)
 
             if self._output_format == Application.OUTPUT_FORMAT_YAML_COLORED:
-                console_str = highlight(yaml_str,
-                                        lexers.YamlLexer(),
-                                        formatters.Terminal256Formatter(style=self._output_style))
+                console_str = highlight(
+                    yaml_str,
+                    lexers.YamlLexer(),
+                    formatters.Terminal256Formatter(style=self._output_style))
             else:
                 console_str = yaml_str
 
@@ -290,7 +304,9 @@ class Application(object):
 
         else:
             # should not arrive here
-            raise Exception('internal error: unprocessed value "{}" for output format'.format(self._output_format))
+            raise Exception(
+                'internal error: unprocessed value "{}" for output format'.
+                format(self._output_format))
 
         # output command metadata (such as runtime)
         if self._output_verbosity == Application.OUTPUT_VERBOSITY_SILENT:
@@ -303,20 +319,28 @@ class Application(object):
                 pass
             elif self._output_verbosity == Application.OUTPUT_VERBOSITY_NORMAL:
                 if result.duration:
-                    click.echo(style_finished_line(u'Finished in {} ms.'.format(result.duration)))
+                    click.echo(
+                        style_finished_line(u'Finished in {} ms.'.format(
+                            result.duration)))
                 else:
                     click.echo(style_finished_line(u'Finished successfully.'))
             elif self._output_verbosity == Application.OUTPUT_VERBOSITY_EXTENDED:
                 if result.duration:
-                    click.echo(style_finished_line(u'Finished in {} ms on {}.'.format(result.duration, localnow())))
+                    click.echo(
+                        style_finished_line(u'Finished in {} ms on {}.'.format(
+                            result.duration, localnow())))
                 else:
-                    click.echo(style_finished_line(u'Finished successfully on {}.'.format(localnow())))
+                    click.echo(
+                        style_finished_line(
+                            u'Finished successfully on {}.'.format(
+                                localnow())))
             else:
                 # should not arrive here
                 raise Exception('internal error')
 
     def _get_bottom_toolbar_tokens(self, cli):
-        toolbar_str = ' Current resource path: {}'.format(self.format_selected())
+        toolbar_str = ' Current resource path: {}'.format(
+            self.format_selected())
         return [
             (Token.Toolbar, toolbar_str),
         ]
@@ -343,9 +367,11 @@ class Application(object):
 
         cmd = ctx.command.name
         if cmd not in [u'auth', u'shell']:
-            raise click.ClickException('"{}" command can only be run in shell'.format(cmd))
+            raise click.ClickException(
+                '"{}" command can only be run in shell'.format(cmd))
 
-        click.echo('Crossbar.io Shell: {}'.format(style_ok('v{}'.format(__version__))))
+        click.echo('Crossbar.io Shell: {}'.format(
+            style_ok('v{}'.format(__version__))))
 
         # load user profile and key for given profile name
         key, profile = self._load_profile(profile=cfg.profile)
@@ -401,7 +427,8 @@ class Application(object):
             click.echo('Connecting to {} ..'.format(url))
             _res = runner.run(self.session, start_loop=False)
         except socket.gaierror as e:
-            click.echo(style_error('Could not connect to {}: {}'.format(url, e)))
+            click.echo(
+                style_error('Could not connect to {}: {}'.format(url, e)))
             loop.close()
             sys.exit(1)
 
@@ -428,20 +455,30 @@ class Application(object):
                 if error == u'new-user-auth-code-sent':
 
                     click.echo('\nThanks for registering! {}'.format(message))
-                    click.echo(style_ok('Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'))
+                    click.echo(
+                        style_ok(
+                            'Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'
+                        ))
 
                 elif error == u'registered-user-auth-code-sent':
 
                     click.echo('\nWelcome back! {}'.format(message))
-                    click.echo(style_ok('Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'))
+                    click.echo(
+                        style_ok(
+                            'Please check your inbox and run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>.\n'
+                        ))
 
                 elif error == u'pending-activation':
 
                     click.echo()
                     click.echo(style_ok(message))
                     click.echo()
-                    click.echo('Tip: to activate, run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>"')
-                    click.echo('Tip: you can request sending a new code with "cbsh auth --new-code"')
+                    click.echo(
+                        'Tip: to activate, run "cbsh auth --code <THE CODE YOU GOT BY EMAIL>"'
+                    )
+                    click.echo(
+                        'Tip: you can request sending a new code with "cbsh auth --new-code"'
+                    )
                     click.echo()
 
                 elif error == u'no-pending-activation':
@@ -469,7 +506,10 @@ class Application(object):
 
                     # we should not arrive here! otherwise, add a new clause above and handle the situation
                     exit_code = 1
-                    click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
+                    click.echo(
+                        style_error(
+                            'Internal error: unprocessed error type {}:'.
+                            format(error)))
                     click.echo(style_error(message))
 
             elif e.error.startswith(u'crossbar.error.'):
@@ -486,7 +526,10 @@ class Application(object):
 
                     # we should not arrive here! otherwise, add a new clause above and handle the situation
                     exit_code = 1
-                    click.echo(style_error('Internal error: unprocessed error type {}:'.format(error)))
+                    click.echo(
+                        style_error(
+                            'Internal error: unprocessed error type {}:'.
+                            format(error)))
                     click.echo(style_error(message))
 
             else:
@@ -514,12 +557,13 @@ class Application(object):
                 }
 
                 shell_task = loop.create_task(
-                    repl.repl(ctx,
-                              get_bottom_toolbar_tokens=self._get_bottom_toolbar_tokens,
-                              # get_prompt_tokens=self._get_prompt_tokens,
-                              style=self._style,
-                              prompt_kwargs=prompt_kwargs)
-                )
+                    repl.repl(
+                        ctx,
+                        get_bottom_toolbar_tokens=self.
+                        _get_bottom_toolbar_tokens,
+                        # get_prompt_tokens=self._get_prompt_tokens,
+                        style=self._style,
+                        prompt_kwargs=prompt_kwargs))
 
                 loop.run_until_complete(shell_task)
 
@@ -533,11 +577,15 @@ class Application(object):
 
     def _print_welcome(self, url, session_details):
         click.echo(self.WELCOME)
-        click.echo(self.CONNECTED.format(
-            url=url,
-            realm=style_crossbar(session_details.realm) if session_details else None,
-            authmethod=session_details.authmethod if session_details else None,
-            authid=style_crossbar(session_details.authid) if session_details else None,
-            authrole=style_crossbar(session_details.authrole) if session_details else None,
-            session=session_details.session if session_details else None
-        ))
+        click.echo(
+            self.CONNECTED.format(
+                url=url,
+                realm=style_crossbar(session_details.realm)
+                if session_details else None,
+                authmethod=session_details.authmethod
+                if session_details else None,
+                authid=style_crossbar(session_details.authid)
+                if session_details else None,
+                authrole=style_crossbar(session_details.authrole)
+                if session_details else None,
+                session=session_details.session if session_details else None))
