@@ -141,7 +141,7 @@ class Application(object):
     """
 
     def __init__(self):
-        self.current_resource_type = None
+        self.current_resource_type = None  # type: str
         self.current_resource = None
         self.session = None
         self._history = FileHistory('.cbsh-history')
@@ -399,7 +399,7 @@ class Application(object):
         # this will be fired when the ShellClient below actually has joined
         # the respective realm on Crossbar.io Fabric (either the global users
         # realm, or a management realm the user has a role on)
-        ready = asyncio.Future()
+        ready = asyncio.Future()  # type: ignore
 
         extra = {
             # these are forward on the actual client connection

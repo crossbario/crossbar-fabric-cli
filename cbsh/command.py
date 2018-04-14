@@ -127,7 +127,7 @@ class CmdListNodes(CmdList):
     """
 
     def __init__(self, verbose=False):
-        CmdList.__init__(self, verbose)
+        CmdList.__init__(self)
 
     async def run(self, session):
         self._pre(session)
@@ -142,7 +142,7 @@ class CmdListWorkers(CmdList):
     """
 
     def __init__(self, node, verbose=False):
-        CmdList.__init__(self, verbose)
+        CmdList.__init__(self)
         self.node = node
 
     async def run(self, session):
@@ -334,13 +334,12 @@ class CmdStartContainerComponent(CmdStart):
             config[u'realm'] = self.realm
 
         if self.transport_type == u'websocket':
-            config[u'transport'][u'url'] = self.transport_ws_url
+            config[u'transport'][u'url'] = self.transport_ws_url  # type: ignore
 
         if self.transport_endpoint_type == u'tcp':
-            config[u'transport'][u'endpoint'][
-                u'host'] = self.transport_tcp_host
-            config[u'transport'][u'endpoint'][
-                u'port'] = self.transport_tcp_port
+            _ep = config[u'transport'][u'endpoint']  # type: ignore
+            _ep[u'host'] = self.transport_tcp_host
+            _ep[u'port'] = self.transport_tcp_port
 
         result = await session.call(
             u'crossbarfabriccenter.start_container_component',

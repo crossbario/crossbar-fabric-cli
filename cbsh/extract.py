@@ -30,6 +30,7 @@
 
 import re
 import os
+from typing import List
 
 # .. xbr:namespace:: network.xbr.mobility.navigation
 # .. xbr:interface:: INavigationMonitor
@@ -228,7 +229,7 @@ def _extract(root, filterpaths=None):
         for f in filenames:
             if f.endswith('.rst'):
                 fn = os.path.join(dirpath, f)
-                blocks = []
+                blocks = []  # type: List[List[str]]
                 if filterpaths is None or fn in filterpaths:
                     with open(fn) as fd:
                         contents = fd.read()

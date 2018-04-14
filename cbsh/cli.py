@@ -47,34 +47,6 @@ txaio.use_asyncio()
 from cbsh import app, command, quickstart  # noqa: E402
 from cbsh import __version__, __build__  # noqa: E402
 
-if False:
-    # try to monkey patch click to allow arguments to have help
-    # DOES NOT WORK!
-
-    _old_click_argument = click.argument
-
-    import inspect
-    from click import Argument
-    from click.decorators import _param_memo
-
-    def _new_click_argument(*param_decls, **attrs):
-        def decorator(f):
-            if 'help' in attrs:
-                attrs['help'] = inspect.cleandoc(attrs['help'])
-            _Klass = attrs.pop('cls', Argument)
-            _param_memo(f, _Klass(param_decls, **attrs))
-            return f
-
-        return decorator
-
-    click.argument = _new_click_argument
-
-
-def hl(text):
-    if not isinstance(text, six.text_type):
-        text = '{}'.format(text)
-    return click.style(text, fg='yellow', bold=True)
-
 
 USAGE = """
 Examples:
@@ -88,8 +60,15 @@ using the "--profile" option:
     cbf --profile mister-test1 shell
 """
 
+
 # the global, singleton app object
 _app = app.Application()
+
+
+def hl(text):
+    if not isinstance(text, six.text_type):
+        text = '{}'.format(text)
+    return click.style(text, fg='yellow', bold=True)
 
 
 class Config(object):

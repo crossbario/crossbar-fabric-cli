@@ -206,7 +206,7 @@ def run(cfg):
 
     select = None
     while select not in range(0, num + 1):
-        select = click.prompt('Please select', type=int, default=0)
+        select = click.prompt('Please select', type=int, default='0')
 
     if select > 0:
 

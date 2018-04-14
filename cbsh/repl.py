@@ -101,7 +101,7 @@ def _help_internal():
         formatter.write_text('prefix external commands with "!"')
     with formatter.section('Internal Commands'):
         formatter.write_text('prefix internal commands with ":"')
-        info_table = defaultdict(list)
+        info_table = defaultdict(list)  # type: ignore
         for mnemonic, target_info in six.iteritems(_internal_commands):
             info_table[target_info[1]].append(mnemonic)
         formatter.write_dl(
@@ -142,7 +142,8 @@ class ClickCompleter(Completer):
             # command, so give all relevant completions for this context.
             incomplete = ''
 
-        ctx = click._bashcomplete.resolve_ctx(self.cli, '', args)
+        # FIXME
+        ctx = click._bashcomplete.resolve_ctx(self.cli, '', args)  # noqa
         if ctx is None:
             return
 

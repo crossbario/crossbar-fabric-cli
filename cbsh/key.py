@@ -120,7 +120,7 @@ def _parse_keyfile(key_path, private=True):
     if private:
         allowed_tags.append(u'private-key-ed25519')
 
-    tags = OrderedDict()
+    tags = OrderedDict()  # type: ignore
     with open(key_path, 'r') as key_file:
         got_blankline = False
         for line in key_file.readlines():

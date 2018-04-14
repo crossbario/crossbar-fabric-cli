@@ -3,11 +3,6 @@ version: '1.0.{build}'
 image: Visual Studio 2017
 shallow_clone: true
 
-# only commits to master trigger appveyor
-branches:
-  only:
-  - master
-
 environment:
   matrix:
     - PYTHON: "C:\\Python36"
@@ -31,7 +26,7 @@ install:
 # build/install the package itself
 build_script:
   # make appveyor build number available as "cbsh._version.__build__"
-  - ps: (Get-Content .\\cbsh\\_version.py).replace('00000', '$(build)') | Set-Content .\\cbsh\\_version.py
+  - ps: (Get-Content .\\cbsh\\_version.py).replace("00000", "$env:APPVEYOR_BUILD_NUMBER") | Set-Content .\\cbsh\\_version.py
 
   # make appveyor build environment available as ."buildenv.json" in the package
   - python -c "import os, json; fd = open('cbsh\\.buildenv.json', 'w'); json.dump({key: os.environ[key] for key in os.environ if key.startswith('SQB')}, fd); fd.close()"
@@ -80,21 +75,49 @@ artifacts:
   - path: cbsh.exe
     name: Crossbar.io Shell
 
-# this step uploads cbsh.exe to bucket "download.crossbario.com", available at URL
-# https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/cbsh.exe
-#
-deploy:
-  provider: S3
-  bucket: download.crossbario.com
-  region: eu-central-1
-  unzip: false
-  set_public: true
-  folder: cbsh/windows
-  artifact: Crossbar.io Shell
 
-  # to generate the encrypted key material for S3 IAM access below, go to:
-  # https://ci.appveyor.com/tools/encrypt
-  access_key_id:
-    secure: O8zpApNyYa9l577lVw5YzaYALUtZhY06CHkRQZQxOm8=
-  secret_access_key:
-    secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
+# only commits to master trigger appveyor
+#branches:
+#  only:
+#  - master
+
+
+# configuration for "master" branch
+# build in Release mode and deploy to S3
+# https://www.appveyor.com/docs/branches/#conditional-build-configuration
+-
+  branches:
+    only:
+      - master
+
+  configuration: Release
+
+  # this step uploads cbsh.exe to bucket "download.crossbario.com", available at URL
+  # https://s3.eu-central-1.amazonaws.com/download.crossbario.com/cbsh/windows/cbsh.exe
+  #
+  deploy:
+    provider: S3
+    bucket: download.crossbario.com
+    region: eu-central-1
+    unzip: false
+    set_public: true
+    folder: cbsh/windows
+    artifact: Crossbar.io Shell
+
+    # to generate the encrypted key material for S3 IAM access below, go to:
+    # https://ci.appveyor.com/tools/encrypt
+    access_key_id:
+      secure: O8zpApNyYa9l577lVw5YzaYALUtZhY06CHkRQZQxOm8=
+    secret_access_key:
+      secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
+
+
+# "fall back" configuration for all other branches
+# no "branches" section defined
+# do not deploy at all
+-
+  configuration: Debug
+
+
+on_finish:
+  ps: date
