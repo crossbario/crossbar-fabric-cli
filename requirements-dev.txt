@@ -2,7 +2,10 @@ wheel
 flake8
 autopep8
 yapf
+pylint
 tox
 twine
 pytest
+sphinx
+sphinx_rtd_theme
 pyinstaller

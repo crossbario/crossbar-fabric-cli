@@ -25,6 +25,9 @@ matrix:
 
   include:
     - python: 3.6
+      env: TOX_ENV=sphinx
+
+    - python: 3.6
       env: TOX_ENV=flake8
 
     - python: 3.6
@@ -32,6 +35,9 @@ matrix:
 
     - python: 3.6
       env: TOX_ENV=mypy
+
+    - python: 3.6
+      env: TOX_ENV=pylint
 
     - python: 3.6
       env: TOX_ENV=pytest
