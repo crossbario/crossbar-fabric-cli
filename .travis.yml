@@ -1,8 +1,17 @@
 language: python
 
+sudo: false
+
+# https://docs.travis-ci.com/user/encryption-keys/
+access_key_id:
+  secure: "bfWhxVG3zlPb0VAbew+NiraX2xs6HC3Ssmjb7MUg0i4LAuKFfI664rdwmq4vHEhX+ceB3EH5nGnJ0FnRPe80qSQ7YOqSA89kpxh1TOeAEz4ZyGSTxXQuKPEzeUHFzfaSaci5IF/6+k7n5C8wxj1HwYHlTEhCeH191RJ3HT16YjW2OelN/UYSn3M5igloauuGNEWGlGgXwD99xenVzCt+7ZRFDufSOwXvNMkQj6yC7xp5D3FQf/fN0CJyqZNS1UhB4C6GVVa8UtIu9jl0vr6eQ08cFn13Yq8zyEGoTNM7lroO68f1qo6wPOML2fvWChTTBv9CjZfBVXPtZvBfqN1l6pMi0xxdPhZlTaS1knm3uvscclEPHZnrILAdXG1/H6WS+KXlbt9UNw9hSlZLxE/TK+qmJqXv/8+LdtowM8Q/YQXrCm+kxnij9pjK0up1KiZ0bFvm52jBQLvVwJqFLIZYDMTiDui0srs+8P34ypcYmuqaFoQT0GsJOdvod9UUjZaX8NKVjKv7iNsLvis4qMp4bzJH+wCq6xWVIEz7gLL3Qhj00hLo+f517xFbL8lZBVrCJVF1ToQZGcCZ7TLTB2K7xMwuXg+1zO6Wc25zLiECt8yW+c8I+3oEn4iT+r6CC5brzxWvZtTtNjPsQySLQWq61x3JKSlsAOHZC3/DWGqEN8g="
+
+secret_access_key:      
+  secure: "lgDkKXA6VjcfshQ//JSR6p6LbqiX7VHJyFB6N9CB74l1bJyYdfzGtESefJ3bTlUtJ8K5PZpz/e7yBIR8dbkv/Z9xiD8nc2EmwlQ1IiZm9/ktQj98/OaCNN1DOJ4hesRIXSlbF4r0ZaUuG7IjN5HjObm/C4TpwmpZo20mAFlsBME9tauR6AadnwqG5MGlcnwluahNI/kN8pxRfonfecRN7RdXb4bcGqJUSUb7TDYDYwWMyECVDUGwxZepTyhT/VZcMvLV/Z0q4bdE9D3t/YIhFQ546An+z0zyc94NlRWlhidtFSq+O7U4QQPN4lIQKFKTgyZzDc6qQ6ae5OPsPFl32F+1/yBJ5g0sEEbmQVVFys1WE3WkDNA0jIlTXA0BAGP18nZDCZMCzkCWfxR+h/juFxemDWtlKxZLjjQpxWcPv2HILn+z3slM+aWbHQ/GiEyo3vEJRRg/snNTkkhmkWalcuxls6TQE+AONKFvKWIUfRUV7HrH2id4fh+DASUd0aHwvFMDwpuMBxuZyKA+i/wA96gwPI4HDMf070wPJPFZMvq8zx5zwuZtnh7vJUSyBEt0CLZpNnQuLf4hwhv4ikkHyqgIg66FVBHN43MFc5+xbbvRRt5s29kfMP2uhcfri2wWGvNFBCr9XM0SFHNJiSBk4PZ14F+wpm7Tj4j2fmMfapw="
+
 env:
   - TOX_ENV=flake8
-  - TOX_ENV=style
+  - TOX_ENV=yapf
   - TOX_ENV=mypy
   - TOX_ENV=py36
 
@@ -13,22 +22,22 @@ install:
 script:
   - tox -c tox.ini -e $TOX_ENV
 
-#notifications:
-#   irc:
-#      channels:
-#         - "irc.freenode.org#autobahn"
-#      use_notice: true
-#      skip_join: true
+#after_script:
+#  - codecov
 
-#after_success:
-#  # since we use --parallel-mode to coverage inside Tox we use
-#  # "coverage combine" so the filename is always ".coverage"
-#  - cd test && coverage combine && codecov
+matrix:
 
-# https://docs.travis-ci.com/user/encryption-keys/
+  fast_finish: true
 
-access_key_id:
-  secure: "bfWhxVG3zlPb0VAbew+NiraX2xs6HC3Ssmjb7MUg0i4LAuKFfI664rdwmq4vHEhX+ceB3EH5nGnJ0FnRPe80qSQ7YOqSA89kpxh1TOeAEz4ZyGSTxXQuKPEzeUHFzfaSaci5IF/6+k7n5C8wxj1HwYHlTEhCeH191RJ3HT16YjW2OelN/UYSn3M5igloauuGNEWGlGgXwD99xenVzCt+7ZRFDufSOwXvNMkQj6yC7xp5D3FQf/fN0CJyqZNS1UhB4C6GVVa8UtIu9jl0vr6eQ08cFn13Yq8zyEGoTNM7lroO68f1qo6wPOML2fvWChTTBv9CjZfBVXPtZvBfqN1l6pMi0xxdPhZlTaS1knm3uvscclEPHZnrILAdXG1/H6WS+KXlbt9UNw9hSlZLxE/TK+qmJqXv/8+LdtowM8Q/YQXrCm+kxnij9pjK0up1KiZ0bFvm52jBQLvVwJqFLIZYDMTiDui0srs+8P34ypcYmuqaFoQT0GsJOdvod9UUjZaX8NKVjKv7iNsLvis4qMp4bzJH+wCq6xWVIEz7gLL3Qhj00hLo+f517xFbL8lZBVrCJVF1ToQZGcCZ7TLTB2K7xMwuXg+1zO6Wc25zLiECt8yW+c8I+3oEn4iT+r6CC5brzxWvZtTtNjPsQySLQWq61x3JKSlsAOHZC3/DWGqEN8g="
+  include:
+    - python: 3.6
+      env: TOX_ENV=flake8
 
-secret_access_key:      
-  secure: "lgDkKXA6VjcfshQ//JSR6p6LbqiX7VHJyFB6N9CB74l1bJyYdfzGtESefJ3bTlUtJ8K5PZpz/e7yBIR8dbkv/Z9xiD8nc2EmwlQ1IiZm9/ktQj98/OaCNN1DOJ4hesRIXSlbF4r0ZaUuG7IjN5HjObm/C4TpwmpZo20mAFlsBME9tauR6AadnwqG5MGlcnwluahNI/kN8pxRfonfecRN7RdXb4bcGqJUSUb7TDYDYwWMyECVDUGwxZepTyhT/VZcMvLV/Z0q4bdE9D3t/YIhFQ546An+z0zyc94NlRWlhidtFSq+O7U4QQPN4lIQKFKTgyZzDc6qQ6ae5OPsPFl32F+1/yBJ5g0sEEbmQVVFys1WE3WkDNA0jIlTXA0BAGP18nZDCZMCzkCWfxR+h/juFxemDWtlKxZLjjQpxWcPv2HILn+z3slM+aWbHQ/GiEyo3vEJRRg/snNTkkhmkWalcuxls6TQE+AONKFvKWIUfRUV7HrH2id4fh+DASUd0aHwvFMDwpuMBxuZyKA+i/wA96gwPI4HDMf070wPJPFZMvq8zx5zwuZtnh7vJUSyBEt0CLZpNnQuLf4hwhv4ikkHyqgIg66FVBHN43MFc5+xbbvRRt5s29kfMP2uhcfri2wWGvNFBCr9XM0SFHNJiSBk4PZ14F+wpm7Tj4j2fmMfapw="
+    - python: 3.6
+      env: TOX_ENV=yapf
+
+    - python: 3.6
+      env: TOX_ENV=mypy
+
+    - python: 3.6
+      env: TOX_ENV=py36
