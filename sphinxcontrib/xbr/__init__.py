@@ -35,7 +35,7 @@ import re
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from six import iteritems
-from sphinx import addnodes, locale
+from sphinx import addnodes
 from sphinx.builders import Builder
 from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain, Index, ObjType
@@ -1001,8 +1001,6 @@ class XBRBuilder(Builder):
         # type: (unicode, nodes.Node) -> None
         """Where you actually write something to the filesystem."""
         print('XBR: write_doc(docname={}, doctree={})'.format(docname, type(doctree)))
-
-        from pprint import pprint
 
         def _print(nodes):
             for node in nodes:
