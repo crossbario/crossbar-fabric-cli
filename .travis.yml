@@ -9,12 +9,6 @@ access_key_id:
 secret_access_key:      
   secure: "lgDkKXA6VjcfshQ//JSR6p6LbqiX7VHJyFB6N9CB74l1bJyYdfzGtESefJ3bTlUtJ8K5PZpz/e7yBIR8dbkv/Z9xiD8nc2EmwlQ1IiZm9/ktQj98/OaCNN1DOJ4hesRIXSlbF4r0ZaUuG7IjN5HjObm/C4TpwmpZo20mAFlsBME9tauR6AadnwqG5MGlcnwluahNI/kN8pxRfonfecRN7RdXb4bcGqJUSUb7TDYDYwWMyECVDUGwxZepTyhT/VZcMvLV/Z0q4bdE9D3t/YIhFQ546An+z0zyc94NlRWlhidtFSq+O7U4QQPN4lIQKFKTgyZzDc6qQ6ae5OPsPFl32F+1/yBJ5g0sEEbmQVVFys1WE3WkDNA0jIlTXA0BAGP18nZDCZMCzkCWfxR+h/juFxemDWtlKxZLjjQpxWcPv2HILn+z3slM+aWbHQ/GiEyo3vEJRRg/snNTkkhmkWalcuxls6TQE+AONKFvKWIUfRUV7HrH2id4fh+DASUd0aHwvFMDwpuMBxuZyKA+i/wA96gwPI4HDMf070wPJPFZMvq8zx5zwuZtnh7vJUSyBEt0CLZpNnQuLf4hwhv4ikkHyqgIg66FVBHN43MFc5+xbbvRRt5s29kfMP2uhcfri2wWGvNFBCr9XM0SFHNJiSBk4PZ14F+wpm7Tj4j2fmMfapw="
 
-env:
-  - TOX_ENV=flake8
-  - TOX_ENV=yapf
-  - TOX_ENV=mypy
-  - TOX_ENV=py36
-
 install:
   - pip install tox
 #  - pip install tox codecov
