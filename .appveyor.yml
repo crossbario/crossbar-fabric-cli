@@ -1,8 +1,8 @@
-version: '1.0.{build}'
-
+# use the latest toolchain image
 image: Visual Studio 2017
 shallow_clone: true
 
+# define the base environment and build matrix
 environment:
   matrix:
     - PYTHON: "C:\\Python36"
@@ -75,16 +75,15 @@ artifacts:
   - path: cbsh.exe
     name: Crossbar.io Shell
 
+# all of above was for the "Debug" configuration, and is also the common base configuration
+# for any derived configurations defined in "for:" below. in particular, this default
+# configuration does not have a branch filter, so it will run for PRs as well.
+configuration: Debug
 
-# only commits to master trigger appveyor
-#branches:
-#  only:
-#  - master
+# here we are going to override common configuration
+for:
 
-
-# configuration for "master" branch
-# build in Release mode and deploy to S3
-# https://www.appveyor.com/docs/branches/#conditional-build-configuration
+# override settings for "master" branch. this will only run for commits to "master"
 -
   branches:
     only:
@@ -111,13 +110,6 @@ artifacts:
     secret_access_key:
       secure: 12lctYLle9L+rP2ZohkSKXa4h9IiI0b8YwRlNTtb02h0J8FoQGjVI9scem3GRpCG
 
-
-# "fall back" configuration for all other branches
-# no "branches" section defined
-# do not deploy at all
--
-  configuration: Debug
-
-
+# and finally ..
 on_finish:
   ps: date
