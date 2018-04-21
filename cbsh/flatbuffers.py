@@ -34,7 +34,6 @@ from pprint import pprint
 
 from reflection.Schema import Schema
 
-
 _BASETYPE_ID2NAME = {
     None: 'Unknown',
     0: 'None',
@@ -56,7 +55,6 @@ _BASETYPE_ID2NAME = {
     16: 'Union',
 }
 
-
 schema = {
     'meta': {},
     'tables': [],
@@ -64,12 +62,10 @@ schema = {
     'services': [],
 }
 
-
 schema_by_uri = {
     'meta': {},
     'uri': {},
 }
-
 
 # idl_parser.cpp: line 2404:
 # while (token_ != kTokenEof) { ... }
@@ -87,7 +83,6 @@ schema_by_uri = {
 
 filename = 'reflection.bfbs'
 filepath = os.path.abspath(filename)
-
 
 with open(filepath, 'rb') as f:
     buf = f.read()
@@ -132,21 +127,30 @@ with open(filepath, 'rb') as f:
             }
 
             num_enum_value_docs = _enum_value.DocumentationLength()
-            enum_value_docs = [_enum_value.Documentation(i).decode('utf8').strip() for i in range(num_enum_value_docs)]
+            enum_value_docs = [
+                _enum_value.Documentation(i).decode('utf8').strip()
+                for i in range(num_enum_value_docs)
+            ]
             enum_value['docs'] = enum_value_docs
 
             enum_values.append(enum_value)
 
-        enum['values'] = sorted(enum_values, key=lambda enum_value: enum_value['name'])
+        enum['values'] = sorted(
+            enum_values, key=lambda enum_value: enum_value['name'])
 
         num_enum_docs = _enum.DocumentationLength()
-        enum_docs = [_enum.Documentation(i).decode('utf8').strip() for i in range(num_enum_docs)]
+        enum_docs = [
+            _enum.Documentation(i).decode('utf8').strip()
+            for i in range(num_enum_docs)
+        ]
         enum['docs'] = enum_docs
 
         enums.append(enum)
 
         if enum['name'] in schema_by_uri['uri']:
-            raise Exception('unexpected duplicate definition for qualified name "{}"'.format(enum['name']))
+            raise Exception(
+                'unexpected duplicate definition for qualified name "{}"'.
+                format(enum['name']))
         else:
             schema_by_uri['uri'][enum['name']] = enum
 
@@ -174,9 +178,12 @@ with open(filepath, 'rb') as f:
                 'def': 'field',
                 'name': _field_name,
                 'type': {
-                    'base_type': _BASETYPE_ID2NAME.get(_field_type.BaseType(), None),
-                    'element': _BASETYPE_ID2NAME.get(_field_type.Element(), None),
-                    'index': _field_index,
+                    'base_type':
+                    _BASETYPE_ID2NAME.get(_field_type.BaseType(), None),
+                    'element':
+                    _BASETYPE_ID2NAME.get(_field_type.Element(), None),
+                    'index':
+                    _field_index,
                 },
                 'id': int(_field.Id()),
                 'offset': int(_field.Offset()),
@@ -188,13 +195,18 @@ with open(filepath, 'rb') as f:
         obj['fields'] = fields_by_name
 
         num_obj_docs = _obj.DocumentationLength()
-        obj_docs = [_obj.Documentation(i).decode('utf8').strip() for i in range(num_obj_docs)]
+        obj_docs = [
+            _obj.Documentation(i).decode('utf8').strip()
+            for i in range(num_obj_docs)
+        ]
         obj['docs'] = obj_docs
 
         objects.append(obj)
 
         if obj['name'] in schema_by_uri['uri']:
-            raise Exception('unexpected duplicate definition for qualified name "{}"'.format(field['name']))
+            raise Exception(
+                'unexpected duplicate definition for qualified name "{}"'.
+                format(field['name']))
         else:
             schema_by_uri['uri'][obj['name']] = obj
 
@@ -211,9 +223,12 @@ with open(filepath, 'rb') as f:
         }
 
         num_service_attrs = _service.AttributesLength()
-        service_attrs = [_service.Attributes(i) for i in range(num_service_attrs)]
+        service_attrs = [
+            _service.Attributes(i) for i in range(num_service_attrs)
+        ]
         service_attrs = {
-            x.Key().decode('utf8'): x.Value().decode('utf8') for x in service_attrs
+            x.Key().decode('utf8'): x.Value().decode('utf8')
+            for x in service_attrs
         }
         service['attrs'] = service_attrs
 
@@ -236,12 +251,16 @@ with open(filepath, 'rb') as f:
             num_call_attrs = _call.AttributesLength()
             call_attrs = [_call.Attributes(i) for i in range(num_call_attrs)]
             call_attrs = {
-                x.Key().decode('utf8'): x.Value().decode('utf8') for x in call_attrs
+                x.Key().decode('utf8'): x.Value().decode('utf8')
+                for x in call_attrs
             }
             call['attrs'] = call_attrs
 
             num_call_docs = _call.DocumentationLength()
-            call_docs = [_call.Documentation(i).decode('utf8').strip() for i in range(num_call_docs)]
+            call_docs = [
+                _call.Documentation(i).decode('utf8').strip()
+                for i in range(num_call_docs)
+            ]
             call['docs'] = call_docs
 
             calls.append(call)
@@ -251,21 +270,24 @@ with open(filepath, 'rb') as f:
         service['calls'] = calls_by_name
 
         num_service_docs = _service.DocumentationLength()
-        service_docs = [_service.Documentation(i).decode('utf8').strip() for i in range(num_service_docs)]
+        service_docs = [
+            _service.Documentation(i).decode('utf8').strip()
+            for i in range(num_service_docs)
+        ]
         service['docs'] = service_docs
 
         services.append(service)
 
         if service['name'] in schema_by_uri['uri']:
-            raise Exception('unexpected duplicate definition for qualified name "{}"'.format(service['name']))
+            raise Exception(
+                'unexpected duplicate definition for qualified name "{}"'.
+                format(service['name']))
         else:
             schema_by_uri['uri'][service['name']] = service
-
 
 schema['enums'] = sorted(enums, key=lambda enum: enum['name'])
 schema['tables'] = sorted(objects, key=lambda obj: obj['name'])
 schema['services'] = sorted(services, key=lambda service: service['name'])
-
 
 if False:
     if True:
@@ -281,13 +303,16 @@ if False:
 if False:
     pprint(schema['services'])
 
-
 # pprint(schema_by_uri, width=240)
 
 output_filename = 'reflection.json'
 output_filepath = os.path.abspath(output_filename)
 with open(output_filepath, 'wb') as f:
-    data = json.dumps(schema_by_uri, ensure_ascii=False, sort_keys=False, separators=(',', ':')).encode('utf8')
+    data = json.dumps(
+        schema_by_uri,
+        ensure_ascii=False,
+        sort_keys=False,
+        separators=(',', ':')).encode('utf8')
     f.write(data)
 
 print('output file written: {}'.format(output_filepath))
