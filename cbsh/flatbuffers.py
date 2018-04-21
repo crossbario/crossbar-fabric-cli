@@ -1,9 +1,39 @@
+#####################################################################################
+#
+#  Copyright (c) Crossbar.io Technologies GmbH
+#
+#  Unless a separate license agreement exists between you and Crossbar.io GmbH (e.g.
+#  you have purchased a commercial license), the license terms below apply.
+#
+#  Should you enter into a separate license agreement after having received a copy of
+#  this software, then the terms of such license agreement replace the terms below at
+#  the time at which such license agreement becomes effective.
+#
+#  In case a separate license agreement ends, and such agreement ends without being
+#  replaced by another separate license agreement, the license terms below apply
+#  from the time at which said agreement ends.
+#
+#  LICENSE TERMS
+#
+#  This program is free software: you can redistribute it and/or modify it under the
+#  terms of the GNU General Public License, version 3, as published by the
+#  Free Software Foundation. This program is distributed in the hope that it will be
+#  useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+#  See the GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
+#
+#####################################################################################
+
 import os
 import json
 from pprint import pprint
-import flatbuffers
 
 from reflection.Schema import Schema
+
 
 _BASETYPE_ID2NAME = {
     None: 'Unknown',
@@ -34,6 +64,7 @@ schema = {
     'services': [],
 }
 
+
 schema_by_uri = {
     'meta': {},
     'uri': {},
@@ -56,6 +87,7 @@ schema_by_uri = {
 
 filename = 'reflection.bfbs'
 filepath = os.path.abspath(filename)
+
 
 with open(filepath, 'rb') as f:
     buf = f.read()
@@ -118,7 +150,6 @@ with open(filepath, 'rb') as f:
         else:
             schema_by_uri['uri'][enum['name']] = enum
 
-
     # iterate over objects (framebuffer structs)
     #
     num_objs = _schema.ObjectsLength()
@@ -152,7 +183,7 @@ with open(filepath, 'rb') as f:
             }
             fields.append(field)
             fields_by_name[_field_name] = field
-        
+
         # obj['fields'] = sorted(fields, key=lambda field: field['id'])
         obj['fields'] = fields_by_name
 
@@ -166,7 +197,6 @@ with open(filepath, 'rb') as f:
             raise Exception('unexpected duplicate definition for qualified name "{}"'.format(field['name']))
         else:
             schema_by_uri['uri'][obj['name']] = obj
-
 
     # iterate over services
     #
@@ -199,8 +229,8 @@ with open(filepath, 'rb') as f:
                 'name': _call_name,
                 'request': _call.Request().Name().decode('utf8'),
                 'response': _call.Response().Name().decode('utf8'),
-                #'id': int(_call.Id()),
-                #'offset': int(_call.Offset()),
+                # 'id': int(_call.Id()),
+                # 'offset': int(_call.Offset()),
             }
 
             num_call_attrs = _call.AttributesLength()
@@ -232,7 +262,6 @@ with open(filepath, 'rb') as f:
             schema_by_uri['uri'][service['name']] = service
 
 
-
 schema['enums'] = sorted(enums, key=lambda enum: enum['name'])
 schema['tables'] = sorted(objects, key=lambda obj: obj['name'])
 schema['services'] = sorted(services, key=lambda service: service['name'])
@@ -240,7 +269,6 @@ schema['services'] = sorted(services, key=lambda service: service['name'])
 
 if False:
     if True:
-        #pprint(schema)
         pprint(schema_by_uri, width=240)
     else:
         pprint(schema_by_uri['meta'])
@@ -254,12 +282,12 @@ if False:
     pprint(schema['services'])
 
 
-#pprint(schema_by_uri, width=240)
+# pprint(schema_by_uri, width=240)
 
 output_filename = 'reflection.json'
 output_filepath = os.path.abspath(output_filename)
 with open(output_filepath, 'wb') as f:
-    data = json.dumps(schema_by_uri, ensure_ascii=False, sort_keys=False, separators=(',',':')).encode('utf8')
+    data = json.dumps(schema_by_uri, ensure_ascii=False, sort_keys=False, separators=(',', ':')).encode('utf8')
     f.write(data)
 
 print('output file written: {}'.format(output_filepath))
