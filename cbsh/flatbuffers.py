@@ -55,6 +55,7 @@ _BASETYPE_ID2NAME = {
     16: 'Union',
 }
 
+schema = None  # type: dict
 schema = {
     'meta': {},
     'tables': [],
@@ -62,6 +63,7 @@ schema = {
     'services': [],
 }
 
+schema_by_uri = None  # type: dict
 schema_by_uri = {
     'meta': {},
     'uri': {},
@@ -226,11 +228,11 @@ with open(filepath, 'rb') as f:
         service_attrs = [
             _service.Attributes(i) for i in range(num_service_attrs)
         ]
-        service_attrs = {
+        service_attrs_dict = {
             x.Key().decode('utf8'): x.Value().decode('utf8')
             for x in service_attrs
         }
-        service['attrs'] = service_attrs
+        service['attrs'] = service_attrs_dict
 
         num_calls = _service.CallsLength()
         calls = []
@@ -250,11 +252,11 @@ with open(filepath, 'rb') as f:
 
             num_call_attrs = _call.AttributesLength()
             call_attrs = [_call.Attributes(i) for i in range(num_call_attrs)]
-            call_attrs = {
+            call_attrs_dict = {
                 x.Key().decode('utf8'): x.Value().decode('utf8')
                 for x in call_attrs
             }
-            call['attrs'] = call_attrs
+            call['attrs'] = call_attrs_dict
 
             num_call_docs = _call.DocumentationLength()
             call_docs = [
