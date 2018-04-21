@@ -148,3 +148,4 @@ TEST_IDL_FILES=tests/idl/example.fbs
 test_idl:
 	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtin-attrs $(TEST_IDL_FILES)
 	find tests/idl/
+	ls -la tests/idl/

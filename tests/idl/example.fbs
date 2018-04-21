@@ -3,7 +3,13 @@
 //
 
 /// We only need "uri" and "Void" (maybe move that elsewhere?)
-include "wamp.fbs";
+//include "wamp.fbs";
+
+attribute "uri";
+attribute "uuid";
+
+namespace wamp;
+table Void {}
 
 
 namespace com.example.accelstorage;
