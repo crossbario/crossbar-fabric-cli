@@ -114,7 +114,7 @@ install_exe: build_exe
 
 
 # flatc compiler to use
-FLATC=${HOME}/scm/xbr/flatbuffers/flatc
+FLATC=${HOME}/scm/xbr/flatbuffers/flatc -I ${HOME}/scm/wamp-proto/wamp-proto/rfc/flatbuffers/
 #FLATC=flatc
 
 
@@ -141,3 +141,10 @@ reflection:
 reflection_bindings: reflection
 	$(FLATC) -o cbsh --python $(REFLECTION_FILES)
 	find cbsh/reflection
+
+
+TEST_IDL_FILES=tests/idl/example.fbs
+
+test_idl:
+	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtin-attrs $(TEST_IDL_FILES)
+	find tests/idl/
