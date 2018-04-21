@@ -105,3 +105,39 @@ publish_exe: build_exe
 # install Linux exe locally
 install_exe: build_exe
 	sudo cp ./dist/cbsh /usr/local/bin/cbsh
+
+
+
+#
+# USAGE: clear && time make clean build test cloc
+#
+
+
+# flatc compiler to use
+FLATC=${HOME}/scm/xbr/flatbuffers/flatc
+#FLATC=flatc
+
+
+check_py_modified:
+	flake8 void.py
+	pycodestyle void.py
+	pylint void.py
+
+cloc:
+	cloc --read-lang-def=cloc.def --exclude-dir=_build .
+	cloc ./_build
+
+#test: bfbs python
+#	PYTHONPATH=./_build/python python test.py
+
+
+# generate schema type library (.bfbs binary)
+# input .fbs files for schema
+REFLECTION_FILES=reflection.fbs
+
+reflection:
+	$(FLATC) -o . --binary --schema --bfbs-comments --bfbs-builtin-attrs $(REFLECTION_FILES)
+
+reflection_bindings: reflection
+	$(FLATC) -o cbsh --python $(REFLECTION_FILES)
+	find cbsh/reflection

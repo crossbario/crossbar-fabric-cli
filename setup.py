@@ -75,7 +75,6 @@ setup(
     # packages=find_packages(),
     packages=[
         'cbsh',
-        'sphinxcontrib.xbr'
     ],
     include_package_data=True,
     data_files=[
