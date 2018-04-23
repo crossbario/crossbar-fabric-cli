@@ -40,7 +40,7 @@ output_filename = 'tests/idl/example.json'
 
 INTERFACE_ATTRS = ['type', 'uuid']
 INTERFACE_MEMBER_ATTRS = ['type', 'stream']
-INTERFACE_MEMBER_TYPES = ['procedure', 'topic', 'error']
+INTERFACE_MEMBER_TYPES = ['procedure', 'topic']
 INTERFACE_MEMBER_STREAM_VALUES = [None, 'in', 'out', 'inout']
 
 
@@ -122,10 +122,11 @@ with open(filepath, 'rb') as f:
     enums = []
     for i in range(num_enums):
         _enum = _schema.Enums(i)
+        enum_name = _enum.Name().decode('utf8')
 
         enum = {
-            'def': 'enum',
-            'name': _enum.Name().decode('utf8'),
+            'type': 'enum',
+            'name': enum_name,
         }
 
         num_enum_values = _enum.ValuesLength()
@@ -146,8 +147,13 @@ with open(filepath, 'rb') as f:
 
             enum_values.append(enum_value)
 
-        enum['values'] = sorted(
-            enum_values, key=lambda enum_value: enum_value['name'])
+        enum_values = sorted(enum_values, key=lambda enum_value: enum_value['name'])
+        enum_values_dict =  {}
+        for e in enum_values:
+            enum_values_dict[e['name']] = {
+                'docs': e['docs']
+            }
+        enum['values'] = enum_values_dict
 
         num_enum_docs = _enum.DocumentationLength()
         enum_docs = [
@@ -158,12 +164,12 @@ with open(filepath, 'rb') as f:
 
         enums.append(enum)
 
-        if enum['name'] in schema_by_uri['uri']:
+        if enum_name in schema_by_uri['uri']:
             raise Exception(
                 'unexpected duplicate definition for qualified name "{}"'.
-                format(enum['name']))
+                format(enum_name))
         else:
-            schema_by_uri['uri'][enum['name']] = enum
+            schema_by_uri['uri'][enum_name] = enum
 
     # iterate over objects (framebuffer structs)
     #
@@ -171,10 +177,15 @@ with open(filepath, 'rb') as f:
     objects = []
     for i in range(num_objs):
         _obj = _schema.Objects(i)
+        obj_name = _obj.Name().decode('utf8')
+
+        # skip our "void marker"
+        if obj_name in ['Void']:
+            continue
 
         obj = {
-            'def': 'table',
-            'name': _obj.Name().decode('utf8'),
+            'type': 'table',
+            'name': obj_name,
         }
 
         num_fields = _obj.FieldsLength()
@@ -185,24 +196,26 @@ with open(filepath, 'rb') as f:
             _field_type = _field.Type()
             _field_index = int(_field_type.Index())
             _field_name = _field.Name().decode('utf8')
+            _field_base_type = _BASETYPE_ID2NAME.get(_field_type.BaseType(), None)
+            _field_element = _BASETYPE_ID2NAME.get(_field_type.Element(), None)
+            if _field_element == 'None':
+                _field_element = None
+
             field = {
-                'def': 'field',
-                'name': _field_name,
-                'type': {
-                    'base_type':
-                    _BASETYPE_ID2NAME.get(_field_type.BaseType(), None),
-                    'element':
-                    _BASETYPE_ID2NAME.get(_field_type.Element(), None),
-                    'index':
-                    _field_index,
-                },
+                #'def': 'field',
+                #'name': _field_name,
                 'id': int(_field.Id()),
                 'offset': int(_field.Offset()),
+                'base_type': _field_base_type,
             }
+            if _field_element:
+                field['field_element'] = _field_element
+            if _field_index != -1:
+                field['field_index'] = _field_index
+
             fields.append(field)
             fields_by_name[_field_name] = field
 
-        # obj['fields'] = sorted(fields, key=lambda field: field['id'])
         obj['fields'] = fields_by_name
 
         num_obj_docs = _obj.DocumentationLength()

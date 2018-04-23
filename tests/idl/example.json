@@ -7,47 +7,40 @@
         "root": null
     }, 
     "uri": {
-        "com.example.accelstorage.Gender": {
-            "def": "enum", 
-            "name": "com.example.accelstorage.Gender", 
-            "values": [
-                {
-                    "name": "FEMALE", 
-                    "docs": []
+        "com.example.survey.Gender": {
+            "type": "enum", 
+            "name": "com.example.survey.Gender", 
+            "values": {
+                "FEMALE": {
+                    "docs": [
+                        "Gender is female."
+                    ]
                 }, 
-                {
-                    "name": "MALE", 
-                    "docs": []
+                "MALE": {
+                    "docs": [
+                        "Gender is male."
+                    ]
                 }, 
-                {
-                    "name": "UNSET", 
-                    "docs": []
+                "UNSET": {
+                    "docs": [
+                        "Unset or unknown gender."
+                    ]
                 }
-            ], 
+            }, 
             "docs": [
                 "Gender (simplified;)."
             ]
         }, 
-        "Void": {
-            "def": "table", 
-            "name": "Void", 
-            "fields": {}, 
-            "docs": []
-        }, 
         "com.example.accelstorage.AccelBatch": {
-            "def": "table", 
+            "type": "table", 
             "name": "com.example.accelstorage.AccelBatch", 
             "fields": {
                 "series": {
-                    "def": "field", 
-                    "name": "series", 
-                    "type": {
-                        "base_type": "Vector", 
-                        "element": "Obj", 
-                        "index": 3
-                    }, 
                     "id": 0, 
-                    "offset": 4
+                    "offset": 4, 
+                    "base_type": "Vector", 
+                    "field_element": "Obj", 
+                    "field_index": 3
                 }
             }, 
             "docs": [
@@ -55,41 +48,23 @@
             ]
         }, 
         "com.example.accelstorage.AccelSample": {
-            "def": "table", 
+            "type": "table", 
             "name": "com.example.accelstorage.AccelSample", 
             "fields": {
                 "x": {
-                    "def": "field", 
-                    "name": "x", 
-                    "type": {
-                        "base_type": "Float", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 0, 
-                    "offset": 0
+                    "offset": 0, 
+                    "base_type": "Float"
                 }, 
                 "y": {
-                    "def": "field", 
-                    "name": "y", 
-                    "type": {
-                        "base_type": "Float", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 1, 
-                    "offset": 4
+                    "offset": 4, 
+                    "base_type": "Float"
                 }, 
                 "z": {
-                    "def": "field", 
-                    "name": "z", 
-                    "type": {
-                        "base_type": "Float", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 2, 
-                    "offset": 8
+                    "offset": 8, 
+                    "base_type": "Float"
                 }
             }, 
             "docs": [
@@ -97,177 +72,141 @@
             ]
         }, 
         "com.example.accelstorage.AccelSeries": {
-            "def": "table", 
+            "type": "table", 
             "name": "com.example.accelstorage.AccelSeries", 
             "fields": {
                 "sample_period": {
-                    "def": "field", 
-                    "name": "sample_period", 
-                    "type": {
-                        "base_type": "UShort", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 1, 
-                    "offset": 6
+                    "offset": 6, 
+                    "base_type": "UShort"
                 }, 
                 "sample_start": {
-                    "def": "field", 
-                    "name": "sample_start", 
-                    "type": {
-                        "base_type": "ULong", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 0, 
-                    "offset": 4
+                    "offset": 4, 
+                    "base_type": "ULong"
                 }, 
                 "samples": {
-                    "def": "field", 
-                    "name": "samples", 
-                    "type": {
-                        "base_type": "Vector", 
-                        "element": "Obj", 
-                        "index": 2
-                    }, 
                     "id": 2, 
-                    "offset": 8
+                    "offset": 8, 
+                    "base_type": "Vector", 
+                    "field_element": "Obj", 
+                    "field_index": 2
                 }
             }, 
             "docs": [
                 "A series of samples from the accelerometer sensor."
             ]
         }, 
-        "com.example.accelstorage.IceCreamOfTheDayReply": {
-            "def": "table", 
-            "name": "com.example.accelstorage.IceCreamOfTheDayReply", 
+        "com.example.accelstorage.AccelSeriesRejected": {
+            "type": "table", 
+            "name": "com.example.accelstorage.AccelSeriesRejected", 
+            "fields": {
+                "outlier_cout": {
+                    "id": 1, 
+                    "offset": 6, 
+                    "base_type": "UInt"
+                }, 
+                "outlier_probability": {
+                    "id": 0, 
+                    "offset": 4, 
+                    "base_type": "Float"
+                }
+            }, 
+            "docs": [
+                "Error raised when the accelerometer data supplied was invalid.", 
+                "The error provides details about the deviation detected."
+            ]
+        }, 
+        "com.example.accelstorage.NoSuchSeries": {
+            "type": "table", 
+            "name": "com.example.accelstorage.NoSuchSeries", 
+            "fields": {}, 
+            "docs": [
+                "No sample series matching the criteria could be found."
+            ]
+        }, 
+        "com.example.accelstorage.TimeRange": {
+            "type": "table", 
+            "name": "com.example.accelstorage.TimeRange", 
+            "fields": {
+                "bar": {
+                    "id": 3, 
+                    "offset": 10, 
+                    "base_type": "UByte"
+                }, 
+                "endof": {
+                    "id": 2, 
+                    "offset": 8, 
+                    "base_type": "ULong"
+                }, 
+                "foo": {
+                    "id": 0, 
+                    "offset": 4, 
+                    "base_type": "UByte"
+                }, 
+                "start": {
+                    "id": 1, 
+                    "offset": 6, 
+                    "base_type": "UInt"
+                }
+            }, 
+            "docs": [
+                "A time range."
+            ]
+        }, 
+        "com.example.survey.IceCreamOfTheDayReply": {
+            "type": "table", 
+            "name": "com.example.survey.IceCreamOfTheDayReply", 
             "fields": {
                 "i_like_chocolate": {
-                    "def": "field", 
-                    "name": "i_like_chocolate", 
-                    "type": {
-                        "base_type": "Bool", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 5, 
-                    "offset": 14
+                    "offset": 14, 
+                    "base_type": "Bool"
                 }, 
                 "i_like_lemon": {
-                    "def": "field", 
-                    "name": "i_like_lemon", 
-                    "type": {
-                        "base_type": "Bool", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 3, 
-                    "offset": 10
+                    "offset": 10, 
+                    "base_type": "Bool"
                 }, 
                 "i_like_strawberry": {
-                    "def": "field", 
-                    "name": "i_like_strawberry", 
-                    "type": {
-                        "base_type": "Bool", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 4, 
-                    "offset": 12
+                    "offset": 12, 
+                    "base_type": "Bool"
                 }, 
                 "my_age": {
-                    "def": "field", 
-                    "name": "my_age", 
-                    "type": {
-                        "base_type": "UShort", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 0, 
-                    "offset": 4
+                    "offset": 4, 
+                    "base_type": "UShort"
                 }, 
                 "my_gender": {
-                    "def": "field", 
-                    "name": "my_gender", 
-                    "type": {
-                        "base_type": "UByte", 
-                        "element": "None", 
-                        "index": 0
-                    }, 
                     "id": 1, 
-                    "offset": 6
+                    "offset": 6, 
+                    "base_type": "UByte", 
+                    "field_index": 0
                 }, 
                 "my_hashed_email": {
-                    "def": "field", 
-                    "name": "my_hashed_email", 
-                    "type": {
-                        "base_type": "Vector", 
-                        "element": "UByte", 
-                        "index": -1
-                    }, 
                     "id": 2, 
-                    "offset": 8
+                    "offset": 8, 
+                    "base_type": "Vector", 
+                    "field_element": "UByte"
                 }
             }, 
             "docs": [
                 "Replies to ice cream surveys."
             ]
         }, 
-        "com.example.accelstorage.IceCreamOfTheDaySurvey": {
-            "def": "table", 
-            "name": "com.example.accelstorage.IceCreamOfTheDaySurvey", 
+        "com.example.survey.IceCreamOfTheDaySurvey": {
+            "type": "table", 
+            "name": "com.example.survey.IceCreamOfTheDaySurvey", 
             "fields": {
                 "expires": {
-                    "def": "field", 
-                    "name": "expires", 
-                    "type": {
-                        "base_type": "ULong", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
                     "id": 0, 
-                    "offset": 4
+                    "offset": 4, 
+                    "base_type": "ULong"
                 }
             }, 
             "docs": [
                 "Ice cream surveys."
-            ]
-        }, 
-        "com.example.accelstorage.InvalidAccelSeries": {
-            "def": "table", 
-            "name": "com.example.accelstorage.InvalidAccelSeries", 
-            "fields": {}, 
-            "docs": []
-        }, 
-        "com.example.accelstorage.TimeRange": {
-            "def": "table", 
-            "name": "com.example.accelstorage.TimeRange", 
-            "fields": {
-                "endof": {
-                    "def": "field", 
-                    "name": "endof", 
-                    "type": {
-                        "base_type": "ULong", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
-                    "id": 1, 
-                    "offset": 6
-                }, 
-                "start": {
-                    "def": "field", 
-                    "name": "start", 
-                    "type": {
-                        "base_type": "ULong", 
-                        "element": "None", 
-                        "index": -1
-                    }, 
-                    "id": 0, 
-                    "offset": 4
-                }
-            }, 
-            "docs": [
-                "A time range."
             ]
         }, 
         "com.example.accelstorage.AccelStorage": {
@@ -303,13 +242,6 @@
                         "Event fired when a sample batch was stored. The time range", 
                         "of the stored samples is provided as event payload."
                     ]
-                }, 
-                "invalid_accel_series": {
-                    "type": "error", 
-                    "in": null, 
-                    "out": "com.example.accelstorage.InvalidAccelSeries", 
-                    "stream": null, 
-                    "docs": []
                 }
             }, 
             "docs": [
@@ -384,15 +316,15 @@
                 "Define an interface for accelerometer storage services."
             ]
         }, 
-        "com.example.accelstorage.IceCreamSurvey": {
+        "com.example.survey.IceCreamSurvey": {
             "type": "interface", 
-            "name": "com.example.accelstorage.IceCreamSurvey", 
+            "name": "com.example.survey.IceCreamSurvey", 
             "uuid": "7e2c99b7-7506-477f-b782-7266a9e76126", 
             "slots": {
                 "on_new_survey": {
                     "type": "topic", 
-                    "in": "com.example.accelstorage.IceCreamOfTheDaySurvey", 
-                    "out": "com.example.accelstorage.IceCreamOfTheDayReply", 
+                    "in": "com.example.survey.IceCreamOfTheDaySurvey", 
+                    "out": "com.example.survey.IceCreamOfTheDayReply", 
                     "stream": null, 
                     "docs": [
                         "Ice cream surveys are published as events on this topic.", 
