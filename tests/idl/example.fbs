@@ -9,9 +9,12 @@ attribute "uri";
 attribute "uuid";
 attribute "type";
 attribute "stream";
+attribute "raises";
+attribute "publishes";
+
+table Void {}
 
 namespace wamp;
-table Void {}
 
 
 namespace com.example.accelstorage;
@@ -58,6 +61,12 @@ table AccelBatch
 }
 
 
+table InvalidAccelSeries
+{
+
+}
+
+
 /// Define an interface for accelerometer storage services.
 rpc_service AccelStorage (type: "interface", uuid: "4b740947-31d5-4a10-b7ce-4149bbc9ee1e")
 {
@@ -67,7 +76,8 @@ rpc_service AccelStorage (type: "interface", uuid: "4b740947-31d5-4a10-b7ce-4149
 
     /// Procedure to store a series of samples. The time range of
     /// samples stored is returned.
-    store (AccelSeries): TimeRange (type: "procedure");
+    store (AccelSeries): TimeRange (type: "procedure",
+                                    raises: "invalid_accel_series");
 
     /// Procedure that returns the last series of samples stored
     // within the given time range.
@@ -75,45 +85,45 @@ rpc_service AccelStorage (type: "interface", uuid: "4b740947-31d5-4a10-b7ce-4149
 
     /// Event fired when a sample batch was stored. The time range
     /// of the stored samples is provided as event payload.
-    on_store (TimeRange): wamp.Void (type: "topic");
+    on_store (TimeRange): Void (type: "topic");
 
+    invalid_accel_series (Void): InvalidAccelSeries (type: "error");
+}
+
+
+/// Define an interface for accelerometer storage services.
+rpc_service AccelStorageAdvanced (type: "interface", uuid: "14dd174c-efc0-4ebb-9bb5-3e59379e7b26")
+{
     //
     // Examples of **streaming return and/or argument** WAMP procedure declarations
     //
 
     /// Fetch all sample series within the given time range as one batch.
-    fetch_batch (TimeRange): AccelBatch (type: "procedure", stream: "none");
+    fetch_batch (TimeRange): AccelBatch (type: "procedure");
 
     /// Fetch all sample series within the given time range.
     /// Sample series are returned as streaming, "progressive results".
-    fetch_stream (TimeRange): AccelSeries (type: "procedure", stream: "return");
+    fetch_stream (TimeRange): AccelSeries (type: "procedure", stream: "out");
 
     /// Bulk upload sample batches.
-    store_batch (AccelBatch): TimeRange (type: "procedure", stream: "none");
+    store_batch (AccelBatch): TimeRange (type: "procedure");
 
     /// Bulk upload sample batches.
     /// Sample batches are provided as streaming, "progressive call arguments"
-    store_stream (AccelSeries): TimeRange (type: "procedure", stream: "argument");
+    store_stream (AccelSeries): TimeRange (type: "procedure", stream: "in");
 
     /// Compute sliding window average of sample using bulk transformation
     /// of batches of samples.
-    average_batch (AccelBatch): AccelBatch (type: "procedure", stream: "none");
+    average_batch (AccelBatch): AccelBatch (type: "procedure");
 
     /// Compute sliding window average of sample using a streaming transformation
     /// receiving arguments and producing results in a full duplex stream.
-    average_stream (AccelSeries): AccelSeries (type: "procedure", stream: "both");
-
-    //
-    // Examples of **event subscriber replies** WAMP topic declarations
-    //
-
-    /// Ice cream surveys are published as events on this topic.
-    on_new_icecream_survey (IceCreamOfTheDaySurvey): IceCreamOfTheDayReply (type: "topic");
+    average_stream (AccelSeries): AccelSeries (type: "procedure", stream: "inout");
 }
 
 
 
-/// Gender (simplified).
+/// Gender (simplified;).
 enum Gender: uint8
 {
     UNSET,
@@ -141,13 +151,17 @@ table IceCreamOfTheDayReply
 }
 
 
-/// 
-rpc_service IceCreamSurvey (type: "interface", uuid: "7e2c99b7-7506-477f-b782-7266a9e76126")
+/// Ice cream survey services may implement this awesome interface;)
+rpc_service IceCreamSurvey (type: "interface",
+                            uuid: "7e2c99b7-7506-477f-b782-7266a9e76126")
 {
     //
     // Examples of **event subscriber replies** WAMP topic declarations
     //
 
     /// Ice cream surveys are published as events on this topic.
+    /// When a receiver of the event decides to take part in the survey,
+    /// the receiver returns a `IceCreamOfTheDayReply` result (instead of
+    /// returning nothing, as usually in an event handler).
     on_new_survey (IceCreamOfTheDaySurvey): IceCreamOfTheDayReply (type: "topic");
 }

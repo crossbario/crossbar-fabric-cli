@@ -95,3 +95,4 @@ ENV/
 .ropeproject
 .mypy_cache
 *.bfbs
+_python

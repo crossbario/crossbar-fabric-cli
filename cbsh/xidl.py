@@ -38,6 +38,11 @@ from cbsh.reflection.Schema import Schema
 filename = 'tests/idl/example.bfbs'
 output_filename = 'tests/idl/example.json'
 
+INTERFACE_ATTRS = ['type', 'uuid']
+INTERFACE_MEMBER_ATTRS = ['type', 'stream']
+INTERFACE_MEMBER_TYPES = ['procedure', 'topic', 'error']
+INTERFACE_MEMBER_STREAM_VALUES = [None, 'in', 'out', 'inout']
+
 
 _BASETYPE_ID2NAME = {
     None: 'Unknown',
@@ -223,11 +228,6 @@ with open(filepath, 'rb') as f:
     for i in range(num_services):
         _service = _schema.Services(i)
 
-        service = {
-            'def': 'service',
-            'name': _service.Name().decode('utf8'),
-        }
-
         num_service_attrs = _service.AttributesLength()
         service_attrs = [
             _service.Attributes(i) for i in range(num_service_attrs)
@@ -236,7 +236,24 @@ with open(filepath, 'rb') as f:
             x.Key().decode('utf8'): x.Value().decode('utf8')
             for x in service_attrs
         }
-        service['attrs'] = service_attrs_dict
+
+        for attr in service_attrs_dict:
+            if attr not in INTERFACE_ATTRS:
+                raise Exception('invalid XBR interface attribute "{}" - must be one of {}'.format(attr, INTERFACE_ATTRS))
+
+        service_type = service_attrs_dict.get('type', None)
+        if service_type != 'interface':
+            raise Exception('invalid value "{}" for attribute "type" in XBR interface'.format(service_type))
+
+        service_uuid = service_attrs_dict.get('uuid', None)
+
+        service_name = _service.Name().decode('utf8')
+        service = {
+            'type': service_type,
+            'name': service_name,
+            'uuid': service_uuid,
+        }
+        #service['attrs'] = service_attrs_dict
 
         num_calls = _service.CallsLength()
         calls = []
@@ -245,14 +262,6 @@ with open(filepath, 'rb') as f:
             _call = _service.Calls(j)
 
             _call_name = _call.Name().decode('utf8')
-            call = {
-                'def': 'call',
-                'name': _call_name,
-                'request': _call.Request().Name().decode('utf8'),
-                'response': _call.Response().Name().decode('utf8'),
-                # 'id': int(_call.Id()),
-                # 'offset': int(_call.Offset()),
-            }
 
             num_call_attrs = _call.AttributesLength()
             call_attrs = [_call.Attributes(i) for i in range(num_call_attrs)]
@@ -260,20 +269,47 @@ with open(filepath, 'rb') as f:
                 x.Key().decode('utf8'): x.Value().decode('utf8')
                 for x in call_attrs
             }
-            call['attrs'] = call_attrs_dict
 
             num_call_docs = _call.DocumentationLength()
             call_docs = [
                 _call.Documentation(i).decode('utf8').strip()
                 for i in range(num_call_docs)
             ]
+
+            call_type = call_attrs_dict.get('type', None)
+            if call_type not in INTERFACE_MEMBER_TYPES:
+                raise Exception('invalid XBR interface member type "{}" - must be one of {}'.format(call_type, INTERFACE_MEMBER_TYPES))
+
+            call_stream = call_attrs_dict.get('stream', None)
+            if call_stream in ['none', 'None', 'null', 'Null']:
+                call_stream = None
+
+            if call_stream not in INTERFACE_MEMBER_STREAM_VALUES:
+                raise Exception('invalid XBR interface member stream modifier "{}" - must be one of {}'.format(call_stream, INTERFACE_MEMBER_STREAM_VALUES))
+
+            def _decode_type(x):
+                res = x.Name().decode('utf8')
+                if res in ['Void', 'wamp.Void']:
+                    res = None
+                return res
+
+            call = {
+                'type': call_type,
+                # 'name': _call_name,
+                'in': _decode_type(_call.Request()),
+                'out': _decode_type(_call.Response()),
+                'stream': call_stream,
+                # 'id': int(_call.Id()),
+                # 'offset': int(_call.Offset()),
+            }
+            #call['attrs'] = call_attrs_dict
             call['docs'] = call_docs
 
             calls.append(call)
             calls_by_name[_call_name] = call
 
         # service['calls'] = sorted(calls, key=lambda field: field['id'])
-        service['calls'] = calls_by_name
+        service['slots'] = calls_by_name
 
         num_service_docs = _service.DocumentationLength()
         service_docs = [
@@ -284,12 +320,12 @@ with open(filepath, 'rb') as f:
 
         services.append(service)
 
-        if service['name'] in schema_by_uri['uri']:
+        if service_name in schema_by_uri['uri']:
             raise Exception(
                 'unexpected duplicate definition for qualified name "{}"'.
-                format(service['name']))
+                format(service_name))
         else:
-            schema_by_uri['uri'][service['name']] = service
+            schema_by_uri['uri'][service_name] = service
 
 schema['enums'] = sorted(enums, key=lambda enum: enum['name'])
 schema['tables'] = sorted(objects, key=lambda obj: obj['name'])
@@ -317,7 +353,8 @@ with open(output_filepath, 'wb') as f:
         schema_by_uri,
         ensure_ascii=False,
         sort_keys=False,
-        separators=(',', ':')).encode('utf8')
+        indent=4,
+        separators=(', ', ': ')).encode('utf8')
     f.write(data)
 
 print('output file written: {}'.format(output_filepath))

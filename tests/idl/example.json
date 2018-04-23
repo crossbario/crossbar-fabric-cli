@@ -1,1 +1,410 @@
-{"meta":{"filename":"tests/idl/example.bfbs","filepath":"/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs","file_ident":"","file_ext":"","root":null},"uri":{"com.example.accelstorage.Gender":{"def":"enum","name":"com.example.accelstorage.Gender","values":[{"name":"FEMALE","docs":[]},{"name":"MALE","docs":[]},{"name":"UNSET","docs":[]}],"docs":["Gender (simplified)."]},"com.example.accelstorage.AccelBatch":{"def":"table","name":"com.example.accelstorage.AccelBatch","fields":{"series":{"def":"field","name":"series","type":{"base_type":"Vector","element":"Obj","index":2},"id":0,"offset":4}},"docs":["A batch of sample series."]},"com.example.accelstorage.AccelSample":{"def":"table","name":"com.example.accelstorage.AccelSample","fields":{"x":{"def":"field","name":"x","type":{"base_type":"Float","element":"None","index":-1},"id":0,"offset":0},"y":{"def":"field","name":"y","type":{"base_type":"Float","element":"None","index":-1},"id":1,"offset":4},"z":{"def":"field","name":"z","type":{"base_type":"Float","element":"None","index":-1},"id":2,"offset":8}},"docs":["One sample from accelerometer sensor."]},"com.example.accelstorage.AccelSeries":{"def":"table","name":"com.example.accelstorage.AccelSeries","fields":{"sample_period":{"def":"field","name":"sample_period","type":{"base_type":"UShort","element":"None","index":-1},"id":1,"offset":6},"sample_start":{"def":"field","name":"sample_start","type":{"base_type":"ULong","element":"None","index":-1},"id":0,"offset":4},"samples":{"def":"field","name":"samples","type":{"base_type":"Vector","element":"Obj","index":1},"id":2,"offset":8}},"docs":["A series of samples from the accelerometer sensor."]},"com.example.accelstorage.IceCreamOfTheDayReply":{"def":"table","name":"com.example.accelstorage.IceCreamOfTheDayReply","fields":{"i_like_chocolate":{"def":"field","name":"i_like_chocolate","type":{"base_type":"Bool","element":"None","index":-1},"id":5,"offset":14},"i_like_lemon":{"def":"field","name":"i_like_lemon","type":{"base_type":"Bool","element":"None","index":-1},"id":3,"offset":10},"i_like_strawberry":{"def":"field","name":"i_like_strawberry","type":{"base_type":"Bool","element":"None","index":-1},"id":4,"offset":12},"my_age":{"def":"field","name":"my_age","type":{"base_type":"UShort","element":"None","index":-1},"id":0,"offset":4},"my_gender":{"def":"field","name":"my_gender","type":{"base_type":"UByte","element":"None","index":0},"id":1,"offset":6},"my_hashed_email":{"def":"field","name":"my_hashed_email","type":{"base_type":"Vector","element":"UByte","index":-1},"id":2,"offset":8}},"docs":["Replies to ice cream surveys."]},"com.example.accelstorage.IceCreamOfTheDaySurvey":{"def":"table","name":"com.example.accelstorage.IceCreamOfTheDaySurvey","fields":{"expires":{"def":"field","name":"expires","type":{"base_type":"ULong","element":"None","index":-1},"id":0,"offset":4}},"docs":["Ice cream surveys."]},"com.example.accelstorage.TimeRange":{"def":"table","name":"com.example.accelstorage.TimeRange","fields":{"endof":{"def":"field","name":"endof","type":{"base_type":"ULong","element":"None","index":-1},"id":1,"offset":6},"start":{"def":"field","name":"start","type":{"base_type":"ULong","element":"None","index":-1},"id":0,"offset":4}},"docs":["A time range."]},"wamp.Void":{"def":"table","name":"wamp.Void","fields":{},"docs":[]},"com.example.accelstorage.AccelStorage":{"def":"service","name":"com.example.accelstorage.AccelStorage","attrs":{"type":"interface","uuid":"4b740947-31d5-4a10-b7ce-4149bbc9ee1e"},"calls":{"store":{"def":"call","name":"store","request":"com.example.accelstorage.AccelSeries","response":"com.example.accelstorage.TimeRange","attrs":{"type":"procedure"},"docs":["Procedure to store a series of samples. The time range of","samples stored is returned."]},"get_last":{"def":"call","name":"get_last","request":"com.example.accelstorage.TimeRange","response":"com.example.accelstorage.AccelSeries","attrs":{"type":"procedure"},"docs":["Procedure that returns the last series of samples stored"]},"on_store":{"def":"call","name":"on_store","request":"com.example.accelstorage.TimeRange","response":"wamp.Void","attrs":{"type":"topic"},"docs":["Event fired when a sample batch was stored. The time range","of the stored samples is provided as event payload."]},"fetch_batch":{"def":"call","name":"fetch_batch","request":"com.example.accelstorage.TimeRange","response":"com.example.accelstorage.AccelBatch","attrs":{"stream":"none","type":"procedure"},"docs":["Fetch all sample series within the given time range as one batch."]},"fetch_stream":{"def":"call","name":"fetch_stream","request":"com.example.accelstorage.TimeRange","response":"com.example.accelstorage.AccelSeries","attrs":{"stream":"return","type":"procedure"},"docs":["Fetch all sample series within the given time range.","Sample series are returned as streaming, \"progressive results\"."]},"store_batch":{"def":"call","name":"store_batch","request":"com.example.accelstorage.AccelBatch","response":"com.example.accelstorage.TimeRange","attrs":{"stream":"none","type":"procedure"},"docs":["Bulk upload sample batches."]},"store_stream":{"def":"call","name":"store_stream","request":"com.example.accelstorage.AccelSeries","response":"com.example.accelstorage.TimeRange","attrs":{"stream":"argument","type":"procedure"},"docs":["Bulk upload sample batches.","Sample batches are provided as streaming, \"progressive call arguments\""]},"average_batch":{"def":"call","name":"average_batch","request":"com.example.accelstorage.AccelBatch","response":"com.example.accelstorage.AccelBatch","attrs":{"stream":"none","type":"procedure"},"docs":["Compute sliding window average of sample using bulk transformation","of batches of samples."]},"average_stream":{"def":"call","name":"average_stream","request":"com.example.accelstorage.AccelSeries","response":"com.example.accelstorage.AccelSeries","attrs":{"stream":"both","type":"procedure"},"docs":["Compute sliding window average of sample using a streaming transformation","receiving arguments and producing results in a full duplex stream."]},"on_new_icecream_survey":{"def":"call","name":"on_new_icecream_survey","request":"com.example.accelstorage.IceCreamOfTheDaySurvey","response":"com.example.accelstorage.IceCreamOfTheDayReply","attrs":{"type":"topic"},"docs":["Ice cream surveys are published as events on this topic."]}},"docs":["Define an interface for accelerometer storage services."]},"com.example.accelstorage.IceCreamSurvey":{"def":"service","name":"com.example.accelstorage.IceCreamSurvey","attrs":{"type":"interface","uuid":"7e2c99b7-7506-477f-b782-7266a9e76126"},"calls":{"on_new_survey":{"def":"call","name":"on_new_survey","request":"com.example.accelstorage.IceCreamOfTheDaySurvey","response":"com.example.accelstorage.IceCreamOfTheDayReply","attrs":{"type":"topic"},"docs":["Ice cream surveys are published as events on this topic."]}},"docs":[""]}}}
+{
+    "meta": {
+        "filename": "tests/idl/example.bfbs", 
+        "filepath": "/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs", 
+        "file_ident": "", 
+        "file_ext": "", 
+        "root": null
+    }, 
+    "uri": {
+        "com.example.accelstorage.Gender": {
+            "def": "enum", 
+            "name": "com.example.accelstorage.Gender", 
+            "values": [
+                {
+                    "name": "FEMALE", 
+                    "docs": []
+                }, 
+                {
+                    "name": "MALE", 
+                    "docs": []
+                }, 
+                {
+                    "name": "UNSET", 
+                    "docs": []
+                }
+            ], 
+            "docs": [
+                "Gender (simplified;)."
+            ]
+        }, 
+        "Void": {
+            "def": "table", 
+            "name": "Void", 
+            "fields": {}, 
+            "docs": []
+        }, 
+        "com.example.accelstorage.AccelBatch": {
+            "def": "table", 
+            "name": "com.example.accelstorage.AccelBatch", 
+            "fields": {
+                "series": {
+                    "def": "field", 
+                    "name": "series", 
+                    "type": {
+                        "base_type": "Vector", 
+                        "element": "Obj", 
+                        "index": 3
+                    }, 
+                    "id": 0, 
+                    "offset": 4
+                }
+            }, 
+            "docs": [
+                "A batch of sample series."
+            ]
+        }, 
+        "com.example.accelstorage.AccelSample": {
+            "def": "table", 
+            "name": "com.example.accelstorage.AccelSample", 
+            "fields": {
+                "x": {
+                    "def": "field", 
+                    "name": "x", 
+                    "type": {
+                        "base_type": "Float", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 0, 
+                    "offset": 0
+                }, 
+                "y": {
+                    "def": "field", 
+                    "name": "y", 
+                    "type": {
+                        "base_type": "Float", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 1, 
+                    "offset": 4
+                }, 
+                "z": {
+                    "def": "field", 
+                    "name": "z", 
+                    "type": {
+                        "base_type": "Float", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 2, 
+                    "offset": 8
+                }
+            }, 
+            "docs": [
+                "One sample from accelerometer sensor."
+            ]
+        }, 
+        "com.example.accelstorage.AccelSeries": {
+            "def": "table", 
+            "name": "com.example.accelstorage.AccelSeries", 
+            "fields": {
+                "sample_period": {
+                    "def": "field", 
+                    "name": "sample_period", 
+                    "type": {
+                        "base_type": "UShort", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 1, 
+                    "offset": 6
+                }, 
+                "sample_start": {
+                    "def": "field", 
+                    "name": "sample_start", 
+                    "type": {
+                        "base_type": "ULong", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 0, 
+                    "offset": 4
+                }, 
+                "samples": {
+                    "def": "field", 
+                    "name": "samples", 
+                    "type": {
+                        "base_type": "Vector", 
+                        "element": "Obj", 
+                        "index": 2
+                    }, 
+                    "id": 2, 
+                    "offset": 8
+                }
+            }, 
+            "docs": [
+                "A series of samples from the accelerometer sensor."
+            ]
+        }, 
+        "com.example.accelstorage.IceCreamOfTheDayReply": {
+            "def": "table", 
+            "name": "com.example.accelstorage.IceCreamOfTheDayReply", 
+            "fields": {
+                "i_like_chocolate": {
+                    "def": "field", 
+                    "name": "i_like_chocolate", 
+                    "type": {
+                        "base_type": "Bool", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 5, 
+                    "offset": 14
+                }, 
+                "i_like_lemon": {
+                    "def": "field", 
+                    "name": "i_like_lemon", 
+                    "type": {
+                        "base_type": "Bool", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 3, 
+                    "offset": 10
+                }, 
+                "i_like_strawberry": {
+                    "def": "field", 
+                    "name": "i_like_strawberry", 
+                    "type": {
+                        "base_type": "Bool", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 4, 
+                    "offset": 12
+                }, 
+                "my_age": {
+                    "def": "field", 
+                    "name": "my_age", 
+                    "type": {
+                        "base_type": "UShort", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 0, 
+                    "offset": 4
+                }, 
+                "my_gender": {
+                    "def": "field", 
+                    "name": "my_gender", 
+                    "type": {
+                        "base_type": "UByte", 
+                        "element": "None", 
+                        "index": 0
+                    }, 
+                    "id": 1, 
+                    "offset": 6
+                }, 
+                "my_hashed_email": {
+                    "def": "field", 
+                    "name": "my_hashed_email", 
+                    "type": {
+                        "base_type": "Vector", 
+                        "element": "UByte", 
+                        "index": -1
+                    }, 
+                    "id": 2, 
+                    "offset": 8
+                }
+            }, 
+            "docs": [
+                "Replies to ice cream surveys."
+            ]
+        }, 
+        "com.example.accelstorage.IceCreamOfTheDaySurvey": {
+            "def": "table", 
+            "name": "com.example.accelstorage.IceCreamOfTheDaySurvey", 
+            "fields": {
+                "expires": {
+                    "def": "field", 
+                    "name": "expires", 
+                    "type": {
+                        "base_type": "ULong", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 0, 
+                    "offset": 4
+                }
+            }, 
+            "docs": [
+                "Ice cream surveys."
+            ]
+        }, 
+        "com.example.accelstorage.InvalidAccelSeries": {
+            "def": "table", 
+            "name": "com.example.accelstorage.InvalidAccelSeries", 
+            "fields": {}, 
+            "docs": []
+        }, 
+        "com.example.accelstorage.TimeRange": {
+            "def": "table", 
+            "name": "com.example.accelstorage.TimeRange", 
+            "fields": {
+                "endof": {
+                    "def": "field", 
+                    "name": "endof", 
+                    "type": {
+                        "base_type": "ULong", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 1, 
+                    "offset": 6
+                }, 
+                "start": {
+                    "def": "field", 
+                    "name": "start", 
+                    "type": {
+                        "base_type": "ULong", 
+                        "element": "None", 
+                        "index": -1
+                    }, 
+                    "id": 0, 
+                    "offset": 4
+                }
+            }, 
+            "docs": [
+                "A time range."
+            ]
+        }, 
+        "com.example.accelstorage.AccelStorage": {
+            "type": "interface", 
+            "name": "com.example.accelstorage.AccelStorage", 
+            "uuid": "4b740947-31d5-4a10-b7ce-4149bbc9ee1e", 
+            "slots": {
+                "store": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.AccelSeries", 
+                    "out": "com.example.accelstorage.TimeRange", 
+                    "stream": null, 
+                    "docs": [
+                        "Procedure to store a series of samples. The time range of", 
+                        "samples stored is returned."
+                    ]
+                }, 
+                "get_last": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.TimeRange", 
+                    "out": "com.example.accelstorage.AccelSeries", 
+                    "stream": null, 
+                    "docs": [
+                        "Procedure that returns the last series of samples stored"
+                    ]
+                }, 
+                "on_store": {
+                    "type": "topic", 
+                    "in": "com.example.accelstorage.TimeRange", 
+                    "out": null, 
+                    "stream": null, 
+                    "docs": [
+                        "Event fired when a sample batch was stored. The time range", 
+                        "of the stored samples is provided as event payload."
+                    ]
+                }, 
+                "invalid_accel_series": {
+                    "type": "error", 
+                    "in": null, 
+                    "out": "com.example.accelstorage.InvalidAccelSeries", 
+                    "stream": null, 
+                    "docs": []
+                }
+            }, 
+            "docs": [
+                "Define an interface for accelerometer storage services."
+            ]
+        }, 
+        "com.example.accelstorage.AccelStorageAdvanced": {
+            "type": "interface", 
+            "name": "com.example.accelstorage.AccelStorageAdvanced", 
+            "uuid": "14dd174c-efc0-4ebb-9bb5-3e59379e7b26", 
+            "slots": {
+                "fetch_batch": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.TimeRange", 
+                    "out": "com.example.accelstorage.AccelBatch", 
+                    "stream": null, 
+                    "docs": [
+                        "Fetch all sample series within the given time range as one batch."
+                    ]
+                }, 
+                "fetch_stream": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.TimeRange", 
+                    "out": "com.example.accelstorage.AccelSeries", 
+                    "stream": "out", 
+                    "docs": [
+                        "Fetch all sample series within the given time range.", 
+                        "Sample series are returned as streaming, \"progressive results\"."
+                    ]
+                }, 
+                "store_batch": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.AccelBatch", 
+                    "out": "com.example.accelstorage.TimeRange", 
+                    "stream": null, 
+                    "docs": [
+                        "Bulk upload sample batches."
+                    ]
+                }, 
+                "store_stream": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.AccelSeries", 
+                    "out": "com.example.accelstorage.TimeRange", 
+                    "stream": "in", 
+                    "docs": [
+                        "Bulk upload sample batches.", 
+                        "Sample batches are provided as streaming, \"progressive call arguments\""
+                    ]
+                }, 
+                "average_batch": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.AccelBatch", 
+                    "out": "com.example.accelstorage.AccelBatch", 
+                    "stream": null, 
+                    "docs": [
+                        "Compute sliding window average of sample using bulk transformation", 
+                        "of batches of samples."
+                    ]
+                }, 
+                "average_stream": {
+                    "type": "procedure", 
+                    "in": "com.example.accelstorage.AccelSeries", 
+                    "out": "com.example.accelstorage.AccelSeries", 
+                    "stream": "inout", 
+                    "docs": [
+                        "Compute sliding window average of sample using a streaming transformation", 
+                        "receiving arguments and producing results in a full duplex stream."
+                    ]
+                }
+            }, 
+            "docs": [
+                "Define an interface for accelerometer storage services."
+            ]
+        }, 
+        "com.example.accelstorage.IceCreamSurvey": {
+            "type": "interface", 
+            "name": "com.example.accelstorage.IceCreamSurvey", 
+            "uuid": "7e2c99b7-7506-477f-b782-7266a9e76126", 
+            "slots": {
+                "on_new_survey": {
+                    "type": "topic", 
+                    "in": "com.example.accelstorage.IceCreamOfTheDaySurvey", 
+                    "out": "com.example.accelstorage.IceCreamOfTheDayReply", 
+                    "stream": null, 
+                    "docs": [
+                        "Ice cream surveys are published as events on this topic.", 
+                        "When a receiver of the event decides to take part in the survey,", 
+                        "the receiver returns a `IceCreamOfTheDayReply` result (instead of", 
+                        "returning nothing, as usually in an event handler)."
+                    ]
+                }
+            }, 
+            "docs": [
+                "Ice cream survey services may implement this awesome interface;)"
+            ]
+        }
+    }
+}
