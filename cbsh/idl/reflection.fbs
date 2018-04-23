@@ -85,7 +85,7 @@ table RPCCall {
     request:Object (required);      // must be a table (not a struct)
     response:Object (required);     // must be a table (not a struct)
     attributes:[KeyValue];
-    documentation:[string];    
+    documentation:[string];
 }
 
 table Service {

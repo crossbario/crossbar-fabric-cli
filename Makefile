@@ -133,14 +133,16 @@ cloc:
 
 # generate schema type library (.bfbs binary)
 # input .fbs files for schema
-REFLECTION_FILES=reflection.fbs
+
+REFLECTION_SCHEMA_FILE=cbsh/idl/reflection.fbs
 
 reflection:
-	$(FLATC) -o . --binary --schema --bfbs-comments --bfbs-builtin-attrs $(REFLECTION_FILES)
+	cp ../../xbr/flatbuffers/reflection/reflection.fbs $(REFLECTION_SCHEMA_FILE)
+	$(FLATC) -o cbsh/idl/ --binary --schema --bfbs-comments --bfbs-builtin-attrs $(REFLECTION_SCHEMA_FILE)
 
 reflection_bindings: reflection
-	$(FLATC) -o cbsh --python $(REFLECTION_FILES)
-	find cbsh/reflection
+	$(FLATC) -o cbsh --python $(REFLECTION_SCHEMA_FILE)
+	find cbsh/idl/
 
 
 TEST_IDL_FILES=tests/idl/example.fbs
