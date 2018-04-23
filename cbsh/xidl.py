@@ -32,7 +32,12 @@ import os
 import json
 from pprint import pprint
 
-from reflection.Schema import Schema
+from cbsh.reflection.Schema import Schema
+
+
+filename = 'tests/idl/example.bfbs'
+output_filename = 'tests/idl/example.json'
+
 
 _BASETYPE_ID2NAME = {
     None: 'Unknown',
@@ -83,7 +88,6 @@ schema_by_uri = {
 #                   => ParseDecl()
 #
 
-filename = 'reflection.bfbs'
 filepath = os.path.abspath(filename)
 
 with open(filepath, 'rb') as f:
@@ -307,7 +311,6 @@ if False:
 
 # pprint(schema_by_uri, width=240)
 
-output_filename = 'reflection.json'
 output_filepath = os.path.abspath(output_filename)
 with open(output_filepath, 'wb') as f:
     data = json.dumps(

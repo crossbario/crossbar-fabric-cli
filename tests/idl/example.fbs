@@ -7,6 +7,8 @@
 
 attribute "uri";
 attribute "uuid";
+attribute "type";
+attribute "stream";
 
 namespace wamp;
 table Void {}
@@ -16,7 +18,7 @@ namespace com.example.accelstorage;
 
 
 /// One sample from accelerometer sensor.
-struct AccelReading
+struct AccelSample
 {
     x: float;
     y: float;
@@ -24,8 +26,8 @@ struct AccelReading
 }
 
 
-/// A batch of samples from the accelerometer sensor.
-table AccelSamples
+/// A series of samples from the accelerometer sensor.
+table AccelSeries
 {
     /// Unix epoch when sample batch was recorded (start thereof).
     sample_start: uint64;
@@ -34,7 +36,7 @@ table AccelSamples
     sample_period: uint16;
 
     /// Sample batch with accelerometer readings.
-    samples: [AccelReading];
+    samples: [AccelSample];
 }
 
 
@@ -49,27 +51,103 @@ table TimeRange
 }
 
 
-/// Define an interface for accelerometer storage services.
-rpc_service AccelStorage (uuid: "4b740947-31d5-4a10-b7ce-4149bbc9ee1e")
+/// A batch of sample series.
+table AccelBatch
 {
-    /// Store a sample batch. The time range of samples stored is returned.
-    store (AccelSamples): TimeRange;
+    series: [AccelSeries];
+}
 
-    /// Return last batch of samples stored within the given time range.
-    get_last (TimeRange): AccelSamples;
 
-    /// Event fired when a sample batch was stored. The time range of the stored samples is provided as event payload.
-    on_store (wamp.Void): TimeRange (streaming: "event");
+/// Define an interface for accelerometer storage services.
+rpc_service AccelStorage (type: "interface", uuid: "4b740947-31d5-4a10-b7ce-4149bbc9ee1e")
+{
+    //
+    // Examples of basic WAMP RPC and PubSub interface declarations
+    //
 
-    /// Retrieve all sample batches within the given time range. Sample batches are returned as streaming, "progressive results".
-    retrieve (TimeRange): AccelSamples (streaming: "result");
+    /// Procedure to store a series of samples. The time range of
+    /// samples stored is returned.
+    store (AccelSeries): TimeRange (type: "procedure");
 
-    // NOTE: Further, the following 2 messaging patterns have been discussed,
-    // but are currently not in the  WAMP spec
+    /// Procedure that returns the last series of samples stored
+    // within the given time range.
+    get_last (TimeRange): AccelSeries (type: "procedure");
 
-    /// Bulk upload a series of sample batches.
-    upload (AccelSamples): TimeRange (streaming: "call");
+    /// Event fired when a sample batch was stored. The time range
+    /// of the stored samples is provided as event payload.
+    on_store (TimeRange): wamp.Void (type: "topic");
 
-    /// Compute running average of samples over time window, a full duplex stream or transformation.
-    average (AccelSamples): AccelSamples (streaming: "transform");
+    //
+    // Examples of **streaming return and/or argument** WAMP procedure declarations
+    //
+
+    /// Fetch all sample series within the given time range as one batch.
+    fetch_batch (TimeRange): AccelBatch (type: "procedure", stream: "none");
+
+    /// Fetch all sample series within the given time range.
+    /// Sample series are returned as streaming, "progressive results".
+    fetch_stream (TimeRange): AccelSeries (type: "procedure", stream: "return");
+
+    /// Bulk upload sample batches.
+    store_batch (AccelBatch): TimeRange (type: "procedure", stream: "none");
+
+    /// Bulk upload sample batches.
+    /// Sample batches are provided as streaming, "progressive call arguments"
+    store_stream (AccelSeries): TimeRange (type: "procedure", stream: "argument");
+
+    /// Compute sliding window average of sample using bulk transformation
+    /// of batches of samples.
+    average_batch (AccelBatch): AccelBatch (type: "procedure", stream: "none");
+
+    /// Compute sliding window average of sample using a streaming transformation
+    /// receiving arguments and producing results in a full duplex stream.
+    average_stream (AccelSeries): AccelSeries (type: "procedure", stream: "both");
+
+    //
+    // Examples of **event subscriber replies** WAMP topic declarations
+    //
+
+    /// Ice cream surveys are published as events on this topic.
+    on_new_icecream_survey (IceCreamOfTheDaySurvey): IceCreamOfTheDayReply (type: "topic");
+}
+
+
+
+/// Gender (simplified).
+enum Gender: uint8
+{
+    UNSET,
+    MALE,
+    FEMALE,
+}
+
+
+/// Ice cream surveys.
+table IceCreamOfTheDaySurvey
+{
+    expires: uint64;
+}
+
+
+/// Replies to ice cream surveys.
+table IceCreamOfTheDayReply
+{
+    my_age: uint16;
+    my_gender: Gender;
+    my_hashed_email: [uint8];
+    i_like_lemon: bool;
+    i_like_strawberry: bool;
+    i_like_chocolate: bool;
+}
+
+
+/// 
+rpc_service IceCreamSurvey (type: "interface", uuid: "7e2c99b7-7506-477f-b782-7266a9e76126")
+{
+    //
+    // Examples of **event subscriber replies** WAMP topic declarations
+    //
+
+    /// Ice cream surveys are published as events on this topic.
+    on_new_survey (IceCreamOfTheDaySurvey): IceCreamOfTheDayReply (type: "topic");
 }
