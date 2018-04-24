@@ -39,16 +39,11 @@ from typing import Dict, Any  # noqa
 import six
 import click
 
+from cbsh.util import hl
 from cbsh.reflection import Schema
 
 import txaio
 txaio.use_asyncio()
-
-
-def hl(text, bold=False):
-    if not isinstance(text, six.text_type):
-        text = '{}'.format(text)
-    return click.style(text, fg='yellow', bold=bold)
 
 
 def extract_attributes(item, allowed_attributes=None):

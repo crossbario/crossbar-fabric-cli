@@ -147,10 +147,12 @@ reflection_bindings: reflection
 #
 TEST_IDL_FILES=tests/idl/example.fbs
 
-test_idl:
+test_idl: test_idl_schema test_idl_full test_idl_cloc
+
+test_idl_schema:
 	$(FLATC) -o tests/idl/_build --binary --schema --bfbs-comments --bfbs-builtins $(TEST_IDL_FILES)
 	$(FLATC) -o tests/idl/_build/python --python $(TEST_IDL_FILES)
-	python cbsh/xidl.py --verbose --outfile tests/idl/_build/example.json tests/idl/_build/example.bfbs
+	python cbsh/idl/loader.py --verbose --outfile tests/idl/_build/example.json tests/idl/_build/example.bfbs
 
 test_idl_full:
 	$(FLATC) -o tests/idl/_build/cpp --cpp $(TEST_IDL_FILES)
@@ -164,3 +166,6 @@ test_idl_full:
 
 test_idl_cloc:
 	cloc --read-lang-def=cloc.def tests/idl/_build
+
+test_idl_generate:
+	python cbsh/idl/generator.py --verbose tests/idl/_build/example.json
