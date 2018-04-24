@@ -175,21 +175,21 @@ def read_reflection_schema(buf, log=None):
         item = _schema.Enums(i)
         name = item.Name().decode('utf8')
         if name in fqn2type:
-            raise Exception('duplicate name '.format(name))
+            raise Exception('duplicate name "{}"'.format(name))
         enum_cnt += 1
 
     for i in range(_schema.ObjectsLength()):
         item = _schema.Objects(i)
         name = item.Name().decode('utf8')
         if name in fqn2type:
-            raise Exception('duplicate name '.format(name))
+            raise Exception('duplicate name "{}"'.format(name))
         object_cnt += 1
 
     for i in range(_schema.ServicesLength()):
         item = _schema.Services(i)
         name = item.Name().decode('utf8')
         if name in fqn2type:
-            raise Exception('duplicate name '.format(name))
+            raise Exception('duplicate name "{}"'.format(name))
         service_cnt += 1
 
     log.info('Processing schema with {} enums, {} objects and {} services ...'.
@@ -275,11 +275,13 @@ def read_reflection_schema(buf, log=None):
             _field_element = _BASETYPE_ID2NAME.get(_field_type.Element(), None)
             if _field_element == 'none':
                 _field_element = None
-            if _field_element == 'object':
-                el = _schema.Objects(_field_type.Element())
-                if isinstance(el, reflection.Type) and hasattr(el, 'IsStruct'):
-                    _field_element = 'struct' if el.Element().IsStruct(
-                    ) else 'table'
+
+            # FIXME
+            # if _field_element == 'object':
+            #     el = _schema.Objects(_field_type.Element())
+            #     if isinstance(el, reflection.Type) and hasattr(el, 'IsStruct'):
+            #         _field_element = 'struct' if el.Element().IsStruct(
+            #         ) else 'table'
 
             field = {
                 # '_index': j,

@@ -111,7 +111,10 @@ class BaseAnonymousClientSession(ApplicationSession):
         asyncio.get_event_loop().stop()
 
 
-class _ShellClient(object):
+# note: naming the class XyzMixin will make pylint not fall over
+# the apparantly undefined members
+# see: https://docs.pylint.org/en/1.6.0/faq.html#how-do-i-avoid-access-to-undefined-member-messages-in-my-mixin-classes
+class _ShellClientMixin(object):
 
     log = txaio.make_logger()
 
@@ -145,15 +148,15 @@ class _ShellClient(object):
         self.disconnect()
 
 
-class ShellClient(_ShellClient, BaseCryptosignClientSession):
+class ShellClient(_ShellClientMixin, BaseCryptosignClientSession):
     pass
 
 
-class ShellAnonymousClient(_ShellClient, BaseAnonymousClientSession):
+class ShellAnonymousClient(_ShellClientMixin, BaseAnonymousClientSession):
     pass
 
 
-class _ManagementClientSession(object):
+class _ManagementClientMixin(object):
 
     log = txaio.make_logger()
 
@@ -188,12 +191,12 @@ class _ManagementClientSession(object):
         self.disconnect()
 
 
-class ManagementClientSession(_ManagementClientSession,
+class ManagementClientSession(_ManagementClientMixin,
                               BaseCryptosignClientSession):
     pass
 
 
-class ManagementAnonymousClientSession(_ManagementClientSession,
+class ManagementAnonymousClientSession(_ManagementClientMixin,
                                        BaseAnonymousClientSession):
     pass
 
