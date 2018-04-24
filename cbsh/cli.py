@@ -80,13 +80,12 @@ class Config(object):
         self.profile = profile
         self.realm = realm
         self.role = role
-        self.verbose = None
         self.resource_type = None
         self.resource = None
 
     def __str__(self):
-        return u'Config(verbose={}, resource_type={}, resource={})'.format(
-            self.verbose, self.resource_type, self.resource)
+        return u'Config(resource_type={}, resource={})'.format(self.resource_type,
+            self.resource)
 
 
 @click.group(
@@ -465,11 +464,9 @@ async def cmd_start_container_component(
 
 
 @cli.group(name='list', help='list resources')
-@click.option(
-    '--verbose', help='include resource details', is_flag=True, default=False)
 @click.pass_obj
-def cmd_list(cfg, verbose):
-    cfg.verbose = verbose
+def cmd_list(cfg):
+    pass
 
 
 @cmd_list.command(name='management-realms', help='list management realms')
@@ -495,17 +492,15 @@ async def cmd_list_workers(cfg, node):
 
 
 @cli.group(name='show', help='show resources')
-@click.option(
-    '--verbose', help='include resource details', is_flag=True, default=False)
 @click.pass_obj
-def cmd_show(cfg, verbose):
-    cfg.verbose = verbose
+def cmd_show(cfg):
+    pass
 
 
 @cmd_show.command(name='fabric', help='show fabric')
 @click.pass_obj
 async def cmd_show_fabric(cfg):
-    cmd = command.CmdShowFabric(verbose=cfg.verbose)
+    cmd = command.CmdShowFabric()
     await cfg.app.run_command(cmd)
 
 
@@ -513,7 +508,7 @@ async def cmd_show_fabric(cfg):
 @click.argument('node')
 @click.pass_obj
 async def cmd_show_node(cfg, node):
-    cmd = command.CmdShowNode(node, verbose=cfg.verbose)
+    cmd = command.CmdShowNode(node)
     await cfg.app.run_command(cmd)
 
 
@@ -522,7 +517,7 @@ async def cmd_show_node(cfg, node):
 @click.argument('worker')
 @click.pass_obj
 async def cmd_show_worker(cfg, node, worker):
-    cmd = command.CmdShowWorker(node, worker, verbose=cfg.verbose)
+    cmd = command.CmdShowWorker(node, worker)
     await cfg.app.run_command(cmd)
 
 
@@ -533,7 +528,7 @@ async def cmd_show_worker(cfg, node, worker):
 @click.pass_obj
 async def cmd_show_transport(cfg, node, worker, transport):
     cmd = command.CmdShowTransport(
-        node, worker, transport, verbose=cfg.verbose)
+        node, worker, transport)
     await cfg.app.run_command(cmd)
 
 
@@ -543,7 +538,7 @@ async def cmd_show_transport(cfg, node, worker, transport):
 @click.argument('realm')
 @click.pass_obj
 async def cmd_show_realm(cfg, node, worker, realm):
-    cmd = command.CmdShowRealm(node, worker, realm, verbose=cfg.verbose)
+    cmd = command.CmdShowRealm(node, worker, realm)
     await cfg.app.run_command(cmd)
 
 
@@ -555,7 +550,7 @@ async def cmd_show_realm(cfg, node, worker, realm):
 @click.pass_obj
 async def cmd_show_component(cfg, node, worker, component):
     cmd = command.CmdShowComponent(
-        node, worker, component, verbose=cfg.verbose)
+        node, worker, component)
     await cfg.app.run_command(cmd)
 
 

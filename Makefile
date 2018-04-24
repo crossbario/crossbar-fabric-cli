@@ -14,6 +14,10 @@ clean:
 	-rm -f ./.cbsh-history
 	-rm -rf ./.pytest_cache
 
+distclean: clean
+	-rm -rf ./.tox
+	-rm -rf ./.mypy_cache
+
 
 # install all dev tools and package in dev mode
 install:

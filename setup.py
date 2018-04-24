@@ -59,8 +59,9 @@ setup(
         'pyyaml>=3.12',             # MIT
         'cookiecutter>=1.6.0',      # BSD
         'stringcase>=1.2.0',        # MIT
-        'sphinx>=1.7.2',                    # BSD
-        'sphinx_rtd_theme>=0.3.0',          # MIT
+        'sphinx>=1.7.2',            # BSD
+        'sphinx_rtd_theme>=0.3.0',  # MIT
+        'flatbuffers',              # Apache 2.0
     ],
     extras_require={
     },

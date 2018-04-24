@@ -126,13 +126,13 @@ class CmdListNodes(CmdList):
     GLOBAL REALM: Get list of nodes in management realms.
     """
 
-    def __init__(self, verbose=False):
+    def __init__(self):
         CmdList.__init__(self)
 
     async def run(self, session):
         self._pre(session)
         result = await session.call(
-            u'crossbarfabriccenter.mrealm.get_nodes', verbose=self.verbose)
+            u'crossbarfabriccenter.mrealm.get_nodes')
         return self._post(session, result)
 
 
@@ -141,7 +141,7 @@ class CmdListWorkers(CmdList):
     MREALM: Get list of workers on a node.
     """
 
-    def __init__(self, node, verbose=False):
+    def __init__(self, node):
         CmdList.__init__(self)
         self.node = node
 
@@ -149,43 +149,41 @@ class CmdListWorkers(CmdList):
         self._pre(session)
         result = await session.call(
             u'crossbarfabriccenter.list_workers',
-            self.node,
-            verbose=self.verbose)
+            self.node)
         return self._post(session, result)
 
 
 class CmdShow(Cmd):
-    def __init__(self, verbose=False):
+    def __init__(self):
         Cmd.__init__(self)
-        self.verbose = verbose
 
 
 class CmdShowFabric(CmdShow):
-    def __init__(self, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self):
+        CmdShow.__init__(self)
 
     async def run(self, session):
         self._pre(session)
         result = await session.call(
-            u'crossbarfabriccenter.show_fabric', verbose=self.verbose)
+            u'crossbarfabriccenter.show_fabric')
         return self._post(session, result)
 
 
 class CmdShowNode(CmdShow):
-    def __init__(self, node, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self, node):
+        CmdShow.__init__(self)
         self.node = node
 
     async def run(self, session):
         self._pre(session)
         result = await session.call(
-            u'crossbarfabriccenter.show_node', self.node, verbose=self.verbose)
+            u'crossbarfabriccenter.show_node', self.node)
         return self._post(session, result)
 
 
 class CmdShowWorker(CmdShow):
-    def __init__(self, node, worker, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self, node, worker):
+        CmdShow.__init__(self)
         self.node = node
         self.worker = worker
 
@@ -194,14 +192,13 @@ class CmdShowWorker(CmdShow):
         result = await session.call(
             u'crossbarfabriccenter.show_worker',
             self.node,
-            self.worker,
-            verbose=self.verbose)
+            self.worker)
         return self._post(session, result)
 
 
 class CmdShowTransport(CmdShow):
-    def __init__(self, node, worker, transport, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self, node, worker, transport):
+        CmdShow.__init__(self)
         self.node = node
         self.worker = worker
         self.transport = transport
@@ -212,14 +209,13 @@ class CmdShowTransport(CmdShow):
             u'crossbarfabriccenter.show_transport',
             self.node,
             self.worker,
-            self.transport,
-            verbose=self.verbose)
+            self.transport)
         return self._post(session, result)
 
 
 class CmdShowRealm(CmdShow):
-    def __init__(self, node, worker, realm, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self, node, worker, realm):
+        CmdShow.__init__(self)
         self.node = node
         self.worker = worker
         self.realm = realm
@@ -230,14 +226,13 @@ class CmdShowRealm(CmdShow):
             u'crossbarfabriccenter.show_realm',
             self.node,
             self.worker,
-            self.realm,
-            verbose=self.verbose)
+            self.realm)
         return self._post(session, result)
 
 
 class CmdShowComponent(CmdShow):
-    def __init__(self, node, worker, component, verbose=False):
-        CmdShow.__init__(self, verbose)
+    def __init__(self, node, worker, component):
+        CmdShow.__init__(self)
         self.node = node
         self.worker = worker
         self.component = component
@@ -248,8 +243,7 @@ class CmdShowComponent(CmdShow):
             u'crossbarfabriccenter.show_component',
             self.node,
             self.worker,
-            self.component,
-            verbose=self.verbose)
+            self.component)
         return self._post(session, result)
 
 
