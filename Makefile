@@ -121,31 +121,16 @@ install_exe: build_exe
 
 
 #
-# USAGE: clear && time make clean build test cloc
+# XBR IDL related targets
 #
-
 
 # flatc compiler to use
 FLATC=${HOME}/scm/xbr/flatbuffers/flatc -I ${HOME}/scm/wamp-proto/wamp-proto/rfc/flatbuffers/
 #FLATC=flatc
 
-
-check_py_modified:
-	flake8 void.py
-	pycodestyle void.py
-	pylint void.py
-
-cloc:
-	cloc --read-lang-def=cloc.def --exclude-dir=_build .
-	cloc ./_build
-
-#test: bfbs python
-#	PYTHONPATH=./_build/python python test.py
-
-
 # generate schema type library (.bfbs binary)
 # input .fbs files for schema
-
+#
 REFLECTION_SCHEMA_FILE=cbsh/idl/reflection.fbs
 
 reflection:
@@ -158,9 +143,24 @@ reflection_bindings: reflection
 	find cbsh/idl/
 
 
+# process example IDL files
+#
 TEST_IDL_FILES=tests/idl/example.fbs
 
 test_idl:
-	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtins $(TEST_IDL_FILES)
-	$(FLATC) -o tests/idl/_python --python $(TEST_IDL_FILES)
-	python cbsh/xidl.py --verbose --outfile tests/idl/example.json tests/idl/example.bfbs
+	$(FLATC) -o tests/idl/_build --binary --schema --bfbs-comments --bfbs-builtins $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/python --python $(TEST_IDL_FILES)
+	python cbsh/xidl.py --verbose --outfile tests/idl/_build/example.json tests/idl/_build/example.bfbs
+
+test_idl_full:
+	$(FLATC) -o tests/idl/_build/cpp --cpp $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/csharp --csharp $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/go --go $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/java --java $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/js --js $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/php --php $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/python --python $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/_build/ts --ts $(TEST_IDL_FILES)
+
+test_idl_cloc:
+	cloc --read-lang-def=cloc.def tests/idl/_build
