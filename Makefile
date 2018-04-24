@@ -34,23 +34,27 @@ install_travis:
 
 # run all tests via Tox (this is also how tests are run on Travis)
 test:
-	tox -e flake8,yapf,mypy,pytest
+	tox
+	#tox .-e flake8,yapf,mypy,pytest
+
+test_sphinx:
+	tox -e sphinx
 
 test_flake8:
 	tox -e flake8
-	#flake8 --ignore=E501 cbsh sphinxcontrib
 
 test_yapf:
 	tox -e yapf
-	#yapf -rd cbsh sphinxcontrib
 
 test_mypy:
 	tox -e mypy
-	#mypy cbsh
+
+test_pylint:
+	tox -e pylint
 
 test_pytest:
 	tox -e pytest
-	#pytest
+
 
 # auto-format code - WARNING: this my change files, in-place!
 autoformat:
