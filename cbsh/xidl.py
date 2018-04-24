@@ -29,19 +29,20 @@
 #####################################################################################
 
 import os
-import sys
 import json
 import argparse
 import hashlib
 import pprint
 
+from typing import Dict, Any  # noqa
+
 import six
 import click
 
+from cbsh import reflection
+
 import txaio
 txaio.use_asyncio()
-
-from cbsh.reflection.Schema import Schema
 
 
 def hl(text, bold=False):
@@ -60,7 +61,8 @@ def extract_attributes(item, allowed_attributes=None):
     if allowed_attributes:
         for attr in attrs_dict:
             if attr not in allowed_attributes:
-                raise Exception('invalid XBR attribute  "{}" - must be one of {}'.format(attr, allowed_attributes))
+                raise Exception(
+                    'invalid XBR attribute  "{}" - must be one of {}'.format(attr, allowed_attributes))
     return attrs_dict
 
 
@@ -115,7 +117,7 @@ def read_reflection_schema(buf, log=None):
     if not log:
         log = txaio.make_logger()
 
-    _schema = Schema.GetRootAsSchema(buf, 0)
+    _schema = reflection.Schema.GetRootAsSchema(buf, 0)
 
     _root = _schema.RootTable()
     if _root:
@@ -160,7 +162,7 @@ def read_reflection_schema(buf, log=None):
     objects = []
     services = []
 
-    fqn2type = {}
+    fqn2type = dict()  # type: Dict[str, Any]
 
     enum_cnt = 0
     object_cnt = 0
@@ -189,7 +191,11 @@ def read_reflection_schema(buf, log=None):
             raise Exception('duplicate name '.format(name))
         service_cnt += 1
 
-    log.info('Processing schema with {} enums, {} objects and {} services ...'.format(enum_cnt, object_cnt, service_cnt))
+    log.info(
+        'Processing schema with {} enums, {} objects and {} services ...'.format(
+            enum_cnt,
+            object_cnt,
+            service_cnt))
 
     # enums
     #
@@ -213,7 +219,7 @@ def read_reflection_schema(buf, log=None):
 
         # extract enum values
         #
-        enum_values_dict =  {}
+        enum_values_dict = dict()  # type: Dict[str, Any]
         for j in range(_enum.ValuesLength()):
             _enum_value = _enum.Values(j)
             enum_value_name = _enum_value.Name().decode('utf8')
@@ -222,7 +228,8 @@ def read_reflection_schema(buf, log=None):
                 # enum values cannot have attributes
             }
             if enum_value_name in enum_values_dict:
-                raise Exception('duplicate enum value "{}"'.format(enum_value_name))
+                raise Exception(
+                    'duplicate enum value "{}"'.format(enum_value_name))
             enum_values_dict[enum_value_name] = enum_value
         enum['values'] = enum_values_dict
 
@@ -264,14 +271,15 @@ def read_reflection_schema(buf, log=None):
             _field_type = _field.Type()
 
             _field_index = int(_field_type.Index())
-            _field_base_type = _BASETYPE_ID2NAME.get(_field_type.BaseType(), None)
+            _field_base_type = _BASETYPE_ID2NAME.get(
+                _field_type.BaseType(), None)
 
             _field_element = _BASETYPE_ID2NAME.get(_field_type.Element(), None)
             if _field_element == 'none':
                 _field_element = None
             if _field_element == 'object':
                 el = _schema.Objects(_field_type.Element())
-                if type(el) == object and hasattr(el, 'IsStruct'):
+                if isinstance(el, reflection.Type) and hasattr(el, 'IsStruct'):
                     _field_element = 'struct' if el.Element().IsStruct() else 'table'
 
             field = {
@@ -288,42 +296,47 @@ def read_reflection_schema(buf, log=None):
 
             if _field_index != -1:
 
-                #field['field_index'] = _field_index
+                # field['field_index'] = _field_index
 
-                if _field_base_type in ['object', 'struct'] or _field_element in ['object', 'struct']:
+                if _field_base_type in [
+                        'object', 'struct'] or _field_element in ['object', 'struct']:
 
                     # obj/struct
 
                     if _field_index < _schema.ObjectsLength():
                         l_obj = _schema.Objects(_field_index)
                         l_obj_ref = _obj.Name().decode('utf8')
-                        field['ref_category'] = 'struct' if l_obj.IsStruct() else 'table'
+                        field['ref_category'] = 'struct' if l_obj.IsStruct(
+                        ) else 'table'
                         field['ref_type'] = l_obj_ref
                         typerefs_cnt += 1
                     else:
-                        log.info('WARNING - referenced table/struct for index {} ("{}.{}") not found'.format(_field_index, obj_name, field_name))
+                        log.info(
+                            'WARNING - referenced table/struct for index {} ("{}.{}") not found'.format(
+                                _field_index, obj_name, field_name))
                         field['ref_category'] = 'object'
                         field['ref_type'] = None
                         typerefs_error_cnt += 1
 
                 elif _field_base_type in ['utype',
-                                        'bool',
-                                        'int8',
-                                        'uint8',
-                                        'int16',
-                                        'uint16',
-                                        'int32',
-                                        'uint32',
-                                        'int64',
-                                        'uint64',
-                                        'float',
-                                        'double',
-                                        'string']:
+                                          'bool',
+                                          'int8',
+                                          'uint8',
+                                          'int16',
+                                          'uint16',
+                                          'int32',
+                                          'uint32',
+                                          'int64',
+                                          'uint64',
+                                          'float',
+                                          'double',
+                                          'string']:
                     # enum
                     field['ref_category'] = 'enum'
 
                     if _field_index < _schema.EnumsLength():
-                        _enum_ref = _schema.Enums(_field_index).Name().decode('utf8')
+                        _enum_ref = _schema.Enums(
+                            _field_index).Name().decode('utf8')
                         field['ref_type'] = _enum_ref
                         typerefs_cnt += 1
                     else:
@@ -332,7 +345,12 @@ def read_reflection_schema(buf, log=None):
                         typerefs_error_cnt += 1
 
                 else:
-                    raise Exception('unhandled field type: {} {} {} {}'.format(field_name, _field_base_type, _field_element, _field_index))
+                    raise Exception(
+                        'unhandled field type: {} {} {} {}'.format(
+                            field_name,
+                            _field_base_type,
+                            _field_element,
+                            _field_index))
 
             field_docs = extract_docs(_field)
             if field_docs:
@@ -353,7 +371,8 @@ def read_reflection_schema(buf, log=None):
                 'unexpected duplicate definition for qualified name "{}"'.
                 format(field['name']))
 
-        # always append the object here, so we can dereference indexes correctly
+        # always append the object here, so we can dereference indexes
+        # correctly
         objects.append(obj)
 
         # skip our "void marker"
@@ -374,7 +393,8 @@ def read_reflection_schema(buf, log=None):
 
         service_type = service_attrs_dict.get('type', None)
         if service_type != 'interface':
-            raise Exception('invalid value "{}" for attribute "type" in XBR interface'.format(service_type))
+            raise Exception(
+                'invalid value "{}" for attribute "type" in XBR interface'.format(service_type))
 
         service = {
             # '_index': i,
@@ -400,14 +420,18 @@ def read_reflection_schema(buf, log=None):
 
             call_type = call_attrs_dict.get('type', None)
             if call_type not in INTERFACE_MEMBER_TYPES:
-                raise Exception('invalid XBR interface member type "{}" - must be one of {}'.format(call_type, INTERFACE_MEMBER_TYPES))
+                raise Exception(
+                    'invalid XBR interface member type "{}" - must be one of {}'.format(
+                        call_type, INTERFACE_MEMBER_TYPES))
 
             call_stream = call_attrs_dict.get('stream', None)
             if call_stream in ['none', 'None', 'null', 'Null']:
                 call_stream = None
 
             if call_stream not in INTERFACE_MEMBER_STREAM_VALUES:
-                raise Exception('invalid XBR interface member stream modifier "{}" - must be one of {}'.format(call_stream, INTERFACE_MEMBER_STREAM_VALUES))
+                raise Exception(
+                    'invalid XBR interface member stream modifier "{}" - must be one of {}'.format(
+                        call_stream, INTERFACE_MEMBER_STREAM_VALUES))
 
             def _decode_type(x):
                 res = x.Name().decode('utf8')
@@ -443,7 +467,8 @@ def read_reflection_schema(buf, log=None):
             schema_by_uri['types'][service_name] = service
 
     if typerefs_error_cnt:
-        raise Exception('{} unresolved type references encountered in schema'.format(typerefs_error_cnt))
+        raise Exception(
+            '{} unresolved type references encountered in schema'.format(typerefs_error_cnt))
 
     schema['enums'] = sorted(enums, key=lambda enum: enum['name'])
     schema['tables'] = sorted(objects, key=lambda obj: obj['name'])
@@ -452,14 +477,26 @@ def read_reflection_schema(buf, log=None):
     return schema_by_uri
 
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('infile', help='FlatBuffers binary schema input file (.bfbs)')
-    parser.add_argument('-o', '--outfile', help='FlatBuffers JSON schema output (.json)')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose processing output.')
-    parser.add_argument('-d', '--debug', action='store_true', help='Enable debug output.')
+    parser.add_argument(
+        'infile',
+        help='FlatBuffers binary schema input file (.bfbs)')
+    parser.add_argument(
+        '-o',
+        '--outfile',
+        help='FlatBuffers JSON schema output (.json)')
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help='Enable verbose processing output.')
+    parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        help='Enable debug output.')
 
     options = parser.parse_args()
 
@@ -488,13 +525,16 @@ if __name__ == '__main__':
 
     cnt_bytes = len(outdata)
     cnt_defs = len(schema['types'].keys())
-    log.info('FlatBuffers JSON schema data written ({} bytes, {} defs).'.format(cnt_bytes, cnt_defs))
+    log.info(
+        'FlatBuffers JSON schema data written ({} bytes, {} defs).'.format(
+            cnt_bytes,
+            cnt_defs))
 
     if options.verbose:
         log.info('Schema metadata:')
         schema_meta_str = pprint.pformat(schema['meta'])
-        #log.info(schema_meta_str)
-        #log.info('{}'.format(schema_meta_str))
+        # log.info(schema_meta_str)
+        # log.info('{}'.format(schema_meta_str))
         print(schema_meta_str)
 
         for o in schema['types'].values():
