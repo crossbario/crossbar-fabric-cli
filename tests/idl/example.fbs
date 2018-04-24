@@ -12,7 +12,7 @@ table Void {}
 
 
 /// Our accelerometer example API lives in this namespace.
-namespace com.example.accelstorage;
+namespace accelstorage;
 
 
 /// One sample from accelerometer sensor.
@@ -134,7 +134,7 @@ rpc_service AccelStorageAdvanced (type: "interface",
 
 
 /// Our survey example API lives in this namespace.
-namespace com.example.survey;
+namespace survey;
 
 enum Moo: uint8
 {
@@ -163,9 +163,9 @@ table IceCreamOfTheDaySurvey (uuid: "TEST 2323")
     expires: uint64 (uuid: "TEST 4242");
     moo: Moo;
 
-    test_1: com.example.accelstorage.AccelSample;
+    test_1: accelstorage.AccelSample;
 
-    test_2: com.example.accelstorage.TimeRange;
+    test_2: accelstorage.TimeRange;
 }
 
 

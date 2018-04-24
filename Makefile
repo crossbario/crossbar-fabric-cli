@@ -138,7 +138,8 @@ REFLECTION_SCHEMA_FILE=cbsh/idl/reflection.fbs
 
 reflection:
 	cp ../../xbr/flatbuffers/reflection/reflection.fbs $(REFLECTION_SCHEMA_FILE)
-	$(FLATC) -o cbsh/idl/ --binary --schema --bfbs-comments --bfbs-builtin-attrs $(REFLECTION_SCHEMA_FILE)
+	$(FLATC) -o cbsh/idl/ --binary --schema --bfbs-comments --bfbs-builtins $(REFLECTION_SCHEMA_FILE)
+	$(FLATC) -o cbsh/idl/ --python $(REFLECTION_SCHEMA_FILE)
 
 reflection_bindings: reflection
 	$(FLATC) -o cbsh --python $(REFLECTION_SCHEMA_FILE)
@@ -148,7 +149,6 @@ reflection_bindings: reflection
 TEST_IDL_FILES=tests/idl/example.fbs
 
 test_idl:
-	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtin-attrs $(TEST_IDL_FILES)
+	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtins $(TEST_IDL_FILES)
 	$(FLATC) -o tests/idl/_python --python $(TEST_IDL_FILES)
-	find tests/idl/
-	ls -la tests/idl/
+	python cbsh/xidl.py --outfile tests/idl/example.json tests/idl/example.bfbs

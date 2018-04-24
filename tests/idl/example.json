@@ -4,13 +4,12 @@
         "filepath": "/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs", 
         "file_ident": "", 
         "file_ext": "", 
-        "root": null
+        "root": ""
     }, 
     "uri": {
-        "com.example.survey.Gender": {
-            "_index": 0, 
+        "survey.Gender": {
             "type": "enum", 
-            "name": "com.example.survey.Gender", 
+            "name": "survey.Gender", 
             "docs": [
                 "Gender (simplified;)."
             ], 
@@ -32,10 +31,9 @@
                 }
             }
         }, 
-        "com.example.survey.Moo": {
-            "_index": 1, 
+        "survey.Moo": {
             "type": "enum", 
-            "name": "com.example.survey.Moo", 
+            "name": "survey.Moo", 
             "docs": [], 
             "values": {
                 "TEST": {
@@ -47,126 +45,123 @@
             }
         }, 
         "Void": {
-            "_index": 0, 
             "type": "table", 
             "name": "Void", 
             "docs": [], 
             "fields": {}
         }, 
-        "com.example.accelstorage.AccelBatch": {
-            "_index": 1, 
+        "accelstorage.AccelBatch": {
             "type": "table", 
-            "name": "com.example.accelstorage.AccelBatch", 
+            "name": "accelstorage.AccelBatch", 
             "docs": [
                 "A batch of sample series."
             ], 
             "fields": {
                 "series": {
-                    "_index": 0, 
+                    "name": "series", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "Vector", 
-                    "element_type": "Obj", 
-                    "referenced_type": "com.example.accelstorage.AccelSeries"
+                    "base_type": "vector", 
+                    "element_type": "object", 
+                    "ref_category": "table", 
+                    "ref_type": "accelstorage.AccelBatch"
                 }, 
                 "test": {
-                    "_index": 1, 
+                    "name": "test", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "Int"
+                    "base_type": "int32"
                 }
             }
         }, 
-        "com.example.accelstorage.AccelSample": {
-            "_index": 2, 
-            "type": "table", 
-            "name": "com.example.accelstorage.AccelSample", 
+        "accelstorage.AccelSample": {
+            "type": "struct", 
+            "name": "accelstorage.AccelSample", 
             "docs": [
                 "One sample from accelerometer sensor."
             ], 
             "fields": {
                 "x": {
-                    "_index": 0, 
+                    "name": "x", 
                     "id": 0, 
                     "offset": 0, 
-                    "base_type": "Float"
+                    "base_type": "float"
                 }, 
                 "y": {
-                    "_index": 1, 
+                    "name": "y", 
                     "id": 1, 
                     "offset": 4, 
-                    "base_type": "Float"
+                    "base_type": "float"
                 }, 
                 "z": {
-                    "_index": 2, 
+                    "name": "z", 
                     "id": 2, 
                     "offset": 8, 
-                    "base_type": "Float"
+                    "base_type": "float"
                 }
             }
         }, 
-        "com.example.accelstorage.AccelSeries": {
-            "_index": 3, 
+        "accelstorage.AccelSeries": {
             "type": "table", 
-            "name": "com.example.accelstorage.AccelSeries", 
+            "name": "accelstorage.AccelSeries", 
             "docs": [
                 "A series of samples from the accelerometer sensor."
             ], 
             "fields": {
                 "sample_period": {
-                    "_index": 0, 
+                    "name": "sample_period", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "UShort", 
+                    "base_type": "uint16", 
                     "docs": [
                         "Sample length in ms."
                     ]
                 }, 
                 "sample_start": {
-                    "_index": 1, 
+                    "name": "sample_start", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "ULong", 
+                    "base_type": "uint64", 
                     "docs": [
                         "Unix epoch when sample batch was recorded (start thereof)."
                     ]
                 }, 
                 "samples": {
-                    "_index": 2, 
+                    "name": "samples", 
                     "id": 2, 
                     "offset": 8, 
-                    "base_type": "Vector", 
-                    "element_type": "Obj", 
-                    "referenced_type": "com.example.accelstorage.AccelSample", 
+                    "base_type": "vector", 
+                    "element_type": "object", 
+                    "ref_category": "struct", 
+                    "ref_type": "accelstorage.AccelSeries", 
                     "docs": [
                         "Sample batch with accelerometer readings."
                     ]
                 }
             }
         }, 
-        "com.example.accelstorage.AccelSeriesRejected": {
-            "_index": 4, 
+        "accelstorage.AccelSeriesRejected": {
             "type": "table", 
-            "name": "com.example.accelstorage.AccelSeriesRejected", 
+            "name": "accelstorage.AccelSeriesRejected", 
             "docs": [
                 "Error raised when the accelerometer data supplied was invalid.", 
                 "The error provides details about the deviation detected."
             ], 
             "fields": {
                 "outlier_cout": {
-                    "_index": 0, 
+                    "name": "outlier_cout", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "UInt", 
+                    "base_type": "uint32", 
                     "docs": [
                         "Number of outlier samples (individual readings) detected."
                     ]
                 }, 
                 "outlier_probability": {
-                    "_index": 1, 
+                    "name": "outlier_probability", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "Float", 
+                    "base_type": "float", 
                     "docs": [
                         "In case the error was raised because of outliers,", 
                         "the probability of detection"
@@ -174,302 +169,158 @@
                 }
             }
         }, 
-        "com.example.accelstorage.NoSuchSeries": {
-            "_index": 5, 
+        "accelstorage.NoSuchSeries": {
             "type": "table", 
-            "name": "com.example.accelstorage.NoSuchSeries", 
+            "name": "accelstorage.NoSuchSeries", 
             "docs": [
                 "No sample series matching the criteria could be found."
             ], 
             "fields": {}
         }, 
-        "com.example.accelstorage.TimeRange": {
-            "_index": 6, 
+        "accelstorage.TimeRange": {
             "type": "table", 
-            "name": "com.example.accelstorage.TimeRange", 
+            "name": "accelstorage.TimeRange", 
             "docs": [
                 "A time range."
             ], 
             "fields": {
                 "bar": {
-                    "_index": 0, 
+                    "name": "bar", 
                     "id": 3, 
                     "offset": 10, 
-                    "base_type": "UByte", 
-                    "attr": {
-                        "uuid": "1"
-                    }
+                    "base_type": "uint8"
                 }, 
                 "endof": {
-                    "_index": 1, 
+                    "name": "endof", 
                     "id": 2, 
                     "offset": 8, 
-                    "base_type": "ULong", 
+                    "base_type": "uint64", 
                     "docs": [
                         "Unix epoch end time or 0 for infinity into the future."
-                    ], 
-                    "attr": {
-                        "uuid": "81d3403a-8203-47a6-b7bd-dbaae03195b7"
-                    }
+                    ]
                 }, 
                 "foo": {
-                    "_index": 2, 
+                    "name": "foo", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "UByte"
+                    "base_type": "uint8"
                 }, 
                 "start": {
-                    "_index": 3, 
+                    "name": "start", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "UInt", 
+                    "base_type": "uint32", 
                     "docs": [
                         "Unix epoch start time or 0 for infinity into the past."
-                    ], 
-                    "attr": {
-                        "uuid": null
-                    }
+                    ]
                 }
             }
         }, 
-        "com.example.survey.IceCreamOfTheDayReply": {
-            "_index": 7, 
+        "survey.IceCreamOfTheDayReply": {
             "type": "table", 
-            "name": "com.example.survey.IceCreamOfTheDayReply", 
+            "name": "survey.IceCreamOfTheDayReply", 
             "docs": [
                 "Replies to ice cream surveys."
             ], 
             "fields": {
                 "age": {
-                    "_index": 0, 
+                    "name": "age", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "UShort", 
+                    "base_type": "uint16", 
                     "docs": [
                         "Your age in years."
                     ]
                 }, 
                 "gender": {
-                    "_index": 1, 
+                    "name": "gender", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "UByte", 
-                    "referenced_type": "com.example.survey.Gender", 
+                    "base_type": "uint8", 
+                    "ref_category": "enum", 
+                    "ref_type": "survey.Gender", 
                     "docs": [
                         "Your gender."
                     ]
                 }, 
                 "hashed_email": {
-                    "_index": 2, 
+                    "name": "hashed_email", 
                     "id": 2, 
                     "offset": 8, 
-                    "base_type": "Vector", 
-                    "element_type": "UByte", 
+                    "base_type": "vector", 
+                    "element_type": "uint8", 
                     "docs": [
                         "SHA256 of your email address."
                     ]
                 }, 
                 "likes_chocolate": {
-                    "_index": 3, 
+                    "name": "likes_chocolate", 
                     "id": 5, 
                     "offset": 14, 
-                    "base_type": "Bool", 
+                    "base_type": "bool", 
                     "docs": [
                         "Survey flag: you like chocolate ice cream?"
                     ]
                 }, 
                 "likes_lemon": {
-                    "_index": 4, 
+                    "name": "likes_lemon", 
                     "id": 3, 
                     "offset": 10, 
-                    "base_type": "Bool", 
+                    "base_type": "bool", 
                     "docs": [
                         "Survey flag: you like lemon ice cream?"
                     ]
                 }, 
                 "likes_strawberry": {
-                    "_index": 5, 
+                    "name": "likes_strawberry", 
                     "id": 4, 
                     "offset": 12, 
-                    "base_type": "Bool", 
+                    "base_type": "bool", 
                     "docs": [
                         "Survey flag: you like strawberry ice cream?"
                     ]
                 }
             }
         }, 
-        "com.example.survey.IceCreamOfTheDaySurvey": {
-            "_index": 8, 
+        "survey.IceCreamOfTheDaySurvey": {
             "type": "table", 
-            "name": "com.example.survey.IceCreamOfTheDaySurvey", 
+            "name": "survey.IceCreamOfTheDaySurvey", 
             "docs": [
                 "Ice cream surveys."
             ], 
             "fields": {
                 "expires": {
-                    "_index": 0, 
+                    "name": "expires", 
                     "id": 0, 
                     "offset": 4, 
-                    "base_type": "ULong", 
+                    "base_type": "uint64", 
                     "docs": [
                         "Unix epoch (UTC) when survey expires."
-                    ], 
-                    "attr": {
-                        "uuid": "TEST 4242"
-                    }
+                    ]
                 }, 
                 "moo": {
-                    "_index": 1, 
+                    "name": "moo", 
                     "id": 1, 
                     "offset": 6, 
-                    "base_type": "UByte", 
-                    "referenced_type": "com.example.survey.Moo"
+                    "base_type": "uint8", 
+                    "ref_category": "enum", 
+                    "ref_type": "survey.Moo"
                 }, 
                 "test_1": {
-                    "_index": 2, 
+                    "name": "test_1", 
                     "id": 2, 
                     "offset": 8, 
-                    "base_type": "Obj", 
-                    "referenced_type": "com.example.accelstorage.AccelSample"
+                    "base_type": "object", 
+                    "ref_category": "struct", 
+                    "ref_type": "survey.IceCreamOfTheDaySurvey"
                 }, 
                 "test_2": {
-                    "_index": 3, 
+                    "name": "test_2", 
                     "id": 3, 
                     "offset": 10, 
-                    "base_type": "Obj", 
-                    "referenced_type": "com.example.accelstorage.TimeRange"
-                }
-            }
-        }, 
-        "com.example.accelstorage.AccelStorage": {
-            "_index": 0, 
-            "type": "interface", 
-            "name": "com.example.accelstorage.AccelStorage", 
-            "docs": [
-                "Define an interface for accelerometer storage services."
-            ], 
-            "uuid": "4b740947-31d5-4a10-b7ce-4149bbc9ee1e", 
-            "slots": {
-                "store": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.AccelSeries", 
-                    "out": "com.example.accelstorage.TimeRange", 
-                    "stream": null, 
-                    "docs": [
-                        "Procedure to store a series of samples. The time range of", 
-                        "samples stored is returned."
-                    ]
-                }, 
-                "get_last": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.TimeRange", 
-                    "out": "com.example.accelstorage.AccelSeries", 
-                    "stream": null, 
-                    "docs": [
-                        "Procedure that returns the last series of samples stored"
-                    ]
-                }, 
-                "on_store": {
-                    "type": "topic", 
-                    "in": "com.example.accelstorage.TimeRange", 
-                    "out": null, 
-                    "stream": null, 
-                    "docs": [
-                        "Event fired when a sample batch was stored. The time range", 
-                        "of the stored samples is provided as event payload."
-                    ]
-                }
-            }
-        }, 
-        "com.example.accelstorage.AccelStorageAdvanced": {
-            "_index": 1, 
-            "type": "interface", 
-            "name": "com.example.accelstorage.AccelStorageAdvanced", 
-            "docs": [
-                "Define an interface for accelerometer storage services."
-            ], 
-            "uuid": "14dd174c-efc0-4ebb-9bb5-3e59379e7b26", 
-            "slots": {
-                "fetch_batch": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.TimeRange", 
-                    "out": "com.example.accelstorage.AccelBatch", 
-                    "stream": null, 
-                    "docs": [
-                        "Fetch all sample series within the given time range as one batch."
-                    ]
-                }, 
-                "fetch_stream": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.TimeRange", 
-                    "out": "com.example.accelstorage.AccelSeries", 
-                    "stream": "out", 
-                    "docs": [
-                        "Fetch all sample series within the given time range.", 
-                        "Sample series are returned as streaming, \"progressive results\"."
-                    ]
-                }, 
-                "store_batch": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.AccelBatch", 
-                    "out": "com.example.accelstorage.TimeRange", 
-                    "stream": null, 
-                    "docs": [
-                        "Bulk upload sample batches."
-                    ]
-                }, 
-                "store_stream": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.AccelSeries", 
-                    "out": "com.example.accelstorage.TimeRange", 
-                    "stream": "in", 
-                    "docs": [
-                        "Bulk upload sample batches.", 
-                        "Sample batches are provided as streaming, \"progressive call arguments\""
-                    ]
-                }, 
-                "average_batch": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.AccelBatch", 
-                    "out": "com.example.accelstorage.AccelBatch", 
-                    "stream": null, 
-                    "docs": [
-                        "Compute sliding window average of sample using bulk transformation", 
-                        "of batches of samples."
-                    ]
-                }, 
-                "average_stream": {
-                    "type": "procedure", 
-                    "in": "com.example.accelstorage.AccelSeries", 
-                    "out": "com.example.accelstorage.AccelSeries", 
-                    "stream": "inout", 
-                    "docs": [
-                        "Compute sliding window average of sample using a streaming transformation", 
-                        "receiving arguments and producing results in a full duplex stream."
-                    ]
-                }
-            }
-        }, 
-        "com.example.survey.IceCreamSurvey": {
-            "_index": 2, 
-            "type": "interface", 
-            "name": "com.example.survey.IceCreamSurvey", 
-            "docs": [
-                "Ice cream survey services may implement this awesome interface;)"
-            ], 
-            "uuid": "7e2c99b7-7506-477f-b782-7266a9e76126", 
-            "slots": {
-                "on_new_survey": {
-                    "type": "topic", 
-                    "in": "com.example.survey.IceCreamOfTheDaySurvey", 
-                    "out": "com.example.survey.IceCreamOfTheDayReply", 
-                    "stream": null, 
-                    "docs": [
-                        "Ice cream surveys are published as events on this topic.", 
-                        "When a receiver of the event decides to take part in the survey,", 
-                        "the receiver returns a `IceCreamOfTheDayReply` result (instead of", 
-                        "returning nothing, as usually in an event handler)."
-                    ]
+                    "base_type": "object", 
+                    "ref_category": "table", 
+                    "ref_type": "survey.IceCreamOfTheDaySurvey"
                 }
             }
         }
