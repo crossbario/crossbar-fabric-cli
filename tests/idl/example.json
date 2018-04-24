@@ -4,7 +4,7 @@
         "filepath": "/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs", 
         "file_ident": "", 
         "file_ext": "", 
-        "root": ""
+        "root": null
     }, 
     "uri": {
         "survey.Gender": {
@@ -321,6 +321,145 @@
                     "base_type": "object", 
                     "ref_category": "table", 
                     "ref_type": "survey.IceCreamOfTheDaySurvey"
+                }
+            }
+        }, 
+        "accelstorage.AccelStorage": {
+            "type": "interface", 
+            "name": "accelstorage.AccelStorage", 
+            "docs": [
+                "Define an interface for accelerometer storage services."
+            ], 
+            "uuid": "4b740947-31d5-4a10-b7ce-4149bbc9ee1e", 
+            "slots": {
+                "store": {
+                    "type": "procedure", 
+                    "name": "store", 
+                    "in": "accelstorage.AccelSeries", 
+                    "out": "accelstorage.TimeRange", 
+                    "stream": null, 
+                    "docs": [
+                        "Procedure to store a series of samples. The time range of", 
+                        "samples stored is returned."
+                    ]
+                }, 
+                "get_last": {
+                    "type": "procedure", 
+                    "name": "get_last", 
+                    "in": "accelstorage.TimeRange", 
+                    "out": "accelstorage.AccelSeries", 
+                    "stream": null, 
+                    "docs": [
+                        "Procedure that returns the last series of samples stored"
+                    ]
+                }, 
+                "on_store": {
+                    "type": "topic", 
+                    "name": "on_store", 
+                    "in": "accelstorage.TimeRange", 
+                    "out": null, 
+                    "stream": null, 
+                    "docs": [
+                        "Event fired when a sample batch was stored. The time range", 
+                        "of the stored samples is provided as event payload."
+                    ]
+                }
+            }
+        }, 
+        "accelstorage.AccelStorageAdvanced": {
+            "type": "interface", 
+            "name": "accelstorage.AccelStorageAdvanced", 
+            "docs": [
+                "Define an interface for accelerometer storage services."
+            ], 
+            "uuid": "14dd174c-efc0-4ebb-9bb5-3e59379e7b26", 
+            "slots": {
+                "fetch_batch": {
+                    "type": "procedure", 
+                    "name": "fetch_batch", 
+                    "in": "accelstorage.TimeRange", 
+                    "out": "accelstorage.AccelBatch", 
+                    "stream": null, 
+                    "docs": [
+                        "Fetch all sample series within the given time range as one batch."
+                    ]
+                }, 
+                "fetch_stream": {
+                    "type": "procedure", 
+                    "name": "fetch_stream", 
+                    "in": "accelstorage.TimeRange", 
+                    "out": "accelstorage.AccelSeries", 
+                    "stream": "out", 
+                    "docs": [
+                        "Fetch all sample series within the given time range.", 
+                        "Sample series are returned as streaming, \"progressive results\"."
+                    ]
+                }, 
+                "store_batch": {
+                    "type": "procedure", 
+                    "name": "store_batch", 
+                    "in": "accelstorage.AccelBatch", 
+                    "out": "accelstorage.TimeRange", 
+                    "stream": null, 
+                    "docs": [
+                        "Bulk upload sample batches."
+                    ]
+                }, 
+                "store_stream": {
+                    "type": "procedure", 
+                    "name": "store_stream", 
+                    "in": "accelstorage.AccelSeries", 
+                    "out": "accelstorage.TimeRange", 
+                    "stream": "in", 
+                    "docs": [
+                        "Bulk upload sample batches.", 
+                        "Sample batches are provided as streaming, \"progressive call arguments\""
+                    ]
+                }, 
+                "average_batch": {
+                    "type": "procedure", 
+                    "name": "average_batch", 
+                    "in": "accelstorage.AccelBatch", 
+                    "out": "accelstorage.AccelBatch", 
+                    "stream": null, 
+                    "docs": [
+                        "Compute sliding window average of sample using bulk transformation", 
+                        "of batches of samples."
+                    ]
+                }, 
+                "average_stream": {
+                    "type": "procedure", 
+                    "name": "average_stream", 
+                    "in": "accelstorage.AccelSeries", 
+                    "out": "accelstorage.AccelSeries", 
+                    "stream": "inout", 
+                    "docs": [
+                        "Compute sliding window average of sample using a streaming transformation", 
+                        "receiving arguments and producing results in a full duplex stream."
+                    ]
+                }
+            }
+        }, 
+        "survey.IceCreamSurvey": {
+            "type": "interface", 
+            "name": "survey.IceCreamSurvey", 
+            "docs": [
+                "Ice cream survey services may implement this awesome interface;)"
+            ], 
+            "uuid": "7e2c99b7-7506-477f-b782-7266a9e76126", 
+            "slots": {
+                "on_new_survey": {
+                    "type": "topic", 
+                    "name": "on_new_survey", 
+                    "in": "survey.IceCreamOfTheDaySurvey", 
+                    "out": "survey.IceCreamOfTheDayReply", 
+                    "stream": null, 
+                    "docs": [
+                        "Ice cream surveys are published as events on this topic.", 
+                        "When a receiver of the event decides to take part in the survey,", 
+                        "the receiver returns a `IceCreamOfTheDayReply` result (instead of", 
+                        "returning nothing, as usually in an event handler)."
+                    ]
                 }
             }
         }

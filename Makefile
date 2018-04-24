@@ -139,7 +139,7 @@ REFLECTION_SCHEMA_FILE=cbsh/idl/reflection.fbs
 reflection:
 	cp ../../xbr/flatbuffers/reflection/reflection.fbs $(REFLECTION_SCHEMA_FILE)
 	$(FLATC) -o cbsh/idl/ --binary --schema --bfbs-comments --bfbs-builtins $(REFLECTION_SCHEMA_FILE)
-	$(FLATC) -o cbsh/idl/ --python $(REFLECTION_SCHEMA_FILE)
+	$(FLATC) -o cbsh/ --python $(REFLECTION_SCHEMA_FILE)
 
 reflection_bindings: reflection
 	$(FLATC) -o cbsh --python $(REFLECTION_SCHEMA_FILE)
