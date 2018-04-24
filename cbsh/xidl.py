@@ -39,7 +39,7 @@ from typing import Dict, Any  # noqa
 import six
 import click
 
-from cbsh import reflection
+from cbsh.reflection import Schema
 
 import txaio
 txaio.use_asyncio()
@@ -118,7 +118,7 @@ def read_reflection_schema(buf, log=None):
     if not log:
         log = txaio.make_logger()
 
-    _schema = reflection.Schema.GetRootAsSchema(buf, 0)
+    _schema = Schema.GetRootAsSchema(buf, 0)
 
     _root = _schema.RootTable()
     if _root:
