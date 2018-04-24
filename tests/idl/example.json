@@ -1,12 +1,14 @@
 {
     "meta": {
-        "filename": "tests/idl/example.bfbs", 
-        "filepath": "/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs", 
-        "file_ident": "", 
-        "file_ext": "", 
-        "root": null
+        "bfbs_size": 7448, 
+        "bfbs_sha256": "7c7d5d48662e4bb393eda09bae6fe055b95fa79c88c202a2118eb0a6efc71573", 
+        "file_ident": null, 
+        "file_ext": null, 
+        "root": null, 
+        "file_name": "example.bfbs", 
+        "file_path": "/home/oberstet/scm/crossbario/crossbar-shell/tests/idl/example.bfbs"
     }, 
-    "uri": {
+    "types": {
         "survey.Gender": {
             "type": "enum", 
             "name": "survey.Gender", 

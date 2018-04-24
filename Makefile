@@ -151,4 +151,4 @@ TEST_IDL_FILES=tests/idl/example.fbs
 test_idl:
 	$(FLATC) -o tests/idl/ --binary --schema --bfbs-comments --bfbs-builtins $(TEST_IDL_FILES)
 	$(FLATC) -o tests/idl/_python --python $(TEST_IDL_FILES)
-	python cbsh/xidl.py --outfile tests/idl/example.json tests/idl/example.bfbs
+	python cbsh/xidl.py --verbose --outfile tests/idl/example.json tests/idl/example.bfbs
