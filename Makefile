@@ -19,12 +19,16 @@ distclean: clean
 	-rm -rf ./.mypy_cache
 
 
-# install all dev tools and package in dev mode
-install:
+# install dev & test requirements
+test_requirements:
+	pip install --upgrade pip
 	pip install --no-cache -r requirements-dev.txt
+
+# install package in dev mode
+install:
 	pip install --no-cache -e .
 
-# install package only, as users (regular mode)
+# install package in regular mode
 install_package:
 	pip install --no-cache .
 
