@@ -131,8 +131,7 @@ class CmdListNodes(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.mrealm.get_nodes')
+        result = await session.call(u'crossbarfabriccenter.mrealm.get_nodes')
         return self._post(session, result)
 
 
@@ -147,9 +146,8 @@ class CmdListWorkers(CmdList):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.list_workers',
-            self.node)
+        result = await session.call(u'crossbarfabriccenter.list_workers',
+                                    self.node)
         return self._post(session, result)
 
 
@@ -164,8 +162,7 @@ class CmdShowFabric(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_fabric')
+        result = await session.call(u'crossbarfabriccenter.show_fabric')
         return self._post(session, result)
 
 
@@ -176,8 +173,8 @@ class CmdShowNode(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_node', self.node)
+        result = await session.call(u'crossbarfabriccenter.show_node',
+                                    self.node)
         return self._post(session, result)
 
 
@@ -189,10 +186,8 @@ class CmdShowWorker(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_worker',
-            self.node,
-            self.worker)
+        result = await session.call(u'crossbarfabriccenter.show_worker',
+                                    self.node, self.worker)
         return self._post(session, result)
 
 
@@ -205,11 +200,8 @@ class CmdShowTransport(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_transport',
-            self.node,
-            self.worker,
-            self.transport)
+        result = await session.call(u'crossbarfabriccenter.show_transport',
+                                    self.node, self.worker, self.transport)
         return self._post(session, result)
 
 
@@ -222,11 +214,8 @@ class CmdShowRealm(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_realm',
-            self.node,
-            self.worker,
-            self.realm)
+        result = await session.call(u'crossbarfabriccenter.show_realm',
+                                    self.node, self.worker, self.realm)
         return self._post(session, result)
 
 
@@ -239,11 +228,8 @@ class CmdShowComponent(CmdShow):
 
     async def run(self, session):
         self._pre(session)
-        result = await session.call(
-            u'crossbarfabriccenter.show_component',
-            self.node,
-            self.worker,
-            self.component)
+        result = await session.call(u'crossbarfabriccenter.show_component',
+                                    self.node, self.worker, self.component)
         return self._post(session, result)
 
 

@@ -84,8 +84,8 @@ class Config(object):
         self.resource = None
 
     def __str__(self):
-        return u'Config(resource_type={}, resource={})'.format(self.resource_type,
-            self.resource)
+        return u'Config(resource_type={}, resource={})'.format(
+            self.resource_type, self.resource)
 
 
 @click.group(
@@ -527,8 +527,7 @@ async def cmd_show_worker(cfg, node, worker):
 @click.argument('transport')
 @click.pass_obj
 async def cmd_show_transport(cfg, node, worker, transport):
-    cmd = command.CmdShowTransport(
-        node, worker, transport)
+    cmd = command.CmdShowTransport(node, worker, transport)
     await cfg.app.run_command(cmd)
 
 
@@ -549,8 +548,7 @@ async def cmd_show_realm(cfg, node, worker, realm):
 @click.argument('component')
 @click.pass_obj
 async def cmd_show_component(cfg, node, worker, component):
-    cmd = command.CmdShowComponent(
-        node, worker, component)
+    cmd = command.CmdShowComponent(node, worker, component)
     await cfg.app.run_command(cmd)
 
 
