@@ -55,22 +55,23 @@ def extract_attributes(item, allowed_attributes=None):
     num_attrs = item.AttributesLength()
     attrs = [item.Attributes(i) for i in range(num_attrs)]
     attrs_dict = {
-        x.Key().decode('utf8'): x.Value().decode('utf8') if x.Value().decode('utf8') not in ['0'] else None
+        x.Key().decode('utf8'): x.Value().decode('utf8')
+        if x.Value().decode('utf8') not in ['0'] else None
         for x in attrs
     }
     if allowed_attributes:
         for attr in attrs_dict:
             if attr not in allowed_attributes:
                 raise Exception(
-                    'invalid XBR attribute  "{}" - must be one of {}'.format(attr, allowed_attributes))
+                    'invalid XBR attribute  "{}" - must be one of {}'.format(
+                        attr, allowed_attributes))
     return attrs_dict
 
 
 def extract_docs(item):
     num_docs = item.DocumentationLength()
     item_docs = [
-        item.Documentation(i).decode('utf8').strip()
-        for i in range(num_docs)
+        item.Documentation(i).decode('utf8').strip() for i in range(num_docs)
     ]
     return item_docs
 
@@ -191,11 +192,8 @@ def read_reflection_schema(buf, log=None):
             raise Exception('duplicate name '.format(name))
         service_cnt += 1
 
-    log.info(
-        'Processing schema with {} enums, {} objects and {} services ...'.format(
-            enum_cnt,
-            object_cnt,
-            service_cnt))
+    log.info('Processing schema with {} enums, {} objects and {} services ...'.
+             format(enum_cnt, object_cnt, service_cnt))
 
     # enums
     #
@@ -271,8 +269,8 @@ def read_reflection_schema(buf, log=None):
             _field_type = _field.Type()
 
             _field_index = int(_field_type.Index())
-            _field_base_type = _BASETYPE_ID2NAME.get(
-                _field_type.BaseType(), None)
+            _field_base_type = _BASETYPE_ID2NAME.get(_field_type.BaseType(),
+                                                     None)
 
             _field_element = _BASETYPE_ID2NAME.get(_field_type.Element(), None)
             if _field_element == 'none':
@@ -280,7 +278,8 @@ def read_reflection_schema(buf, log=None):
             if _field_element == 'object':
                 el = _schema.Objects(_field_type.Element())
                 if isinstance(el, reflection.Type) and hasattr(el, 'IsStruct'):
-                    _field_element = 'struct' if el.Element().IsStruct() else 'table'
+                    _field_element = 'struct' if el.Element().IsStruct(
+                    ) else 'table'
 
             field = {
                 # '_index': j,
@@ -299,7 +298,8 @@ def read_reflection_schema(buf, log=None):
                 # field['field_index'] = _field_index
 
                 if _field_base_type in [
-                        'object', 'struct'] or _field_element in ['object', 'struct']:
+                        'object', 'struct'
+                ] or _field_element in ['object', 'struct']:
 
                     # obj/struct
 
@@ -312,31 +312,23 @@ def read_reflection_schema(buf, log=None):
                         typerefs_cnt += 1
                     else:
                         log.info(
-                            'WARNING - referenced table/struct for index {} ("{}.{}") not found'.format(
-                                _field_index, obj_name, field_name))
+                            'WARNING - referenced table/struct for index {} ("{}.{}") not found'.
+                            format(_field_index, obj_name, field_name))
                         field['ref_category'] = 'object'
                         field['ref_type'] = None
                         typerefs_error_cnt += 1
 
-                elif _field_base_type in ['utype',
-                                          'bool',
-                                          'int8',
-                                          'uint8',
-                                          'int16',
-                                          'uint16',
-                                          'int32',
-                                          'uint32',
-                                          'int64',
-                                          'uint64',
-                                          'float',
-                                          'double',
-                                          'string']:
+                elif _field_base_type in [
+                        'utype', 'bool', 'int8', 'uint8', 'int16', 'uint16',
+                        'int32', 'uint32', 'int64', 'uint64', 'float',
+                        'double', 'string'
+                ]:
                     # enum
                     field['ref_category'] = 'enum'
 
                     if _field_index < _schema.EnumsLength():
-                        _enum_ref = _schema.Enums(
-                            _field_index).Name().decode('utf8')
+                        _enum_ref = _schema.Enums(_field_index).Name().decode(
+                            'utf8')
                         field['ref_type'] = _enum_ref
                         typerefs_cnt += 1
                     else:
@@ -345,12 +337,9 @@ def read_reflection_schema(buf, log=None):
                         typerefs_error_cnt += 1
 
                 else:
-                    raise Exception(
-                        'unhandled field type: {} {} {} {}'.format(
-                            field_name,
-                            _field_base_type,
-                            _field_element,
-                            _field_index))
+                    raise Exception('unhandled field type: {} {} {} {}'.format(
+                        field_name, _field_base_type, _field_element,
+                        _field_index))
 
             field_docs = extract_docs(_field)
             if field_docs:
@@ -394,7 +383,8 @@ def read_reflection_schema(buf, log=None):
         service_type = service_attrs_dict.get('type', None)
         if service_type != 'interface':
             raise Exception(
-                'invalid value "{}" for attribute "type" in XBR interface'.format(service_type))
+                'invalid value "{}" for attribute "type" in XBR interface'.
+                format(service_type))
 
         service = {
             # '_index': i,
@@ -421,8 +411,8 @@ def read_reflection_schema(buf, log=None):
             call_type = call_attrs_dict.get('type', None)
             if call_type not in INTERFACE_MEMBER_TYPES:
                 raise Exception(
-                    'invalid XBR interface member type "{}" - must be one of {}'.format(
-                        call_type, INTERFACE_MEMBER_TYPES))
+                    'invalid XBR interface member type "{}" - must be one of {}'.
+                    format(call_type, INTERFACE_MEMBER_TYPES))
 
             call_stream = call_attrs_dict.get('stream', None)
             if call_stream in ['none', 'None', 'null', 'Null']:
@@ -430,8 +420,8 @@ def read_reflection_schema(buf, log=None):
 
             if call_stream not in INTERFACE_MEMBER_STREAM_VALUES:
                 raise Exception(
-                    'invalid XBR interface member stream modifier "{}" - must be one of {}'.format(
-                        call_stream, INTERFACE_MEMBER_STREAM_VALUES))
+                    'invalid XBR interface member stream modifier "{}" - must be one of {}'.
+                    format(call_stream, INTERFACE_MEMBER_STREAM_VALUES))
 
             def _decode_type(x):
                 res = x.Name().decode('utf8')
@@ -468,7 +458,8 @@ def read_reflection_schema(buf, log=None):
 
     if typerefs_error_cnt:
         raise Exception(
-            '{} unresolved type references encountered in schema'.format(typerefs_error_cnt))
+            '{} unresolved type references encountered in schema'.format(
+                typerefs_error_cnt))
 
     schema['enums'] = sorted(enums, key=lambda enum: enum['name'])
     schema['tables'] = sorted(objects, key=lambda obj: obj['name'])
@@ -481,22 +472,16 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'infile',
-        help='FlatBuffers binary schema input file (.bfbs)')
+        'infile', help='FlatBuffers binary schema input file (.bfbs)')
     parser.add_argument(
-        '-o',
-        '--outfile',
-        help='FlatBuffers JSON schema output (.json)')
+        '-o', '--outfile', help='FlatBuffers JSON schema output (.json)')
     parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
         help='Enable verbose processing output.')
     parser.add_argument(
-        '-d',
-        '--debug',
-        action='store_true',
-        help='Enable debug output.')
+        '-d', '--debug', action='store_true', help='Enable debug output.')
 
     options = parser.parse_args()
 
@@ -507,7 +492,8 @@ if __name__ == '__main__':
     with open(infile_path, 'rb') as f:
         buf = f.read()
 
-    log.info('Loading FlatBuffers binary schema ({} bytes) ...'.format(len(buf)))
+    log.info('Loading FlatBuffers binary schema ({} bytes) ...'.format(
+        len(buf)))
 
     try:
         schema = read_reflection_schema(buf, log=log)
@@ -519,16 +505,19 @@ if __name__ == '__main__':
         schema['meta']['file_path'] = infile_path
 
     with open(options.outfile, 'wb') as f:
-        outdata = json.dumps(schema, ensure_ascii=False, sort_keys=False, indent=4,
-                             separators=(', ', ': ')).encode('utf8')
+        outdata = json.dumps(
+            schema,
+            ensure_ascii=False,
+            sort_keys=False,
+            indent=4,
+            separators=(', ', ': ')).encode('utf8')
         f.write(outdata)
 
     cnt_bytes = len(outdata)
     cnt_defs = len(schema['types'].keys())
     log.info(
         'FlatBuffers JSON schema data written ({} bytes, {} defs).'.format(
-            cnt_bytes,
-            cnt_defs))
+            cnt_bytes, cnt_defs))
 
     if options.verbose:
         log.info('Schema metadata:')
