@@ -74,6 +74,10 @@ autoformat:
 docs:
 	sphinx-build -b html ./docs ./docs/_build
 
+# spellcheck the docs
+docs_spelling:
+	sphinx-build -b spelling -d ./docs/_build/doctrees ./docs ./docs/_build/spelling
+	#sphinx-build -b spelling -d build/doctrees   source build/spelling
 
 # build source distribution and universal egg - which is what
 # we publish to pypi

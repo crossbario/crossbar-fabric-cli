@@ -86,7 +86,15 @@ release = __version__
 # ones.
 extensions = [
     #    'sphinxcontrib.xbr',
+    'sphinxcontrib.spelling',
 ]
+
+# extensions not available on RTD
+if spelling is not None:
+    extensions.append('sphinxcontrib.spelling')
+    spelling_lang = 'en_US'
+    spelling_show_suggestions = False
+    spelling_word_list_filename = 'spelling_wordlist.txt'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

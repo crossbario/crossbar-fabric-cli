@@ -9,4 +9,5 @@ pytest
 mypy
 sphinx
 sphinx_rtd_theme
+sphinxcontrib_spelling
 pyinstaller

@@ -13,3 +13,4 @@ Contents
    installation
    templates
    interfaces
+   workflow
